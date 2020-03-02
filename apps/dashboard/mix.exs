@@ -5,10 +5,10 @@ defmodule Dashboard.MixProject do
     [
       app: :dashboard,
       version: "0.1.0",
-      build_path: "../../_build",
-      config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
+      build_path: "./_build",
+      config_path: "./config/config.exs",
+      deps_path: "./deps",
+      lockfile: "./mix.lock",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -48,7 +48,9 @@ defmodule Dashboard.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:paper_trail, "~> 0.8.2"},
-      {:pow, "~> 1.0.18"}
+      {:pow, "~> 1.0.18"},
+      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
+      {:lims_client, in_umbrella: true}
     ]
   end
 
