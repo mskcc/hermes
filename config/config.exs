@@ -16,3 +16,10 @@ import Config
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 #
+# Configure this in "dev.secret.exs"
+config :lims_client,
+  url: "",
+  username: "",
+  password: ""
+
+import_config "#{Mix.env()}.secret.exs"
