@@ -8,10 +8,9 @@ RUN \
 
 RUN \
 	apk update && apk upgrade && \
-	apk add --no-cache --update postgresql-client && \
-    apk add --no-cache --update nodejs && \
-    apk add --no-cache --update npm && \
-    apk add --no-cache --update inotify-tools
+	apk add --no-cache --update postgresql-client inotify-tools && \
+    apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.11/main/ nodejs=12.15.0-r1 && \
+    apk add --no-cache --update npm
 	
 WORKDIR /app
 EXPOSE 4000
