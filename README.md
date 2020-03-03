@@ -11,4 +11,7 @@ apps/
 
 ## Configuration (TODO)
 ## Development (TODO)
+1. Install [Docker](https://docs.docker.com/compose/install/).
+2. `docker-compose up`
+
 ## Deployment (TODO)
