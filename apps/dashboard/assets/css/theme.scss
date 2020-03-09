@@ -80,3 +80,24 @@ nav.navbar {
 	max-height: 250px;
 	overflow-y: scroll;
 }
+
+/* For choice.js */
+.choices__placeholder {
+    top: 12px;
+    position: absolute;
+}
+.control.is-danger {
+    .choices__inner {
+        border-color: #f14668;
+    }
+
+}
+.select:not(.is-multiple):not(.is-loading)::after, .navbar-link:not(.is-arrowless)::after {
+    border: none;
+}
+div.select {
+    width: 100%;
+    .choices[data-type*="select-one"]::after {
+
+    }
+}

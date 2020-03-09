@@ -39,6 +39,10 @@ defmodule DashboardWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      import Phoenix.HTML.Form,
+        except: [label: 2, select: 3, select: 4, textarea: 2, submit: 1, input: 2, checkbox: 2, checkbox: 3]
+      import DashboardWeb.Helpers.Input
+
       import DashboardWeb.ErrorHelpers
       import DashboardWeb.Gettext
       alias DashboardWeb.Router.Helpers, as: Routes

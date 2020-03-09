@@ -1,6 +1,6 @@
 /* This file is for your main application css. */
 
+@import '~choices.js/public/assets/styles/choices.css';
 @import 'bulma';
-$fa-font-path: "~font-awesome/fonts";
-@import '~font-awesome/scss/font-awesome';
+@import '~@fortawesome/fontawesome-free/css/all.css';
 @import './theme.scss';
