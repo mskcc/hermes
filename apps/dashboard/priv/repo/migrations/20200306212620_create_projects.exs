@@ -7,6 +7,5 @@ defmodule Dashboard.Repo.Migrations.CreateProjects do
 
       timestamps()
     end
-
   end
 end

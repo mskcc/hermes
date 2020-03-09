@@ -75,6 +75,7 @@ defmodule DashboardWeb.SampleControllerTest do
     test "deletes chosen sample", %{conn: conn, sample: sample} do
       conn = delete(conn, Routes.sample_path(conn, :delete, sample))
       assert redirected_to(conn) == Routes.sample_path(conn, :index)
+
       assert_error_sent 404, fn ->
         get(conn, Routes.sample_path(conn, :show, sample))
       end

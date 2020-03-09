@@ -7,6 +7,5 @@ defmodule Dashboard.Repo.Migrations.CreateAssays do
 
       timestamps()
     end
-
   end
 end
