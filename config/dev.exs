@@ -6,7 +6,7 @@ config :dashboard, Dashboard.Repo,
   password: "postgres",
   database: "dashboard_dev",
   port: 5432,
-  hostname: "db",
+  hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 

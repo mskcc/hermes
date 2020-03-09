@@ -24,7 +24,7 @@ defmodule Dashboard.MixProject do
   def application do
     [
       mod: {Dashboard.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :paddle]
     ]
   end
 
@@ -37,9 +37,10 @@ defmodule Dashboard.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.12"},
+      {:phoenix, "~> 1.4.15"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},
+      {:phoenix_live_view, "~> 0.9"},
       {:ecto_sql, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
@@ -49,8 +50,8 @@ defmodule Dashboard.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:paper_trail, "~> 0.8.2"},
       {:pow, "~> 1.0.18"},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
-      {:lims_client, in_umbrella: true}
+      {:lims_client, in_umbrella: true},
+      {:paddle, "~> 0.1.0"}
     ]
   end
 

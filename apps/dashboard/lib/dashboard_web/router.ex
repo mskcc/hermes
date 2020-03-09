@@ -1,5 +1,6 @@
 defmodule DashboardWeb.Router do
   use DashboardWeb, :router
+  use Pow.Phoenix.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -13,10 +14,27 @@ defmodule DashboardWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", DashboardWeb do
+  pipeline :account do
+    plug :put_layout, {DashboardWeb.LayoutView, :account}
+  end
+
+  scope "/api/v1" do
+    pipe_through [:api]
+    # pipe_through [:api, :account]
+    get "/projects", DashboardWeb.Api.V1.ProjectController, :index
+    get "/assays", DashboardWeb.Api.V1.AssayController, :index
+  end
+
+  scope "/" do
     pipe_through :browser
+    pow_routes()
+  end
+
+  scope "/", DashboardWeb do
+    pipe_through [:browser, :account]
 
     get "/", PageController, :index
+    resources "/samples", SampleController
   end
 
   # Other scopes may use custom stacks.

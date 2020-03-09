@@ -1,0 +1,13 @@
+<h1>Show Sample</h1>
+
+<ul>
+
+  <li>
+    <strong>Mrn:</strong>
+    <%= @sample.mrn %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.sample_path(@conn, :edit, @sample) %></span>
+<span><%= link "Back", to: Routes.sample_path(@conn, :index) %></span>
