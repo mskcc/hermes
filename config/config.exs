@@ -23,13 +23,14 @@ config :lims_client,
   password: ""
 
 config :paddle, Paddle,
-  #host: "vsskiplappfm1.mskcc.root.mskcc.org",
+  # host: "vsskiplappfm1.mskcc.root.mskcc.org",
   host: "ldapha.mskcc.root.mskcc.org",
   base: "DC=MSKCC,DC=ROOT,DC=MSKCC,DC=ORG",
   ssl: true,
   port: 636
 
 import_config "config.dashboard.exs"
+
 config :pow,
   user: Dashboard.Users.User,
   users_context: Dashboard.Users.LDAPContext

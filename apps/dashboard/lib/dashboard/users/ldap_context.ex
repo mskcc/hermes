@@ -10,6 +10,7 @@ defmodule Dashboard.Users.LDAPContext do
     case Paddle.authenticate(params["email"], params["password"]) do
       {:ok} ->
         IO.inspect("We're good")
+
       {:error, message} ->
         IO.inspect("Wuh oh")
         IO.inspect(message)

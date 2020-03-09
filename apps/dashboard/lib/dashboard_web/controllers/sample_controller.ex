@@ -10,8 +10,7 @@ defmodule DashboardWeb.SampleController do
   end
 
   def new(conn, _params) do
-    changeset = Projects.change_sample(%Sample{
-    })
+    changeset = Projects.change_sample(%Sample{})
     render(conn, "new.html", changeset: changeset, projects: [], assays: [])
   end
 
@@ -23,8 +22,16 @@ defmodule DashboardWeb.SampleController do
         |> redirect(to: Routes.sample_path(conn, :show, sample))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        projects = if sample_params["project_id"], do: [Projects.get_project!(sample_params["project_id"])], else: []
-        assays = if sample_params["assay_id"], do: [Projects.get_assay!(sample_params["assay_id"])], else: []
+        projects =
+          if sample_params["project_id"],
+            do: [Projects.get_project!(sample_params["project_id"])],
+            else: []
+
+        assays =
+          if sample_params["assay_id"],
+            do: [Projects.get_assay!(sample_params["assay_id"])],
+            else: []
+
         render(conn, "new.html", changeset: changeset, projects: projects, assays: assays)
     end
   end
