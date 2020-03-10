@@ -1,0 +1,4 @@
+<div class="notification is-success">
+  <%= get_flash(@conn, :fragment_info) %>
+</div>
+<%= render "form.html", Map.put(assigns, :action, Routes.assay_path(@conn, :create, layout: false)) %>

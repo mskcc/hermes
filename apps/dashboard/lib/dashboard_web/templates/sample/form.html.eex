@@ -10,10 +10,20 @@
       <%= input f, :mrn, icon: "fa-user" %>
       <%= select f, :assay_id, Enum.map(@assays, &{&1.name, &1.id}), [data_url: "/api/v1/assays", add: true] %>
       <%= select f, :project_id, Enum.map(@projects, &{&1.name, &1.id}), [data_url: "/api/v1/projects", add: true] %>
-
-      <%= live_component @socket, RailwayUiWeb.MessageLive.SearchComponent, search: @search, id: :search %>
-
     </div>
   </div>
   <%= submit "Save" %>
 <% end %>
+
+<div id="assay_id-modal" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Create an Assay</p>
+    </header>
+    <section class="modal-card-body">
+      <%= render DashboardWeb.AssayView, "form.html", action: Routes.assay_path(@conn, :create, "layout": false), changeset: @assay_changeset %>
+    </section>
+  </div>
+  <button class="modal-close is-large" aria-label="close"></button>
+</div>

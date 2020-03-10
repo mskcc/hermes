@@ -35,6 +35,7 @@ defmodule DashboardWeb.Router do
 
     get "/", PageController, :index
     resources "/samples", SampleController
+    post "/assays", AssayController, :create
   end
 
   # Other scopes may use custom stacks.

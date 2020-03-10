@@ -3,6 +3,8 @@ defmodule DashboardWeb.SampleController do
 
   alias Dashboard.Projects
   alias Dashboard.Projects.Sample
+  alias Dashboard.Projects.Assay
+  alias Dashboard.Projects.Project
 
   def index(conn, _params) do
     samples = Projects.list_samples()
@@ -11,7 +13,16 @@ defmodule DashboardWeb.SampleController do
 
   def new(conn, _params) do
     changeset = Projects.change_sample(%Sample{})
-    render(conn, "new.html", changeset: changeset, projects: [], assays: [])
+    assay_changeset = Projects.change_assay(%Assay{})
+    project_changeset = Projects.change_project(%Project{})
+
+    render(conn, "new.html",
+      changeset: changeset,
+      projects: [],
+      assays: [],
+      assay_changeset: assay_changeset,
+      project_changeset: project_changeset
+    )
   end
 
   def create(conn, %{"sample" => sample_params}) do
@@ -32,7 +43,16 @@ defmodule DashboardWeb.SampleController do
             do: [Projects.get_assay!(sample_params["assay_id"])],
             else: []
 
-        render(conn, "new.html", changeset: changeset, projects: projects, assays: assays)
+        assay_changeset = Projects.change_assay(%Assay{})
+        project_changeset = Projects.change_project(%Project{})
+
+        render(conn, "new.html",
+          changeset: changeset,
+          projects: projects,
+          assays: assays,
+          assay_changeset: assay_changeset,
+          project_changeset: project_changeset
+        )
     end
   end
 

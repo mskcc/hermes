@@ -50,11 +50,12 @@ defmodule DashboardWeb.Helpers.Input do
   def select(form, field, options \\ [], opts \\ []) do
     {can_add, opts} = Keyword.pop(opts, :add)
 
-    IO.inspect(field)
-
     Phoenix.HTML.Tag.content_tag :div, class: "field" do
       error = DashboardWeb.ErrorHelpers.error_tag(form, field)
-      control_class = if form.errors[field], do: "control is-danger", else: "control"
+
+      control_class =
+        if form.errors[field], do: "control is-danger full-width", else: "control full-width"
+
       modal = ""
 
       field_class = "field" <> if can_add, do: " has-addons", else: ""
@@ -67,7 +68,7 @@ defmodule DashboardWeb.Helpers.Input do
               Phoenix.HTML.Tag.content_tag(
                 :div,
                 Phoenix.HTML.Form.select(form, field, options, opts),
-                class: "select"
+                class: "select full-width"
               )
             end,
             if(can_add,
@@ -83,10 +84,10 @@ defmodule DashboardWeb.Helpers.Input do
   end
 
   defp addon_button(opts \\ []) do
-    opts = Keyword.put(opts, :class, "control")
+    opts = Keyword.put(opts, :class, "button is-info")
 
-    Phoenix.HTML.Tag.content_tag :div, opts do
-      Phoenix.HTML.Tag.content_tag :div, class: "button is-info" do
+    Phoenix.HTML.Tag.content_tag :div, class: "control" do
+      Phoenix.HTML.Tag.content_tag :button, opts do
         icon("fa-plus")
       end
     end
