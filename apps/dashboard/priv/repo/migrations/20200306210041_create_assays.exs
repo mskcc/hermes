@@ -5,7 +5,7 @@ defmodule Dashboard.Repo.Migrations.CreateAssays do
     create table(:assays) do
       add :name, :string
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 end

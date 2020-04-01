@@ -51,7 +51,10 @@ defmodule Dashboard.MixProject do
       {:paper_trail, "~> 0.8.2"},
       {:pow, "~> 1.0.18"},
       {:lims_client, in_umbrella: true},
-      {:paddle, "~> 0.1.0"}
+      {:access_tracker_client, in_umbrella: true},
+      {:paddle, "~> 0.1.0"},
+      {:quantum, "~> 3.0-rc"},
+      {:ecto_enum, "~> 1.4"}
     ]
   end
 

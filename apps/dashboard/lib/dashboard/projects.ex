@@ -35,6 +35,22 @@ defmodule Dashboard.Projects do
   end
 
   @doc """
+  Gets a single assay by name.
+
+  Raises `Ecto.NoResultsError` if the Assay does not exist.
+
+  ## Examples
+
+      iex> get_assay_by_name("Access")
+      %Assay{}
+
+      iex> get_assay_by_name("Non-existent")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_assay_by_name!(name), do: Repo.get_by!(Assay, name: name)
+
+  @doc """
   Gets a single assay.
 
   Raises `Ecto.NoResultsError` if the Assay does not exist.
@@ -158,6 +174,22 @@ defmodule Dashboard.Projects do
 
   """
   def get_project!(id), do: Repo.get!(Project, id)
+
+  @doc """
+  Gets a single project by name.
+
+  Raises `Ecto.NoResultsError` if the Project does not exist.
+
+  ## Examples
+
+      iex> get_project_by_name!("Access")
+      %Project{}
+
+      iex> get_project_by_name!("Non-existent")
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_project_by_name!(name), do: Repo.get_by!(Project, name: name)
 
   @doc """
   Creates a project.
@@ -318,5 +350,52 @@ defmodule Dashboard.Projects do
   """
   def change_sample(%Sample{} = sample) do
     Sample.changeset(sample, %{})
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking sample changes.
+
+  ## Examples
+
+      iex> fetch_samples(sample)
+      %Ecto.Changeset{source: %Sample{}}
+
+  """
+  def fetch_samples() do
+    case AccessTrackerClient.fetch_samples() do
+      {:ok, body} ->
+        assay = get_assay_by_name!("Access")
+        project = get_project_by_name!("Access")
+
+        samples =
+          body["data"]
+          |> Enum.map(fn s ->
+            status =
+              if s["fieldData"]["Sample_Status"] == "",
+                do: nil,
+                else: s["fieldData"]["Sample_Status"]
+
+            [
+              mrn: s["fieldData"]["MRN"],
+              status: status,
+              tube_id: s["fieldData"]["TubeID"],
+              assay_id: assay.id,
+              project_id: project.id,
+              inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+              updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+            ]
+          end)
+
+        Dashboard.Repo.insert_all(
+          Sample,
+          samples,
+          on_conflict: :replace_all,
+          conflict_target: [:tube_id]
+        )
+
+      {:error, _status, body} ->
+        # TODO log/retry here
+        IO.inspect(body)
+    end
   end
 end
