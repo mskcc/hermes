@@ -5,7 +5,7 @@ defmodule Dashboard.Repo.Migrations.CreateProjects do
     create table(:projects) do
       add :name, :string
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
   end
 end

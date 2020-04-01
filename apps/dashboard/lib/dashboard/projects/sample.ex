@@ -3,18 +3,23 @@ defmodule Dashboard.Projects.Sample do
   import Ecto.Changeset
   alias Dashboard.Projects
 
+  @default_role SampleStatusEnum.__enum_map__()[:New]
+
   schema "samples" do
     field :mrn, :string
+    field :tube_id, :string
+    field :status, SampleStatusEnum, default: @default_status
     belongs_to :project, Projects.Project
     belongs_to :assay, Projects.Assay
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(sample, attrs) do
     sample
-    |> cast(attrs, [:mrn, :project_id, :assay_id])
-    |> validate_required([:mrn, :project_id, :assay_id])
+    |> cast(attrs, [:mrn, :project_id, :assay_id, :tube_id])
+    |> validate_required([:project_id, :assay_id, :tube_id])
+    |> unique_constraint([:tube_id])
   end
 end

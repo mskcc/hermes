@@ -11,7 +11,7 @@ defmodule DashboardWeb.AssayController do
     case Projects.create_assay(assay_params) do
       {:ok, assay} ->
         conn
-        |> put_flash(:fragment_info, "Assay #{assay.name} created successfully.")
+        |> put_flash(:info, "Assay #{assay.name} created successfully.")
         |> render("new.html", changeset: changeset, layout: false)
 
       {:error, %Ecto.Changeset{} = changeset} ->

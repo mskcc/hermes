@@ -5,7 +5,7 @@ defmodule Dashboard.Projects.Project do
   schema "projects" do
     field :name, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false

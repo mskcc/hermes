@@ -11,9 +11,10 @@ defmodule Dashboard.Application do
       # Start the Ecto repository
       Dashboard.Repo,
       # Start the endpoint when the application starts
-      DashboardWeb.Endpoint
+      DashboardWeb.Endpoint,
       # Starts a worker by calling: Dashboard.Worker.start_link(arg)
       # {Dashboard.Worker, arg},
+      Dashboard.Scheduler
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

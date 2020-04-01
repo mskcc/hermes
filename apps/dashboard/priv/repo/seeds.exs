@@ -9,3 +9,11 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+Dashboard.Repo.insert!(%Dashboard.Projects.Project{
+  name: "Access"
+})
+
+Dashboard.Repo.insert!(%Dashboard.Projects.Assay{
+  name: "Access"
+})

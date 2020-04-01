@@ -4,13 +4,12 @@ defmodule Dashboard.Repo.Migrations.CreateUsers do
   def change do
     create table(:users) do
       add :email, :string
-      add :username, :string
       add :password_hash, :string
+      add :role, RoleEnum.type()
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create unique_index(:users, [:email])
-    create unique_index(:users, [:username])
   end
 end

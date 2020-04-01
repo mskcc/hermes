@@ -15,22 +15,34 @@
         <div id="navMenu" class="navbar-menu">
           <div class="navbar-start">
             <a class="navbar-item">
-              Dashboard 
+              <%= link "Dashboard", to: Routes.page_path(@conn, :index), class: "navbar-item" %>
             </a>
             <a class="navbar-item">
-              Samples
+              <%= link "Samples", to: Routes.sample_path(@conn, :index), class: "navbar-item" %>
             </a>
             <a class="navbar-item" href="admin.html">
-              Users 
+              <%= link "Users", to: Routes.sample_path(@conn, :index), class: "navbar-item" %>
             </a>
           </div>
 
+        <div class="navbar-end">
+          <%= link "Sign out", to: Routes.pow_session_path(@conn, :delete), method: :delete, class: "navbar-item" %>
         </div>
       </div>
     </nav>
   </header>
-  <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-  <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+
+  <%= if get_flash(@conn, :info) do  %>
+    <div class="notification is-success">
+    <%= get_flash(@conn, :info) %>
+    </div>
+  <%end%>
+
+  <%= if get_flash(@conn, :info) do  %>
+    <div class="notification is-danger">
+    <%= get_flash(@conn, :error) %>
+    </div>
+  <%end%>
   <main role="main" class="container">
     <div class="columns">
       <div class="column is-2 ">
@@ -40,7 +52,9 @@
           </p>
           <ul class="menu-list">
             <li><a class="is-active">Dashboard</a></li>
-            <li><a>Samples</a></li>
+            <li>
+              <%= link "Samples", to: Routes.sample_path(@conn, :index) %>
+            </li>
             <li><a>Tags</a></li>
           </ul>
           <p class="menu-label">

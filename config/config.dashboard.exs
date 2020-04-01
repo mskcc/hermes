@@ -28,3 +28,9 @@ config :logger, :console,
 config :phoenix,
   json_library: Jason,
   template_engines: [leex: Phoenix.LiveView.Engine]
+
+config :dashboard, Dashboard.Scheduler,
+  jobs: [
+    # Every 15 minutes
+    # {"*/15 * * * *",   {Dashboard, :pull_samples}},
+  ]
