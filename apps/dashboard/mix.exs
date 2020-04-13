@@ -56,7 +56,7 @@ defmodule Dashboard.MixProject do
       {:quantum, "~> 3.0-rc"},
       {:ecto_enum, "~> 1.4"},
       {:paginator, "~> 0.6"},
-      {:timex, "~> 3.5"},
+      {:timex, "~> 3.5"}
     ]
   end
 

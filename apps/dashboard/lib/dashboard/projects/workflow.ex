@@ -9,7 +9,8 @@ defmodule Dashboard.Projects.Workflow do
     field :name, :string
     belongs_to :job, Projects.Job
     field :status, WorkflowStatusEnum, default: @default_status
-    #TODO link to Beagle
+
+    # TODO link to Beagle
 
     timestamps()
   end

@@ -6,10 +6,13 @@ defmodule LimsClient do
   """
   @url Application.fetch_env!(:lims_client, :url)
 
-  plug Tesla.Middleware.BaseUrl, @url
-  plug Tesla.Middleware.JSON
+  plug(Tesla.Middleware.BaseUrl, @url)
+  plug(Tesla.Middleware.JSON)
 
-  plug Tesla.Middleware.BasicAuth, username: Application.fetch_env!(:lims_client, :username), password: Application.fetch_env!(:lims_client, :password)
+  plug(Tesla.Middleware.BasicAuth,
+    username: Application.fetch_env!(:lims_client, :username),
+    password: Application.fetch_env!(:lims_client, :password)
+  )
 
   @doc """
   Fetch Samples
@@ -21,12 +24,13 @@ defmodule LimsClient do
 
   """
   def fetch_sample_manifests(samples) do
-    query = samples
-      |> Enum.map(&("igoSampleId=#{&1}"))
+    query =
+      samples
+      |> Enum.map(&"igoSampleId=#{&1}")
       |> Enum.join("&")
 
     get("/api/getSampleManifest?" <> query)
-      |> process_response
+    |> process_response
   end
 
   @doc false

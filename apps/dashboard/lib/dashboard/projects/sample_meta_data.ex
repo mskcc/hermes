@@ -4,10 +4,11 @@ defmodule Dashboard.Projects.SampleMetaData do
 
   schema "sample_meta_data" do
     field :lims, :map
-    #embeds_one :price, Price, on_replace: :delete do
+
+    # embeds_one :price, Price, on_replace: :delete do
     #  field :amount, Drycargo.Finance.Types.Amount
     #  field :currency, :string, default: "USD"
-    #end
+    # end
 
     timestamps()
   end

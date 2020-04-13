@@ -20,7 +20,6 @@ config :dashboard, DashboardWeb.Endpoint,
   signing_salt: "nqwpPBDBb2YSoPct1bYHSy0xvfr9M5xBgnXdduyz4r2B7qOPzgaUwFIzbx0fB8H0",
   live_view: [signing_salt: "H88ziZ8BtRa35bZpaNoWVhDOFJMivKiI"]
 
-
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

@@ -153,13 +153,16 @@ defmodule Dashboard.Projects do
 
   """
   def list_projects(%{page: page, per_page: per_page, sort_by: sort_by, filters: filters}) do
-    sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end) # invert
+    # invert
+    sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end)
     IO.inspect(filters)
-    filters = if Map.has_key?(filters, :name) do
-      dynamic([p], (ilike(p.name, ^"%#{filters[:name]}%")))
-    else
-      []
-    end
+
+    filters =
+      if Map.has_key?(filters, :name) do
+        dynamic([p], ilike(p.name, ^"%#{filters[:name]}%"))
+      else
+        []
+      end
 
     count = Repo.one(from s in Project, select: count(s.id), where: ^filters)
 
@@ -170,14 +173,15 @@ defmodule Dashboard.Projects do
       select_merge: %{sub_thing_count: count(s.id)}
     """
 
-    entries = Repo.all(
-      from u in Project,
-        offset: ^((page - 1) * per_page),
-        limit: ^per_page,
-        order_by: ^sort_by,
-        where: ^filters,
-        preload: [:samples]
-    )
+    entries =
+      Repo.all(
+        from u in Project,
+          offset: ^((page - 1) * per_page),
+          limit: ^per_page,
+          order_by: ^sort_by,
+          where: ^filters,
+          preload: [:samples]
+      )
 
     %{entries: entries, count: count}
   end
@@ -228,12 +232,14 @@ defmodule Dashboard.Projects do
   def get_project_by_name!(name), do: Repo.get_by!(Project, name: name)
 
   def find_or_create_project(project_params) do
-    query = %Project{}
-            |> Project.changeset(project_params)
-            |> Repo.insert
+    query =
+      %Project{}
+      |> Project.changeset(project_params)
+      |> Repo.insert()
+
     case query do
       {:ok, project} -> project
-      {:error, changeset} -> Repo.one from u in Project, where: ^Enum.to_list(changeset.changes)
+      {:error, changeset} -> Repo.one(from u in Project, where: ^Enum.to_list(changeset.changes))
     end
   end
 
@@ -314,24 +320,31 @@ defmodule Dashboard.Projects do
 
   """
   def list_samples(%{page: page, per_page: per_page, sort_by: sort_by, filters: filters}) do
-    sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end) # invert
+    # invert
+    sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end)
     IO.inspect(filters)
-    filters = if Map.has_key?(filters, :mrn) do
-      dynamic([p], (ilike(p.mrn, ^"%#{filters[:mrn]}%") or ilike(p.tube_id, ^"%#{filters[:mrn]}%")))
-    else
-      []
-    end
+
+    filters =
+      if Map.has_key?(filters, :mrn) do
+        dynamic(
+          [p],
+          ilike(p.mrn, ^"%#{filters[:mrn]}%") or ilike(p.tube_id, ^"%#{filters[:mrn]}%")
+        )
+      else
+        []
+      end
 
     count = Repo.one(from s in Sample, select: count(s.id), where: ^filters)
 
-    entries = Repo.all(
-      from u in Sample,
-        offset: ^((page - 1) * per_page),
-        limit: ^per_page,
-        order_by: ^sort_by,
-        where: ^filters,
-        preload: [:project, job: :workflows ]
-    )
+    entries =
+      Repo.all(
+        from u in Sample,
+          offset: ^((page - 1) * per_page),
+          limit: ^per_page,
+          order_by: ^sort_by,
+          where: ^filters,
+          preload: [:project, job: :workflows]
+      )
 
     %{entries: entries, count: count}
   end
@@ -444,7 +457,7 @@ defmodule Dashboard.Projects do
               status: status,
               tube_id: s["fieldData"]["TubeID"],
               assay_id: assay.id,
-              #TODO add a cache for this....
+              # TODO add a cache for this....
               project_id: find_or_create_project(%{"name" => s["fieldData"]["Study_Code"]}).id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
