@@ -16,6 +16,10 @@ defmodule Seqosystem.MixProject do
   #
   # Run "mix help deps" for examples and options.
   defp deps do
-    [{:jason, ">= 1.0.0"}, {:git_hooks, "~> 0.4.1", only: [:test, :dev], runtime: false}]
+    [
+      {:dialyxir, "~> 1.0", only: [:dev]},
+      {:jason, ">= 1.0.0"},
+      {:git_hooks, "~> 0.4.1", only: [:test, :dev], runtime: false}
+    ]
   end
 end
