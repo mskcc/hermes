@@ -5,7 +5,7 @@
     </div>
   <% end %>
 
-  <%= input f, Pow.Ecto.Schema.user_id_field(@changeset), label: "Username", placeholder: "e.g. doej", icon: "fa-envelope", required: true %>
+  <%= input f, Pow.Ecto.Schema.user_id_field(@changeset), label: "Username", placeholder: "e.g. doej@mskcc.org", icon: "fa-envelope", required: true %>
 
   <%= input f, :password, label: "Password", placeholder: "********", icon: "fa-lock", required: true%>
 

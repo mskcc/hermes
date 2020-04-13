@@ -1,0 +1,5 @@
+<h1>Edit Workflow</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.workflow_path(@conn, :update, @workflow)) %>
+
+<span><%= link "Back", to: Routes.workflow_path(@conn, :index) %></span>

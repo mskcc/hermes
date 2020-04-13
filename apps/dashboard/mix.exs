@@ -37,10 +37,10 @@ defmodule Dashboard.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.15"},
+      {:phoenix, "~> 1.4.16"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},
-      {:phoenix_live_view, "~> 0.9"},
+      {:phoenix_live_view, "~> 0.10"},
       {:ecto_sql, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
@@ -54,7 +54,9 @@ defmodule Dashboard.MixProject do
       {:access_tracker_client, in_umbrella: true},
       {:paddle, "~> 0.1.0"},
       {:quantum, "~> 3.0-rc"},
-      {:ecto_enum, "~> 1.4"}
+      {:ecto_enum, "~> 1.4"},
+      {:paginator, "~> 0.6"},
+      {:timex, "~> 3.5"},
     ]
   end
 

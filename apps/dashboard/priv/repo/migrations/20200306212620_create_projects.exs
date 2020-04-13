@@ -7,5 +7,7 @@ defmodule Dashboard.Repo.Migrations.CreateProjects do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:projects, [:name])
   end
 end

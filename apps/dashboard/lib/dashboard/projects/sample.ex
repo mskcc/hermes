@@ -9,6 +9,8 @@ defmodule Dashboard.Projects.Sample do
     field :mrn, :string
     field :tube_id, :string
     field :status, SampleStatusEnum, default: @default_status
+    has_many :jobs, Projects.Job
+    has_one :job, Projects.Job
     belongs_to :project, Projects.Project
     belongs_to :assay, Projects.Assay
 

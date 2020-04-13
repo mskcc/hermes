@@ -17,7 +17,9 @@ config :dashboard, DashboardWeb.Endpoint,
   secret_key_base: "UaLWCWni+61uYpy7J+z6g2c1jw9MOY4FPW+8tM1ZWK6GP3rkR1CQs7AjWjv2m6yt",
   render_errors: [view: DashboardWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Dashboard.PubSub, adapter: Phoenix.PubSub.PG2],
-  signing_salt: "ASKDFIJsdfijasDIfjasidfjaSFIJ#$j34j3j23j42ASD)f0aSdfjasDfjasDJfsdf"
+  signing_salt: "nqwpPBDBb2YSoPct1bYHSy0xvfr9M5xBgnXdduyz4r2B7qOPzgaUwFIzbx0fB8H0",
+  live_view: [signing_salt: "H88ziZ8BtRa35bZpaNoWVhDOFJMivKiI"]
+
 
 # Configures Elixir's Logger
 config :logger, :console,

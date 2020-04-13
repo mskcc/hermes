@@ -7,8 +7,7 @@ defmodule DashboardWeb.SampleController do
   alias Dashboard.Projects.Project
 
   def index(conn, _params) do
-    samples = Projects.list_samples()
-    render(conn, "index.html", samples: samples)
+    render(conn, "index.html")
   end
 
   def new(conn, _params) do

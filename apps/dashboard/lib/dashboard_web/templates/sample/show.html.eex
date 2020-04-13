@@ -1,13 +1,24 @@
-<h1>Show Sample</h1>
+<h3 class="title">Sample: <%=@sample.tube_id%></h3>
 
-<ul>
+<div class="container">
+<h4 class="title is-4">Metadata</h4>
+<div id="meta-data-editor"></div>
+</div>
 
-  <li>
-    <strong>Mrn:</strong>
-    <%= @sample.mrn %>
-  </li>
+<div class="container">
+  <h4 class="title is-4">Jobs</h4>
+  <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
+    <thead>
+      <tr>
+        <th>Job</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-</ul>
-
-<span><%= link "Edit", to: Routes.sample_path(@conn, :edit, @sample) %></span>
-<span><%= link "Back", to: Routes.sample_path(@conn, :index) %></span>
+<script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/samples-show.js") %>"></script>

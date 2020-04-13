@@ -16,10 +16,13 @@ import "phoenix_html"
 // Local files can be imported directly using relative paths, for example:
 // import socket from "./socket"
 
+import {Socket} from "phoenix"
+import {LiveSocket, debug} from "phoenix_live_view"
 /* Choice.js Start */
 import Choices from "choices.js"
 import debounce from "lodash/debounce"
 import throttle from "lodash/throttle"
+
 const select = document.querySelectorAll(`select[data-url]`);
 select.forEach(elem => {
     const choice = new Choices(elem);
@@ -74,3 +77,9 @@ document.querySelectorAll(".modal-background").forEach(m => m.addEventListener("
     e.target.parentElement.classList.remove("is-active");
 }));
 /* Modal End */
+
+const Hooks = {}
+const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+const liveSocket = new LiveSocket("/live", Socket, {hooks: Hooks, params: {_csrf_token: csrfToken}})
+
+liveSocket.connect()
