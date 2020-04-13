@@ -75,6 +75,7 @@ defmodule DashboardWeb.WorkflowControllerTest do
     test "deletes chosen workflow", %{conn: conn, workflow: workflow} do
       conn = delete(conn, Routes.workflow_path(conn, :delete, workflow))
       assert redirected_to(conn) == Routes.workflow_path(conn, :index)
+
       assert_error_sent 404, fn ->
         get(conn, Routes.workflow_path(conn, :show, workflow))
       end

@@ -325,7 +325,9 @@ defmodule Dashboard.ProjectsTest do
     end
 
     test "create_sample_meta_data/1 with valid data creates a sample_meta_data" do
-      assert {:ok, %SampleMetaData{} = sample_meta_data} = Projects.create_sample_meta_data(@valid_attrs)
+      assert {:ok, %SampleMetaData{} = sample_meta_data} =
+               Projects.create_sample_meta_data(@valid_attrs)
+
       assert sample_meta_data.lims == %{}
     end
 
@@ -335,20 +337,29 @@ defmodule Dashboard.ProjectsTest do
 
     test "update_sample_meta_data/2 with valid data updates the sample_meta_data" do
       sample_meta_data = sample_meta_data_fixture()
-      assert {:ok, %SampleMetaData{} = sample_meta_data} = Projects.update_sample_meta_data(sample_meta_data, @update_attrs)
+
+      assert {:ok, %SampleMetaData{} = sample_meta_data} =
+               Projects.update_sample_meta_data(sample_meta_data, @update_attrs)
+
       assert sample_meta_data.lims == %{}
     end
 
     test "update_sample_meta_data/2 with invalid data returns error changeset" do
       sample_meta_data = sample_meta_data_fixture()
-      assert {:error, %Ecto.Changeset{}} = Projects.update_sample_meta_data(sample_meta_data, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Projects.update_sample_meta_data(sample_meta_data, @invalid_attrs)
+
       assert sample_meta_data == Projects.get_sample_meta_data!(sample_meta_data.id)
     end
 
     test "delete_sample_meta_data/1 deletes the sample_meta_data" do
       sample_meta_data = sample_meta_data_fixture()
       assert {:ok, %SampleMetaData{}} = Projects.delete_sample_meta_data(sample_meta_data)
-      assert_raise Ecto.NoResultsError, fn -> Projects.get_sample_meta_data!(sample_meta_data.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Projects.get_sample_meta_data!(sample_meta_data.id)
+      end
     end
 
     test "change_sample_meta_data/1 returns a sample_meta_data changeset" do

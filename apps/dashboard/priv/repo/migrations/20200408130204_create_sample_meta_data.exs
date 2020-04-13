@@ -7,6 +7,5 @@ defmodule Dashboard.Repo.Migrations.CreateSampleMetaData do
 
       timestamps()
     end
-
   end
 end

@@ -75,6 +75,7 @@ defmodule DashboardWeb.JobControllerTest do
     test "deletes chosen job", %{conn: conn, job: job} do
       conn = delete(conn, Routes.job_path(conn, :delete, job))
       assert redirected_to(conn) == Routes.job_path(conn, :index)
+
       assert_error_sent 404, fn ->
         get(conn, Routes.job_path(conn, :show, job))
       end
