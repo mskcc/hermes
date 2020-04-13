@@ -142,8 +142,44 @@ defmodule Dashboard.Projects do
       [%Project{}, ...]
 
   """
-  def list_projects do
-    Repo.all(Project)
+
+  @doc """
+  Returns the list of projects
+
+  ## Examples
+
+      iex> list_projects(10, 20, sort_by, %{"name" => "fuzzy search"})
+      [%Project{}, ...]
+
+  """
+  def list_projects(%{page: page, per_page: per_page, sort_by: sort_by, filters: filters}) do
+    sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end) # invert
+    IO.inspect(filters)
+    filters = if Map.has_key?(filters, :name) do
+      dynamic([p], (ilike(p.name, ^"%#{filters[:name]}%")))
+    else
+      []
+    end
+
+    count = Repo.one(from s in Project, select: count(s.id), where: ^filters)
+
+    """
+    query = from t in Project,
+      join: s in assoc(s, :sub_thing),
+      group_by: t.id,
+      select_merge: %{sub_thing_count: count(s.id)}
+    """
+
+    entries = Repo.all(
+      from u in Project,
+        offset: ^((page - 1) * per_page),
+        limit: ^per_page,
+        order_by: ^sort_by,
+        where: ^filters,
+        preload: [:samples]
+    )
+
+    %{entries: entries, count: count}
   end
 
   @doc """
@@ -190,6 +226,16 @@ defmodule Dashboard.Projects do
 
   """
   def get_project_by_name!(name), do: Repo.get_by!(Project, name: name)
+
+  def find_or_create_project(project_params) do
+    query = %Project{}
+            |> Project.changeset(project_params)
+            |> Repo.insert
+    case query do
+      {:ok, project} -> project
+      {:error, changeset} -> Repo.one from u in Project, where: ^Enum.to_list(changeset.changes)
+    end
+  end
 
   @doc """
   Creates a project.
@@ -263,12 +309,31 @@ defmodule Dashboard.Projects do
 
   ## Examples
 
-      iex> list_samples()
+      iex> list_samples(10, 20, sort_by, %{"mrn" => "fuzzy search"})
       [%Sample{}, ...]
 
   """
-  def list_samples do
-    Repo.all(Sample)
+  def list_samples(%{page: page, per_page: per_page, sort_by: sort_by, filters: filters}) do
+    sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end) # invert
+    IO.inspect(filters)
+    filters = if Map.has_key?(filters, :mrn) do
+      dynamic([p], (ilike(p.mrn, ^"%#{filters[:mrn]}%") or ilike(p.tube_id, ^"%#{filters[:mrn]}%")))
+    else
+      []
+    end
+
+    count = Repo.one(from s in Sample, select: count(s.id), where: ^filters)
+
+    entries = Repo.all(
+      from u in Sample,
+        offset: ^((page - 1) * per_page),
+        limit: ^per_page,
+        order_by: ^sort_by,
+        where: ^filters,
+        preload: [:project, job: :workflows ]
+    )
+
+    %{entries: entries, count: count}
   end
 
   @doc """
@@ -365,7 +430,6 @@ defmodule Dashboard.Projects do
     case AccessTrackerClient.fetch_samples() do
       {:ok, body} ->
         assay = get_assay_by_name!("Access")
-        project = get_project_by_name!("Access")
 
         samples =
           body["data"]
@@ -380,7 +444,8 @@ defmodule Dashboard.Projects do
               status: status,
               tube_id: s["fieldData"]["TubeID"],
               assay_id: assay.id,
-              project_id: project.id,
+              #TODO add a cache for this....
+              project_id: find_or_create_project(%{"name" => s["fieldData"]["Study_Code"]}).id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
             ]
@@ -397,5 +462,293 @@ defmodule Dashboard.Projects do
         # TODO log/retry here
         IO.inspect(body)
     end
+  end
+
+  alias Dashboard.Projects.Job
+
+  @doc """
+  Returns the list of jobs.
+
+  ## Examples
+
+      iex> list_jobs()
+      [%Job{}, ...]
+
+  """
+  def list_jobs do
+    Repo.all(Job)
+  end
+
+  @doc """
+  Gets a single job.
+
+  Raises `Ecto.NoResultsError` if the Job does not exist.
+
+  ## Examples
+
+      iex> get_job!(123)
+      %Job{}
+
+      iex> get_job!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_job!(id), do: Repo.get!(Job, id)
+
+  @doc """
+  Creates a job.
+
+  ## Examples
+
+      iex> create_job(%{field: value})
+      {:ok, %Job{}}
+
+      iex> create_job(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_job(attrs \\ %{}) do
+    %Job{}
+    |> Job.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a job.
+
+  ## Examples
+
+      iex> update_job(job, %{field: new_value})
+      {:ok, %Job{}}
+
+      iex> update_job(job, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_job(%Job{} = job, attrs) do
+    job
+    |> Job.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a job.
+
+  ## Examples
+
+      iex> delete_job(job)
+      {:ok, %Job{}}
+
+      iex> delete_job(job)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_job(%Job{} = job) do
+    Repo.delete(job)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking job changes.
+
+  ## Examples
+
+      iex> change_job(job)
+      %Ecto.Changeset{source: %Job{}}
+
+  """
+  def change_job(%Job{} = job) do
+    Job.changeset(job, %{})
+  end
+
+  alias Dashboard.Projects.Workflow
+
+  @doc """
+  Returns the list of workflows.
+
+  ## Examples
+
+      iex> list_workflows()
+      [%Workflow{}, ...]
+
+  """
+  def list_workflows do
+    Repo.all(Workflow)
+  end
+
+  @doc """
+  Gets a single workflow.
+
+  Raises `Ecto.NoResultsError` if the Workflow does not exist.
+
+  ## Examples
+
+      iex> get_workflow!(123)
+      %Workflow{}
+
+      iex> get_workflow!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_workflow!(id), do: Repo.get!(Workflow, id)
+
+  @doc """
+  Creates a workflow.
+
+  ## Examples
+
+      iex> create_workflow(%{field: value})
+      {:ok, %Workflow{}}
+
+      iex> create_workflow(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_workflow(attrs \\ %{}) do
+    %Workflow{}
+    |> Workflow.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a workflow.
+
+  ## Examples
+
+      iex> update_workflow(workflow, %{field: new_value})
+      {:ok, %Workflow{}}
+
+      iex> update_workflow(workflow, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_workflow(%Workflow{} = workflow, attrs) do
+    workflow
+    |> Workflow.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a workflow.
+
+  ## Examples
+
+      iex> delete_workflow(workflow)
+      {:ok, %Workflow{}}
+
+      iex> delete_workflow(workflow)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_workflow(%Workflow{} = workflow) do
+    Repo.delete(workflow)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking workflow changes.
+
+  ## Examples
+
+      iex> change_workflow(workflow)
+      %Ecto.Changeset{source: %Workflow{}}
+
+  """
+  def change_workflow(%Workflow{} = workflow) do
+    Workflow.changeset(workflow, %{})
+  end
+
+  alias Dashboard.Projects.SampleMetaData
+
+  @doc """
+  Returns the list of sample_meta_data.
+
+  ## Examples
+
+      iex> list_sample_meta_data()
+      [%SampleMetaData{}, ...]
+
+  """
+  def list_sample_meta_data do
+    Repo.all(SampleMetaData)
+  end
+
+  @doc """
+  Gets a single sample_meta_data.
+
+  Raises `Ecto.NoResultsError` if the Sample meta data does not exist.
+
+  ## Examples
+
+      iex> get_sample_meta_data!(123)
+      %SampleMetaData{}
+
+      iex> get_sample_meta_data!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_sample_meta_data!(id), do: Repo.get!(SampleMetaData, id)
+
+  @doc """
+  Creates a sample_meta_data.
+
+  ## Examples
+
+      iex> create_sample_meta_data(%{field: value})
+      {:ok, %SampleMetaData{}}
+
+      iex> create_sample_meta_data(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_sample_meta_data(attrs \\ %{}) do
+    %SampleMetaData{}
+    |> SampleMetaData.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a sample_meta_data.
+
+  ## Examples
+
+      iex> update_sample_meta_data(sample_meta_data, %{field: new_value})
+      {:ok, %SampleMetaData{}}
+
+      iex> update_sample_meta_data(sample_meta_data, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_sample_meta_data(%SampleMetaData{} = sample_meta_data, attrs) do
+    sample_meta_data
+    |> SampleMetaData.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a sample_meta_data.
+
+  ## Examples
+
+      iex> delete_sample_meta_data(sample_meta_data)
+      {:ok, %SampleMetaData{}}
+
+      iex> delete_sample_meta_data(sample_meta_data)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_sample_meta_data(%SampleMetaData{} = sample_meta_data) do
+    Repo.delete(sample_meta_data)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking sample_meta_data changes.
+
+  ## Examples
+
+      iex> change_sample_meta_data(sample_meta_data)
+      %Ecto.Changeset{source: %SampleMetaData{}}
+
+  """
+  def change_sample_meta_data(%SampleMetaData{} = sample_meta_data) do
+    SampleMetaData.changeset(sample_meta_data, %{})
   end
 end

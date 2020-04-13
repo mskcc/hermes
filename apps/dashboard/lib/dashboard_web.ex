@@ -24,6 +24,7 @@ defmodule DashboardWeb do
       import Plug.Conn
       import DashboardWeb.Gettext
       alias DashboardWeb.Router.Helpers, as: Routes
+      import Phoenix.LiveView.Controller, only: [live_render: 3]
     end
   end
 
@@ -55,7 +56,10 @@ defmodule DashboardWeb do
 
       import DashboardWeb.ErrorHelpers
       import DashboardWeb.Gettext
+      import Phoenix.LiveView.Helpers
       alias DashboardWeb.Router.Helpers, as: Routes
+      alias DashboardWeb.Helpers.Table
+      alias DashboardWeb.Helpers.Date
     end
   end
 
@@ -64,6 +68,7 @@ defmodule DashboardWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 

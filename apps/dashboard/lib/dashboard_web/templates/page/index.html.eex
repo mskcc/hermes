@@ -11,19 +11,19 @@
   <div class="tile is-ancestor has-text-centered">
     <div class="tile is-parent">
       <article class="tile is-child box">
-        <p class="title">102</p>
+        <p class="title">0</p>
         <p class="subtitle">Samples Running</p>
       </article>
     </div>
     <div class="tile is-parent">
       <article class="tile is-child box">
-        <p class="title">12</p>
+        <p class="title">0</p>
         <p class="subtitle">Samples Completed</p>
       </article>
     </div>
     <div class="tile is-parent">
       <article class="tile is-child box">
-        <p class="title">43</p>
+        <p class="title">0</p>
         <p class="subtitle">Samples Failed</p>
       </article>
     </div>
@@ -34,7 +34,7 @@
     <div class="card events-card">
       <header class="card-header">
         <p class="card-header-title">
-          Recently Updated Samples
+          Recently Added Samples
         </p>
         <a href="#" class="card-header-icon" aria-label="more options">
           <span class="icon">
@@ -46,51 +46,13 @@
         <div class="content">
           <table class="table is-fullwidth is-striped">
             <tbody>
+              <%= for sample <- @recently_added_samples.entries do%>
               <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
+                <td width="5%"></td>
+                <td><%=sample.tube_id%></td>
                 <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
               </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
+              <% end %>
             </tbody>
           </table>
         </div>
@@ -105,7 +67,7 @@
     <div class="card events-card">
       <header class="card-header">
         <p class="card-header-title">
-          Recently Updated Samples
+          Recently Updated Workflows 
         </p>
         <a href="#" class="card-header-icon" aria-label="more options">
           <span class="icon">
@@ -117,46 +79,6 @@
         <div class="content">
           <table class="table is-fullwidth is-striped">
             <tbody>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
-              <tr>
-                <td width="5%"><i class="fa fa-bell-o"></i></td>
-                <td>Lorum ipsum dolem aire</td>
-                <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
-              </tr>
               <tr>
                 <td width="5%"><i class="fa fa-bell-o"></i></td>
                 <td>Lorum ipsum dolem aire</td>

@@ -1,5 +1,6 @@
 import EctoEnum
 defenum(RoleEnum, normal: 0, admin: 10)
+defenum(WorkflowStatusEnum, pending: 0, running: 10, success: 20, failure: 30)
 
 defenum(SampleStatusEnum,
   "Project in discussion": 0,

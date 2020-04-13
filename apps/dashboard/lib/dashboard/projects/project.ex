@@ -4,6 +4,7 @@ defmodule Dashboard.Projects.Project do
 
   schema "projects" do
     field :name, :string
+    has_many :samples, Dashboard.Projects.Sample
 
     timestamps(type: :utc_datetime)
   end
@@ -13,5 +14,6 @@ defmodule Dashboard.Projects.Project do
     project
     |> cast(attrs, [:name])
     |> validate_required([:name])
+    |> unique_constraint(:name)
   end
 end

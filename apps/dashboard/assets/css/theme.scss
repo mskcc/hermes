@@ -102,3 +102,48 @@ nav.navbar {
 	border: none;
 }
 /* End choice.js */
+
+/* Start Table */
+.is-sortable:after {
+    font-family: "Font Awesome 5 Free";
+    content: "\f0dc";
+    color: gainsboro;
+    padding-left: 5px;
+}
+.is-ascending:after {
+    content: "\f0de";
+    color: black;
+}
+
+.is-descending:after {
+    content: "\f0dd";
+    color: black;
+}
+/* End Table */
+
+/* Start Workflows */
+.is-tooltip {
+    color: $grey-lighter;
+}
+
+.workflows {
+    a {
+        &.is-success { color: $success; }
+        &.is-danger { color: $danger; }
+        &.is-inactive { color: $grey-lighter; }
+        &.is-running { color: $purple;   animation: letterSizeBounce 1s linear infinite alternate; }
+    }
+}
+/* End Workflows */
+
+@keyframes letterSizeBounce {
+  0% {
+      color: $purple;
+  }
+  50% {
+        color: $green;
+  }
+  100% {
+      color: $blue;
+  }
+}

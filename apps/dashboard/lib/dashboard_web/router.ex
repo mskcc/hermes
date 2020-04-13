@@ -1,6 +1,7 @@
 defmodule DashboardWeb.Router do
   use DashboardWeb, :router
   use Pow.Phoenix.Router
+  import Phoenix.LiveView.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -20,7 +21,7 @@ defmodule DashboardWeb.Router do
   end
 
   pipeline :account do
-    plug :put_layout, {DashboardWeb.LayoutView, :account}
+    plug :put_root_layout, {DashboardWeb.LayoutView, :account}
   end
 
   pipeline :auth do
@@ -53,8 +54,14 @@ defmodule DashboardWeb.Router do
     pipe_through [:browser, :protected, :account]
 
     get "/", PageController, :index
-    resources "/samples", SampleController
+    resources "/samples", SampleController, except: [:index]
     post "/assays", AssayController, :create
+  end
+
+  scope "/", DashboardWeb do
+    pipe_through [:browser, :protected, :account]
+    live "/samples", SamplesLive.List
+    live "/projects", ProjectsLive.List
   end
 
   # Other scopes may use custom stacks.

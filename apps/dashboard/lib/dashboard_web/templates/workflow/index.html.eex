@@ -1,0 +1,26 @@
+<h1>Listing Workflows</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for workflow <- @workflows do %>
+    <tr>
+      <td><%= workflow.name %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.workflow_path(@conn, :show, workflow) %></span>
+        <span><%= link "Edit", to: Routes.workflow_path(@conn, :edit, workflow) %></span>
+        <span><%= link "Delete", to: Routes.workflow_path(@conn, :delete, workflow), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Workflow", to: Routes.workflow_path(@conn, :new) %></span>

@@ -179,4 +179,181 @@ defmodule Dashboard.ProjectsTest do
       assert %Ecto.Changeset{} = Projects.change_sample(sample)
     end
   end
+
+  describe "jobs" do
+    alias Dashboard.Projects.Job
+
+    @valid_attrs %{job_id: "some job_id"}
+    @update_attrs %{job_id: "some updated job_id"}
+    @invalid_attrs %{job_id: nil}
+
+    def job_fixture(attrs \\ %{}) do
+      {:ok, job} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Projects.create_job()
+
+      job
+    end
+
+    test "list_jobs/0 returns all jobs" do
+      job = job_fixture()
+      assert Projects.list_jobs() == [job]
+    end
+
+    test "get_job!/1 returns the job with given id" do
+      job = job_fixture()
+      assert Projects.get_job!(job.id) == job
+    end
+
+    test "create_job/1 with valid data creates a job" do
+      assert {:ok, %Job{} = job} = Projects.create_job(@valid_attrs)
+      assert job.job_id == "some job_id"
+    end
+
+    test "create_job/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Projects.create_job(@invalid_attrs)
+    end
+
+    test "update_job/2 with valid data updates the job" do
+      job = job_fixture()
+      assert {:ok, %Job{} = job} = Projects.update_job(job, @update_attrs)
+      assert job.job_id == "some updated job_id"
+    end
+
+    test "update_job/2 with invalid data returns error changeset" do
+      job = job_fixture()
+      assert {:error, %Ecto.Changeset{}} = Projects.update_job(job, @invalid_attrs)
+      assert job == Projects.get_job!(job.id)
+    end
+
+    test "delete_job/1 deletes the job" do
+      job = job_fixture()
+      assert {:ok, %Job{}} = Projects.delete_job(job)
+      assert_raise Ecto.NoResultsError, fn -> Projects.get_job!(job.id) end
+    end
+
+    test "change_job/1 returns a job changeset" do
+      job = job_fixture()
+      assert %Ecto.Changeset{} = Projects.change_job(job)
+    end
+  end
+
+  describe "workflows" do
+    alias Dashboard.Projects.Workflow
+
+    @valid_attrs %{name: "some name"}
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
+
+    def workflow_fixture(attrs \\ %{}) do
+      {:ok, workflow} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Projects.create_workflow()
+
+      workflow
+    end
+
+    test "list_workflows/0 returns all workflows" do
+      workflow = workflow_fixture()
+      assert Projects.list_workflows() == [workflow]
+    end
+
+    test "get_workflow!/1 returns the workflow with given id" do
+      workflow = workflow_fixture()
+      assert Projects.get_workflow!(workflow.id) == workflow
+    end
+
+    test "create_workflow/1 with valid data creates a workflow" do
+      assert {:ok, %Workflow{} = workflow} = Projects.create_workflow(@valid_attrs)
+      assert workflow.name == "some name"
+    end
+
+    test "create_workflow/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Projects.create_workflow(@invalid_attrs)
+    end
+
+    test "update_workflow/2 with valid data updates the workflow" do
+      workflow = workflow_fixture()
+      assert {:ok, %Workflow{} = workflow} = Projects.update_workflow(workflow, @update_attrs)
+      assert workflow.name == "some updated name"
+    end
+
+    test "update_workflow/2 with invalid data returns error changeset" do
+      workflow = workflow_fixture()
+      assert {:error, %Ecto.Changeset{}} = Projects.update_workflow(workflow, @invalid_attrs)
+      assert workflow == Projects.get_workflow!(workflow.id)
+    end
+
+    test "delete_workflow/1 deletes the workflow" do
+      workflow = workflow_fixture()
+      assert {:ok, %Workflow{}} = Projects.delete_workflow(workflow)
+      assert_raise Ecto.NoResultsError, fn -> Projects.get_workflow!(workflow.id) end
+    end
+
+    test "change_workflow/1 returns a workflow changeset" do
+      workflow = workflow_fixture()
+      assert %Ecto.Changeset{} = Projects.change_workflow(workflow)
+    end
+  end
+
+  describe "sample_meta_data" do
+    alias Dashboard.Projects.SampleMetaData
+
+    @valid_attrs %{lims: %{}}
+    @update_attrs %{lims: %{}}
+    @invalid_attrs %{lims: nil}
+
+    def sample_meta_data_fixture(attrs \\ %{}) do
+      {:ok, sample_meta_data} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Projects.create_sample_meta_data()
+
+      sample_meta_data
+    end
+
+    test "list_sample_meta_data/0 returns all sample_meta_data" do
+      sample_meta_data = sample_meta_data_fixture()
+      assert Projects.list_sample_meta_data() == [sample_meta_data]
+    end
+
+    test "get_sample_meta_data!/1 returns the sample_meta_data with given id" do
+      sample_meta_data = sample_meta_data_fixture()
+      assert Projects.get_sample_meta_data!(sample_meta_data.id) == sample_meta_data
+    end
+
+    test "create_sample_meta_data/1 with valid data creates a sample_meta_data" do
+      assert {:ok, %SampleMetaData{} = sample_meta_data} = Projects.create_sample_meta_data(@valid_attrs)
+      assert sample_meta_data.lims == %{}
+    end
+
+    test "create_sample_meta_data/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Projects.create_sample_meta_data(@invalid_attrs)
+    end
+
+    test "update_sample_meta_data/2 with valid data updates the sample_meta_data" do
+      sample_meta_data = sample_meta_data_fixture()
+      assert {:ok, %SampleMetaData{} = sample_meta_data} = Projects.update_sample_meta_data(sample_meta_data, @update_attrs)
+      assert sample_meta_data.lims == %{}
+    end
+
+    test "update_sample_meta_data/2 with invalid data returns error changeset" do
+      sample_meta_data = sample_meta_data_fixture()
+      assert {:error, %Ecto.Changeset{}} = Projects.update_sample_meta_data(sample_meta_data, @invalid_attrs)
+      assert sample_meta_data == Projects.get_sample_meta_data!(sample_meta_data.id)
+    end
+
+    test "delete_sample_meta_data/1 deletes the sample_meta_data" do
+      sample_meta_data = sample_meta_data_fixture()
+      assert {:ok, %SampleMetaData{}} = Projects.delete_sample_meta_data(sample_meta_data)
+      assert_raise Ecto.NoResultsError, fn -> Projects.get_sample_meta_data!(sample_meta_data.id) end
+    end
+
+    test "change_sample_meta_data/1 returns a sample_meta_data changeset" do
+      sample_meta_data = sample_meta_data_fixture()
+      assert %Ecto.Changeset{} = Projects.change_sample_meta_data(sample_meta_data)
+    end
+  end
 end
