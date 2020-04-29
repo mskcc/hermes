@@ -1,24 +1,58 @@
 <h3 class="title">Sample: <%=@sample.tube_id%></h3>
 
 <div class="container">
-<h4 class="title is-4">Metadata</h4>
-<div id="meta-data-editor"></div>
-</div>
+  <h4 class="title is-4">Metadata</h4>
+  <div id="metadata-editor"></div>
 
-<div class="container">
-  <h4 class="title is-4">Jobs</h4>
-  <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
-    <thead>
-      <tr>
-        <th>Job</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <script type="application/json" id="metadata-info">
+    <%=raw Jason.encode!(@sample.metadatum.content) %>
+  </script>
 
-<script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/samples-show.js") %>"></script>
+  <div class="container" style="margin-top:20px">
+    <h4 class="title is-4">Jobs</h4>
+    <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Workflows</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for job <- @sample.jobs do %>
+          <tr>
+            <td><%=job.job_id%></td>
+
+            <td class="workflows">
+              <%= if @sample.jobs != [] do %>
+                <%=for workflow <- job.workflows do %>
+                  <a class="is-success" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <%end%>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="container" style="margin-top:20px">
+    <h4 class="title is-4">Metadata History</h4>
+    <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Content</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for metadata <- @sample.metadata do %>
+          <tr>
+            <td><%=metadata.inserted_at %></td>
+            <td><%=Jason.encode!(@sample.metadatum.content) %></td>
+          </tr>
+        <%end%>
+      </tbody>
+    </table>
+  </div>
+
+  <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/samples-show.js") %>"></script>

@@ -1,19 +1,21 @@
-<%= f = form_for @filter_changeset, "#", [phx_change: :filter] %>
 <div class="columns">
   <div class="column is-4">
-    <%= input f, :mrn, hide_label: true, icon: "fa-search", placeholder: "Search" %>
+    <%#= input f, :mrn, hide_label: true, icon: "fa-search", placeholder: "Search" %>
+  </div>
+
+  <div class="column is-4">
+    <%= live_component @socket, DashboardWeb.ProjectSearchComponent, id: "project-search", params: @params %>
   </div>
 </div>
 
+<%= f = form_for @filter_changeset, "#", [phx_change: :filter] %>
 <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
   <thead>
     <tr>
-      <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :tube_id, "2D Barcode", @params, @sort_by) %></th>
-      <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :mrn, "MRN", @params, @sort_by) %></th>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :igo_sequencing_id, "IGO ID", @params, @sort_by) %></th>
       <th>Project</th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :status, "Status", @params, @sort_by) %></th>
       <th>Latest Job <span class="is-tooltip" data-tooltip="Workflows"><i class="fas fa-info-circle"></i></span> </th>
-      <th>Jobs</th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :inserted_at, "Created", @params, @sort_by) %></th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :updated_at, "Updated", @params, @sort_by) %></th>
     </tr>
@@ -22,18 +24,27 @@
     <%= for sample <- @samples.entries do %>
       <tr>
         <td>
-          <%= link sample.tube_id, to: Routes.sample_path(@socket, :show, sample.id) %>
+          <%= link sample.igo_sequencing_id, to: Routes.sample_path(@socket, :show, sample.id) %>
         </td>
-        <td><%= sample.mrn %></td>
         <td><%= sample.project.name%></td>
         <td><%= sample.status%></td>
         <td class="workflows">
-          <a class="is-success" data-tooltip="Test"><i class="far fa-dot-circle"></i></a>
-          <a class="is-success" data-tooltip="Test"><i class="far fa-dot-circle"></i></a>
-          <a class="is-running" data-tooltip="Test"><i class="far fa-dot-circle"></i></a>
-          <a class="is-inactive" data-tooltip="Test"><i class="far fa-dot-circle"></i></a>
+          <%= if sample.jobs != [] do %>
+            <%=for workflow <- List.first(sample.jobs).workflows do %>
+              <%= if workflow.status == :success do %>
+                <a class="is-success" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
+            <% end %>
+
+              <%= if workflow.status == :running do %>
+                <a class="is-running " data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
+            <% end %>
+
+              <%= if workflow.status == :failure do %>
+                <a class="is-danger" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
+            <% end %>
+            <% end %>
+          <% end %>
         </td>
-        <td></td>
         <td data-tooltip="<%=sample.inserted_at%>"><%= Date.relative_to_now(sample.inserted_at)%></td>
         <td data-tooltip="<%=sample.updated_at%>"><%= Date.relative_to_now(sample.updated_at)%></td>
       </tr>

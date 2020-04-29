@@ -5,15 +5,23 @@ defmodule DashboardWeb.SamplesLive.List do
   alias Dashboard.Projects.Sample
   alias DashboardWeb.SampleView
   alias DashboardWeb.Router.Helpers, as: Routes
+  alias DashboardWeb.ProductSearchComponent
 
   @default_per_page 15
   def render(assigns), do: SampleView.render("list.html", assigns)
 
-  def mount(params, session, socket) do
-    {:ok, assign(socket, page: 1, per_page: @default_per_page)}
+  def mount(_params, _session, socket) do
+    {:ok,
+     assign(socket,
+       page: 1,
+       per_page: @default_per_page,
+       loading: false,
+       project: "",
+       project_matches: []
+     )}
   end
 
-  def handle_params(params, url, socket) do
+  def handle_params(params, _url, socket) do
     sort_by =
       (params["sortBy"] || [])
       |> Enum.map(&String.split(&1, "|"))
@@ -59,6 +67,7 @@ defmodule DashboardWeb.SamplesLive.List do
 
   def handle_event("filter", params, socket) do
     IO.inspect(params)
+    IO.inspect(socket.assigns)
 
     """
     changeset =
@@ -68,7 +77,7 @@ defmodule DashboardWeb.SamplesLive.List do
 
     """
 
-    {:noreply, push_patch(socket, to: Routes.live_path(socket, __MODULE__, params["sample"]))}
+    # {:noreply, push_patch(socket, to: Routes.live_path(socket, __MODULE__, params["sample"]))}
   end
 
   def handle_info({Projects, [:samples | _], _}, socket) do

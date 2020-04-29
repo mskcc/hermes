@@ -1,0 +1,5 @@
+<h1>Edit Assay</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.assay_path(@conn, :update, @assay)) %>
+
+<span><%= link "Back", to: Routes.assay_path(@conn, :index) %></span>

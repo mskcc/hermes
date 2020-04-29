@@ -3,6 +3,7 @@ defmodule Dashboard.Projects do
   The Projects context.
   """
 
+  require Logger
   import Ecto.Query, warn: false
   alias Dashboard.Repo
 
@@ -322,13 +323,13 @@ defmodule Dashboard.Projects do
   def list_samples(%{page: page, per_page: per_page, sort_by: sort_by, filters: filters}) do
     # invert
     sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end)
-    IO.inspect(filters)
 
     filters =
       if Map.has_key?(filters, :mrn) do
         dynamic(
           [p],
-          ilike(p.mrn, ^"%#{filters[:mrn]}%") or ilike(p.tube_id, ^"%#{filters[:mrn]}%")
+          ilike(p.mrn, ^"%#{filters[:mrn]}%") or ilike(p.tube_id, ^"%#{filters[:mrn]}%") or
+            ilike(p.mrn, ^"%#{filters[:igo_sequencing_id]}%")
         )
       else
         []
@@ -343,7 +344,7 @@ defmodule Dashboard.Projects do
           limit: ^per_page,
           order_by: ^sort_by,
           where: ^filters,
-          preload: [:project, job: :workflows]
+          preload: [:project, jobs: :workflows]
       )
 
     %{entries: entries, count: count}
@@ -363,7 +364,13 @@ defmodule Dashboard.Projects do
       ** (Ecto.NoResultsError)
 
   """
-  def get_sample!(id), do: Repo.get!(Sample, id)
+  def get_sample!(id) do
+    Repo.one!(
+      from u in Sample,
+        preload: [:metadata, :metadatum, jobs: :workflows],
+        where: u.id == ^id
+    )
+  end
 
   @doc """
   Creates a sample.
@@ -430,6 +437,48 @@ defmodule Dashboard.Projects do
     Sample.changeset(sample, %{})
   end
 
+  def fetch_sample_metadatum() do
+    sample_groups =
+      Repo.all(from u in Sample, select: [:igo_sequencing_id, :id], preload: [:metadatum])
+      |> Enum.chunk_every(10)
+      |> Enum.take(1)
+
+    for samples <- sample_groups do
+      sample_ids = Enum.map(samples, & &1.igo_sequencing_id)
+
+      case LimsClient.fetch_sample_manifests(sample_ids) do
+        {:error, _status, body} ->
+          # TODO log/retry here
+          IO.inspect(body)
+
+        {:ok, body} ->
+          for {sample, new_metadatum} <- Enum.zip(samples, body) do
+            # TODO Redo mechanism here on error
+            case update_metadatum(sample, new_metadatum) do
+              {:ok, _} -> nil
+              {_, message} -> Logger.error(message, %{sample: sample, metadata: new_metadatum})
+            end
+          end
+      end
+    end
+  end
+
+  defp update_metadatum(sample, new_metadatum) do
+    changed = true
+    IO.inspect(sample)
+
+    case changed do
+      true ->
+        create_sample_metadatum(%{
+          content: new_metadatum,
+          sample_id: sample.id
+        })
+
+      _ ->
+        changed
+    end
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking sample changes.
 
@@ -441,6 +490,10 @@ defmodule Dashboard.Projects do
   """
   def fetch_samples() do
     case AccessTrackerClient.fetch_samples() do
+      {:error, _status, body} ->
+        # TODO log/retry here
+        IO.inspect(body)
+
       {:ok, body} ->
         assay = get_assay_by_name!("Access")
 
@@ -454,6 +507,8 @@ defmodule Dashboard.Projects do
 
             [
               mrn: s["fieldData"]["MRN"],
+              igo_sequencing_id: s["fieldData"]["IGO_ID_Sequencing"],
+              igo_extraction_id: s["fieldData"]["IGO_ID_Extraction"],
               status: status,
               tube_id: s["fieldData"]["TubeID"],
               assay_id: assay.id,
@@ -461,6 +516,7 @@ defmodule Dashboard.Projects do
               project_id: find_or_create_project(%{"name" => s["fieldData"]["Study_Code"]}).id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
+              # metadatum: []
             ]
           end)
 
@@ -471,9 +527,8 @@ defmodule Dashboard.Projects do
           conflict_target: [:tube_id]
         )
 
-      {:error, _status, body} ->
-        # TODO log/retry here
-        IO.inspect(body)
+        %{entries: entries, count: count} =
+          list_samples(%{page: 1, per_page: 200, sort_by: [], filters: %{}})
     end
   end
 
@@ -669,99 +724,23 @@ defmodule Dashboard.Projects do
     Workflow.changeset(workflow, %{})
   end
 
-  alias Dashboard.Projects.SampleMetaData
+  alias Dashboard.Projects.SampleMetadatum
 
   @doc """
-  Returns the list of sample_meta_data.
+  Creates a sample_metadatum.
 
   ## Examples
 
-      iex> list_sample_meta_data()
-      [%SampleMetaData{}, ...]
+      iex> create_sample_metadatum(%{field: value})
+      {:ok, %SampleMetadatum{}}
 
-  """
-  def list_sample_meta_data do
-    Repo.all(SampleMetaData)
-  end
-
-  @doc """
-  Gets a single sample_meta_data.
-
-  Raises `Ecto.NoResultsError` if the Sample meta data does not exist.
-
-  ## Examples
-
-      iex> get_sample_meta_data!(123)
-      %SampleMetaData{}
-
-      iex> get_sample_meta_data!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_sample_meta_data!(id), do: Repo.get!(SampleMetaData, id)
-
-  @doc """
-  Creates a sample_meta_data.
-
-  ## Examples
-
-      iex> create_sample_meta_data(%{field: value})
-      {:ok, %SampleMetaData{}}
-
-      iex> create_sample_meta_data(%{field: bad_value})
+      iex> create_sample_metadatum(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_sample_meta_data(attrs \\ %{}) do
-    %SampleMetaData{}
-    |> SampleMetaData.changeset(attrs)
+  def create_sample_metadatum(attrs \\ %{}) do
+    %SampleMetadatum{}
+    |> SampleMetadatum.changeset(attrs)
     |> Repo.insert()
-  end
-
-  @doc """
-  Updates a sample_meta_data.
-
-  ## Examples
-
-      iex> update_sample_meta_data(sample_meta_data, %{field: new_value})
-      {:ok, %SampleMetaData{}}
-
-      iex> update_sample_meta_data(sample_meta_data, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_sample_meta_data(%SampleMetaData{} = sample_meta_data, attrs) do
-    sample_meta_data
-    |> SampleMetaData.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a sample_meta_data.
-
-  ## Examples
-
-      iex> delete_sample_meta_data(sample_meta_data)
-      {:ok, %SampleMetaData{}}
-
-      iex> delete_sample_meta_data(sample_meta_data)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_sample_meta_data(%SampleMetaData{} = sample_meta_data) do
-    Repo.delete(sample_meta_data)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking sample_meta_data changes.
-
-  ## Examples
-
-      iex> change_sample_meta_data(sample_meta_data)
-      %Ecto.Changeset{source: %SampleMetaData{}}
-
-  """
-  def change_sample_meta_data(%SampleMetaData{} = sample_meta_data) do
-    SampleMetaData.changeset(sample_meta_data, %{})
   end
 end
