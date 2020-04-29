@@ -9,11 +9,11 @@ defmodule DashboardWeb.ProjectsLive.List do
   @default_per_page 15
   def render(assigns), do: ProjectView.render("list.html", assigns)
 
-  def mount(params, session, socket) do
+  def mount(_params, _session, socket) do
     {:ok, assign(socket, page: 1, per_page: @default_per_page)}
   end
 
-  def handle_params(params, url, socket) do
+  def handle_params(params, _url, socket) do
     sort_by =
       (params["sortBy"] || [])
       |> Enum.map(&String.split(&1, "|"))

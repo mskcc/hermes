@@ -1,6 +1,12 @@
 # Seqosystem
 TODO Description
 
+## Dependencies
+Tested with the following versions.
+* [Elixir 1.10.2](https://elixir-lang.org/)
+* PostgreSQL 12.1
+* Node 12.16
+
 ## Code Layout
 ```
 apps/
@@ -13,5 +19,7 @@ apps/
 ## Development (TODO)
 1. Install [Docker](https://docs.docker.com/compose/install/).
 2. `docker-compose up`
+
+
 
 ## Deployment (TODO)

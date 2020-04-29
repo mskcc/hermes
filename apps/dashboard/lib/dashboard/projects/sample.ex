@@ -7,12 +7,16 @@ defmodule Dashboard.Projects.Sample do
 
   schema "samples" do
     field :mrn, :string
+    field :igo_sequencing_id, :string
+    field :igo_extraction_id, :string
     field :tube_id, :string
     field :status, SampleStatusEnum, default: @default_status
     has_many :jobs, Projects.Job
     has_one :job, Projects.Job
     belongs_to :project, Projects.Project
     belongs_to :assay, Projects.Assay
+    has_many :metadata, Projects.SampleMetadatum
+    has_one :metadatum, Projects.SampleMetadatum
 
     timestamps(type: :utc_datetime)
   end

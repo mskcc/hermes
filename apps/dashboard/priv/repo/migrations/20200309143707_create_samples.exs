@@ -4,6 +4,8 @@ defmodule Dashboard.Repo.Migrations.CreateSamples do
   def change do
     create table(:samples) do
       add :mrn, :string
+      add :igo_sequencing_id, :string
+      add :igo_extraction_id, :string
       add :project_id, references(:projects, on_delete: :nothing)
       add :assay_id, references(:assays, on_delete: :nothing)
       add :tube_id, :string
