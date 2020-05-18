@@ -32,11 +32,15 @@ defmodule DashboardWeb.ProjectSearchComponent do
 
   def handle_event("suggest", %{"q" => query}, socket) do
     params = Map.put(socket.assigns[:params], :project, query)
-    {:noreply, push_patch(socket, to: Routes.live_path(socket, DashboardWeb.SamplesLive.List, params))}
+
+    {:noreply,
+     push_patch(socket, to: Routes.live_path(socket, DashboardWeb.SamplesLive.List, params))}
   end
 
   def handle_event("search", %{"q" => query}, socket) do
     params = Map.put(socket.assigns[:params], :project, query)
-    {:noreply, push_patch(socket, to: Routes.live_path(socket, DashboardWeb.SamplesLive.List, params))}
+
+    {:noreply,
+     push_patch(socket, to: Routes.live_path(socket, DashboardWeb.SamplesLive.List, params))}
   end
 end

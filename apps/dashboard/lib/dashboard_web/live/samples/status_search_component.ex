@@ -6,6 +6,7 @@ defmodule DashboardWeb.StatusSearchComponent do
   def render(assigns) do
     {selected, _} = Integer.parse(Map.get(assigns.params, "status", "-1"))
     statuses = Enum.sort(SampleStatusEnum.__enum_map__())
+
     ~L"""
     <form phx-change="change" phx-throttle="500" class="dropdown" phx-target="<%= @myself %>">
     <div class="field">
@@ -36,12 +37,14 @@ defmodule DashboardWeb.StatusSearchComponent do
   end
 
   def handle_event("change", %{"status" => status}, socket) do
-    params = if status == "-1" do
-      Map.delete(socket.assigns[:params], "status")
-    else
-      Map.put(socket.assigns[:params], "status", status)
-    end
+    params =
+      if status == "-1" do
+        Map.delete(socket.assigns[:params], "status")
+      else
+        Map.put(socket.assigns[:params], "status", status)
+      end
 
-    {:noreply, push_patch(socket, to: Routes.live_path(socket, DashboardWeb.SamplesLive.List, params))}
+    {:noreply,
+     push_patch(socket, to: Routes.live_path(socket, DashboardWeb.SamplesLive.List, params))}
   end
 end

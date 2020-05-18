@@ -41,8 +41,9 @@ defmodule DashboardWeb.SamplesLive.List do
   defp fetch(socket) do
     %{params: params, sort_by: sort_by} = socket.assigns
 
-    filters = Sample.filter_changeset(params)
-              |> Map.fetch!(:changes)
+    filters =
+      Sample.filter_changeset(params)
+      |> Map.fetch!(:changes)
 
     samples =
       Projects.list_samples(%{
