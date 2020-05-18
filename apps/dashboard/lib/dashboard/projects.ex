@@ -8,6 +8,7 @@ defmodule Dashboard.Projects do
   alias Dashboard.Repo
 
   alias Dashboard.Projects.Assay
+  alias Dashboard.Projects.Workflow
 
   @doc """
   Returns the list of assays.
@@ -579,6 +580,35 @@ defmodule Dashboard.Projects do
     %Job{}
     |> Job.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  This method recursively builds the inserts for the workflows.
+  """
+  def build_workflow_inserts(attrs) do
+    {children, attrs} = Map.pop(attrs, "children")
+    parent_atom = Enum.take_random(0..9, 9) |> Enum.join("") |> String.to_atom
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(parent_atom, Workflow.changeset(%Workflow{}, attrs))
+    |> Ecto.Multi.merge(fn results ->
+      parent = results[parent_atom]
+      Enum.reduce(children, Ecto.Multi.new(), fn (child_attrs, acc) ->
+        child_attrs = Map.merge(%{"parent_id" => parent.id, "job_id" => attrs["job_id"]}, child_attrs)
+        Ecto.Multi.merge(acc, fn _ ->
+          build_workflow_inserts(child_attrs)
+        end)
+      end)
+    end)
+  end
+
+  def create_job_with_workflows(job_attrs \\ %{}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:job, Job.changeset(%Job{}, job_attrs))
+    |> Ecto.Multi.merge(fn %{job: job} ->
+      workflows = Map.put(job_attrs["workflows"], "job_id", job.id)
+      build_workflow_inserts(workflows)
+    end)
+    |> Repo.transaction
   end
 
   @doc """

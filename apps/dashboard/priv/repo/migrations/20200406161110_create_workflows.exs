@@ -5,6 +5,7 @@ defmodule Dashboard.Repo.Migrations.CreateWorkflows do
     create table(:workflows) do
       add :name, :string
       add :job_id, references(:jobs, on_delete: :nothing)
+      add :parent_id, :id
       add :status, WorkflowStatusEnum.type()
 
       timestamps()
