@@ -28,4 +28,12 @@ defmodule Dashboard.Projects.Sample do
     |> validate_required([:project_id, :assay_id, :tube_id])
     |> unique_constraint([:tube_id])
   end
+
+  def filter_changeset(params) do
+    data  = %{}
+    filter_types = %{project: :string, status: :integer, id: :string}
+    filters =
+      {data, filter_types}
+      |> cast(params, Map.keys(filter_types))
+  end
 end
