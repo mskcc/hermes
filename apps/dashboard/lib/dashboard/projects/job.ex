@@ -4,7 +4,8 @@ defmodule Dashboard.Projects.Job do
   alias Dashboard.Projects
 
   schema "jobs" do
-    field :job_id, :string # Link to Beagle's JobGroup
+    # Link to Beagle's JobGroup
+    field :job_id, :string
     belongs_to :sample, Projects.Sample
     has_many :workflows, Projects.Workflow
 
