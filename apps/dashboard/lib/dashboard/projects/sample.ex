@@ -30,8 +30,9 @@ defmodule Dashboard.Projects.Sample do
   end
 
   def filter_changeset(params) do
-    data  = %{}
+    data = %{}
     filter_types = %{project: :string, status: :integer, id: :string}
+
     filters =
       {data, filter_types}
       |> cast(params, Map.keys(filter_types))
