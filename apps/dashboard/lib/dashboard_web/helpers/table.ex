@@ -16,7 +16,7 @@ defmodule DashboardWeb.Helpers.Table do
         ["#{field}|asc"]
       end
 
-    Map.put(params, "sortBy", sort_by_param)
+    Map.put(params, "sort_by", sort_by_param)
     |> Map.delete("page")
   end
 

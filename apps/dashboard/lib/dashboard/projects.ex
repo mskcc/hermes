@@ -157,8 +157,6 @@ defmodule Dashboard.Projects do
   def list_projects(%{page: page, per_page: per_page, sort_by: sort_by, filters: filters}) do
     # invert
     sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end)
-    IO.inspect(filters)
-
     filters =
       if Map.has_key?(filters, :name) do
         dynamic([p], ilike(p.name, ^"%#{filters[:name]}%"))
@@ -167,13 +165,6 @@ defmodule Dashboard.Projects do
       end
 
     count = Repo.one(from s in Project, select: count(s.id), where: ^filters)
-
-    """
-    query = from t in Project,
-      join: s in assoc(s, :sub_thing),
-      group_by: t.id,
-      select_merge: %{sub_thing_count: count(s.id)}
-    """
 
     entries =
       Repo.all(
@@ -325,28 +316,49 @@ defmodule Dashboard.Projects do
     # invert
     sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end)
 
-    filters =
-      if Map.has_key?(filters, :mrn) do
-        dynamic(
-          [p],
-          ilike(p.mrn, ^"%#{filters[:mrn]}%") or ilike(p.tube_id, ^"%#{filters[:mrn]}%") or
-            ilike(p.mrn, ^"%#{filters[:igo_sequencing_id]}%")
-        )
-      else
-        []
-      end
+    filters = Enum.reduce(filters, dynamic(true), fn
+      {:project, value}, dynamic -> 
+        dynamic([project: p], ^dynamic and ilike(p.name, ^"%#{value}%"))
+      {:status, value}, dynamic ->
+        dynamic([p], ^dynamic and p.status == ^value)
+      {:igo_id, value}, dynamic ->
+        dynamic([p], ^dynamic and (
+          ilike(p.igo_sequencing_id, ^"#{value}%")
+          or ilike(p.igo_extraction_id, ^"#{value}%")
+          or ilike(p.tube_id, ^"#{value}%")
+        ))
+      {_, _}, dynamic ->
+        dynamic
+    end)
 
-    count = Repo.one(from s in Sample, select: count(s.id), where: ^filters)
+    count =
+      Sample
+      |> join(:inner, [s], p in assoc(s, :project), as: :project)
+      |> select([s], count(s.id))
+      |> where(^filters)
+      |> Repo.one
 
     entries =
-      Repo.all(
+      Sample
+      |> join(:inner, [s], p in assoc(s, :project), as: :project)
+      |> offset(^((page - 1) * per_page))
+      |> limit(^per_page)
+      |> order_by(^sort_by)
+      |> where(^filters)
+      |> preload([:project, jobs: :workflows])
+      |> Repo.all
+
+    """
+      Repo.all
         from u in Sample,
           offset: ^((page - 1) * per_page),
           limit: ^per_page,
           order_by: ^sort_by,
           where: ^filters,
+          join: p in assoc(u, :project), as: :project,
           preload: [:project, jobs: :workflows]
       )
+      """
 
     %{entries: entries, count: count}
   end

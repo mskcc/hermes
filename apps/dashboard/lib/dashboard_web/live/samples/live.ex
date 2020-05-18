@@ -23,7 +23,7 @@ defmodule DashboardWeb.SamplesLive.List do
 
   def handle_params(params, _url, socket) do
     sort_by =
-      (params["sortBy"] || [])
+      (params["sort_by"] || [])
       |> Enum.map(&String.split(&1, "|"))
       |> Enum.map(fn [k, v] -> {String.to_atom(k), String.to_atom(v)} end)
 
@@ -32,12 +32,7 @@ defmodule DashboardWeb.SamplesLive.List do
     params = Map.put(params, "page", page)
     params = Map.put(params, "per_page", per_page)
 
-    filters =
-      Ecto.Changeset.cast(
-        %Sample{},
-        params,
-        [:mrn]
-      )
+    filters = Sample.filter_changeset(params)
 
     {:noreply,
      socket |> assign(params: params, sort_by: sort_by, filter_changeset: filters) |> fetch()}
@@ -46,13 +41,8 @@ defmodule DashboardWeb.SamplesLive.List do
   defp fetch(socket) do
     %{params: params, sort_by: sort_by} = socket.assigns
 
-    filters =
-      Ecto.Changeset.cast(
-        %Sample{},
-        params,
-        [:mrn]
-      )
-      |> Map.fetch!(:changes)
+    filters = Sample.filter_changeset(params)
+              |> Map.fetch!(:changes)
 
     samples =
       Projects.list_samples(%{
@@ -63,21 +53,6 @@ defmodule DashboardWeb.SamplesLive.List do
       })
 
     assign(socket, samples: samples, page_title: "Listing Samples – Page #{params["page"]}")
-  end
-
-  def handle_event("filter", params, socket) do
-    IO.inspect(params)
-    IO.inspect(socket.assigns)
-
-    """
-    changeset =
-      socket.assigns.user
-      |> Demo.Accounts.change_user(params)
-      |> Map.put(:action, :update)
-
-    """
-
-    # {:noreply, push_patch(socket, to: Routes.live_path(socket, __MODULE__, params["sample"]))}
   end
 
   def handle_info({Projects, [:samples | _], _}, socket) do

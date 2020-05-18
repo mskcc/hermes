@@ -1,14 +1,15 @@
 <div class="columns">
-  <div class="column is-4">
-    <%#= input f, :mrn, hide_label: true, icon: "fa-search", placeholder: "Search" %>
-  </div>
-
-  <div class="column is-4">
+  <div class="column is-3">
     <%= live_component @socket, DashboardWeb.ProjectSearchComponent, id: "project-search", params: @params %>
+  </div>
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.StatusSearchComponent, id: "status-search", params: @params %>
+  </div>
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.IgoSearchComponent, id: "igo-search", params: @params %>
   </div>
 </div>
 
-<%= f = form_for @filter_changeset, "#", [phx_change: :filter] %>
 <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
   <thead>
     <tr>
