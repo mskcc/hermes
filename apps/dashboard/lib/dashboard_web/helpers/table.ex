@@ -40,6 +40,7 @@ defmodule DashboardWeb.Helpers.Table do
 
   defp render_workflow(workflow, column, row) do
     status = Atom.to_string(workflow.status)
+
     ~E"""
     <a class="is-<%=workflow.status%>" style="grid-column: <%=column%>; grid-row: <%=row%>" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
     """
@@ -47,16 +48,19 @@ defmodule DashboardWeb.Helpers.Table do
 
   defp render_workflow_tree(workflow, column \\ 1, current_row \\ 1) do
     workflow.children
-    |> Enum.with_index
+    |> Enum.with_index()
     |> Enum.map(fn {workflow, row} ->
-      [render_workflow(workflow, column, current_row + row) | render_workflow_tree(workflow, column + 1, row)]
+      [
+        render_workflow(workflow, column, current_row + row)
+        | render_workflow_tree(workflow, column + 1, row)
+      ]
     end)
   end
 
   def workflow_statuses(jobs) do
     tree =
       List.last(jobs).workflows
-      |> Enum.reverse
+      |> Enum.reverse()
       |> Enum.reduce(%{}, fn foo, map ->
         foo = Map.put(foo, :children, Map.get(map, foo.id, []))
         Map.update(map, foo.parent_id, [foo], fn foos -> [foo | foos] end)
