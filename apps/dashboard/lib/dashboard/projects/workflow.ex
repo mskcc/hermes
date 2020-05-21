@@ -19,7 +19,7 @@ defmodule Dashboard.Projects.Workflow do
   @doc false
   def changeset(workflow, attrs) do
     workflow
-    |> cast(attrs, [:name, :job_id, :parent_id, :status])
+    |> cast(attrs, [:name, :group_id, :parent_id, :status])
     |> validate_required([:name])
   end
 end

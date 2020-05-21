@@ -1,6 +1,6 @@
 <div class="columns">
   <div class="column is-3">
-    <%= live_component @socket, DashboardWeb.ProjectSearchComponent, id: "project-search", params: @params %>
+    <%= live_component @socket, DashboardWeb.RequestSearchComponent, id: "request-earch", params: @params %>
   </div>
   <div class="column is-3">
     <%= live_component @socket, DashboardWeb.StatusSearchComponent, id: "status-search", params: @params %>
@@ -14,7 +14,7 @@
   <thead>
     <tr>
       <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :igo_sequencing_id, "IGO ID", @params, @sort_by) %></th>
-      <th>Project</th>
+      <th>Request</th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :status, "Status", @params, @sort_by) %></th>
       <th>Latest Job <span class="is-tooltip" data-tooltip="Workflows"><i class="fas fa-info-circle"></i></span> </th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :inserted_at, "Created", @params, @sort_by) %></th>
@@ -27,23 +27,13 @@
         <td>
           <%= link sample.igo_sequencing_id, to: Routes.sample_path(@socket, :show, sample.id) %>
         </td>
-        <td><%= sample.project.name%></td>
+        <td><%= sample.request.name%></td>
         <td><%= sample.status%></td>
         <td class="workflows">
           <%= if sample.jobs != [] do %>
-            <%=for workflow <- List.first(sample.jobs).workflows do %>
-              <%= if workflow.status == :success do %>
-                <a class="is-success" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
-            <% end %>
-
-              <%= if workflow.status == :running do %>
-                <a class="is-running " data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
-            <% end %>
-
-              <%= if workflow.status == :failure do %>
-                <a class="is-danger" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
-            <% end %>
-            <% end %>
+            <div style="grid-auto-rows:16px; grid-gap: 4px; grid-auto-columns: 16px; display: grid;">
+              <%=Table.workflow_statuses(sample.jobs)%>
+            </div>
           <% end %>
         </td>
         <td data-tooltip="<%=sample.inserted_at%>"><%= Date.relative_to_now(sample.inserted_at)%></td>
@@ -58,7 +48,7 @@
   <%= if @params["page"] > 1 do %>
     <%= live_patch "Previous", to: Routes.live_path(@socket, DashboardWeb.SamplesLive.List, Table.update_params(@params, "page", @params["page"] - 1)), class: "is-primary button pagination-previous" %></span>
   <% end %>
-  <%= if (@params["page"] + 1) * @params["per_page"] < @samples.count do %>
+  <%= if @params["page"] * @params["per_page"] < @samples.count do %>
     <%= live_patch "Next", to: Routes.live_path(@socket, DashboardWeb.SamplesLive.List, Table.update_params(@params, "page", @params["page"] + 1)), class: "is-primary button pagination-next" %>
   <% end %>
   <ul class="pagination-list"></ul>

@@ -131,7 +131,7 @@ nav.navbar {
     a {
         &.is-success { color: $success; }
         &.is-danger { color: $danger; }
-        &.is-inactive { color: $grey-lighter; }
+        &.is-pending { color: $grey-lighter; }
         &.is-running { color: $purple;   animation: letterSizeBounce 1s linear infinite alternate; }
     }
 }
