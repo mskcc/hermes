@@ -533,6 +533,7 @@ defmodule Dashboard.Projects do
                 else: s["fieldData"]["Sample_Status"]
 
             IO.inspect(find_or_create_project(%{"name" => s["fieldData"]["Project_ID"]}))
+
             [
               mrn: s["fieldData"]["MRN"],
               igo_sequencing_id: s["fieldData"]["IGO_ID_Sequencing"],
@@ -541,10 +542,11 @@ defmodule Dashboard.Projects do
               tube_id: s["fieldData"]["TubeID"],
               assay_id: assay.id,
               # TODO add a cache for these
-              request_id: find_or_create_request(%{
-                "name" => s["fieldData"]["Request_ID"],
-                "project_id" => 1
-              }).id,
+              request_id:
+                find_or_create_request(%{
+                  "name" => s["fieldData"]["Request_ID"],
+                  "project_id" => 1
+                }).id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
               # metadatum: []

@@ -4,7 +4,8 @@ defmodule Dashboard.Projects.Job do
   alias Dashboard.Projects
 
   schema "jobs" do
-    field :group_id, :string # Refers to Beagle's JobGroup, typically a UUID
+    # Refers to Beagle's JobGroup, typically a UUID
+    field :group_id, :string
     belongs_to :sample, Projects.Sample
     has_many :workflows, Projects.Workflow
 
