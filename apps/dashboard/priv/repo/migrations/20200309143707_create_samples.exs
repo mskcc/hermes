@@ -6,7 +6,7 @@ defmodule Dashboard.Repo.Migrations.CreateSamples do
       add :mrn, :string
       add :igo_sequencing_id, :string
       add :igo_extraction_id, :string
-      add :project_id, references(:projects, on_delete: :nothing)
+      add :request_id, references(:requests, on_delete: :nothing)
       add :assay_id, references(:assays, on_delete: :nothing)
       add :tube_id, :string
       add :status, SampleStatusEnum.type()
@@ -17,7 +17,7 @@ defmodule Dashboard.Repo.Migrations.CreateSamples do
     create unique_index(:samples, [:tube_id])
     create index(:samples, [:status])
     create index(:samples, [:mrn])
-    create index(:samples, [:project_id])
+    create index(:samples, [:request_id])
     create index(:samples, [:assay_id])
   end
 end

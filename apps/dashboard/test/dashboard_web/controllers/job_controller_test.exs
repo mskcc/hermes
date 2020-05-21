@@ -3,9 +3,9 @@ defmodule DashboardWeb.JobControllerTest do
 
   alias Dashboard.Projects
 
-  @create_attrs %{job_id: "some job_id"}
-  @update_attrs %{job_id: "some updated job_id"}
-  @invalid_attrs %{job_id: nil}
+  @create_attrs %{group_id: "some group_id"}
+  @update_attrs %{group_id: "some updated group_id"}
+  @invalid_attrs %{group_id: nil}
 
   def fixture(:job) do
     {:ok, job} = Projects.create_job(@create_attrs)
@@ -60,7 +60,7 @@ defmodule DashboardWeb.JobControllerTest do
       assert redirected_to(conn) == Routes.job_path(conn, :show, job)
 
       conn = get(conn, Routes.job_path(conn, :show, job))
-      assert html_response(conn, 200) =~ "some updated job_id"
+      assert html_response(conn, 200) =~ "some updated group_id"
     end
 
     test "renders errors when data is invalid", %{conn: conn, job: job} do

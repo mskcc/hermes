@@ -13,8 +13,8 @@ defmodule Dashboard.Projects.Sample do
     field :status, SampleStatusEnum, default: @default_status
     has_many :jobs, Projects.Job
     has_one :job, Projects.Job
-    belongs_to :project, Projects.Project
     belongs_to :assay, Projects.Assay
+    belongs_to :request, Projects.Request
     has_many :metadata, Projects.SampleMetadatum
     has_one :metadatum, Projects.SampleMetadatum
 
@@ -24,14 +24,14 @@ defmodule Dashboard.Projects.Sample do
   @doc false
   def changeset(sample, attrs) do
     sample
-    |> cast(attrs, [:mrn, :project_id, :assay_id, :tube_id])
-    |> validate_required([:project_id, :assay_id, :tube_id])
+    |> cast(attrs, [:mrn, :assay_id, :tube_id, :request_id])
+    |> validate_required([:assay_id, :tube_id, :request_id])
     |> unique_constraint([:tube_id])
   end
 
   def filter_changeset(params) do
     data = %{}
-    filter_types = %{project: :string, status: :integer, id: :string}
+    filter_types = %{request: :string, status: :integer, id: :string}
 
     filters =
       {data, filter_types}

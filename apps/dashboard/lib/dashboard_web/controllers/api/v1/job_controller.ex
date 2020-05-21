@@ -5,7 +5,9 @@ defmodule DashboardWeb.Api.V1.JobController do
   alias Dashboard.Projects.Job
 
   def create(conn, params) do
-    case Projects.create_job(params) do
+    sample = Projects.get_sample_by_igo_id!(params["sample_id"])
+    params = Map.put(params, "sample_id", sample.id)
+    case Projects.create_job_with_workflows(params) do
       {:ok, job} ->
         conn
         |> send_resp(201, "")

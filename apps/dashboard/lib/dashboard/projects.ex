@@ -319,13 +319,13 @@ defmodule Dashboard.Projects do
 
     filters =
       Enum.reduce(filters, dynamic(true), fn
-        {:project, value}, dynamic ->
-          dynamic([project: p], ^dynamic and ilike(p.name, ^"%#{value}%"))
+        {:request, value}, dynamic ->
+          dynamic([request: p], ^dynamic and ilike(p.name, ^"%#{value}%"))
 
         {:status, value}, dynamic ->
           dynamic([p], ^dynamic and p.status == ^value)
 
-        {:igo_id, value}, dynamic ->
+        {:id, value}, dynamic ->
           dynamic(
             [p],
             ^dynamic and
@@ -340,19 +340,19 @@ defmodule Dashboard.Projects do
 
     count =
       Sample
-      |> join(:inner, [s], p in assoc(s, :project), as: :project)
+      |> join(:inner, [s], p in assoc(s, :request), as: :request)
       |> select([s], count(s.id))
       |> where(^filters)
       |> Repo.one()
 
     entries =
       Sample
-      |> join(:inner, [s], p in assoc(s, :project), as: :project)
+      |> join(:inner, [s], p in assoc(s, :request), as: :request)
       |> offset(^((page - 1) * per_page))
       |> limit(^per_page)
       |> order_by(^sort_by)
       |> where(^filters)
-      |> preload([:project, jobs: :workflows])
+      |> preload([:request, jobs: :workflows])
       |> Repo.all()
 
     """
@@ -389,6 +389,13 @@ defmodule Dashboard.Projects do
       from u in Sample,
         preload: [:metadata, :metadatum, jobs: :workflows],
         where: u.id == ^id
+    )
+  end
+
+  def get_sample_by_igo_id!(id) do
+    Repo.one!(
+      from u in Sample,
+        where: u.igo_sequencing_id == ^id
     )
   end
 
@@ -504,7 +511,7 @@ defmodule Dashboard.Projects do
 
   ## Examples
 
-      iex> fetch_samples(sample)
+      iex> fetch_samples()
       %Ecto.Changeset{source: %Sample{}}
 
   """
@@ -525,6 +532,7 @@ defmodule Dashboard.Projects do
                 do: nil,
                 else: s["fieldData"]["Sample_Status"]
 
+            IO.inspect(find_or_create_project(%{"name" => s["fieldData"]["Project_ID"]}))
             [
               mrn: s["fieldData"]["MRN"],
               igo_sequencing_id: s["fieldData"]["IGO_ID_Sequencing"],
@@ -532,8 +540,11 @@ defmodule Dashboard.Projects do
               status: status,
               tube_id: s["fieldData"]["TubeID"],
               assay_id: assay.id,
-              # TODO add a cache for this....
-              project_id: find_or_create_project(%{"name" => s["fieldData"]["Study_Code"]}).id,
+              # TODO add a cache for these
+              request_id: find_or_create_request(%{
+                "name" => s["fieldData"]["Request_ID"],
+                "project_id" => 1
+              }).id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
               # metadatum: []
@@ -546,9 +557,6 @@ defmodule Dashboard.Projects do
           on_conflict: :replace_all,
           conflict_target: [:tube_id]
         )
-
-        %{entries: entries, count: count} =
-          list_samples(%{page: 1, per_page: 200, sort_by: [], filters: %{}})
     end
   end
 
@@ -615,7 +623,7 @@ defmodule Dashboard.Projects do
 
       Enum.reduce(children, Ecto.Multi.new(), fn child_attrs, acc ->
         child_attrs =
-          Map.merge(%{"parent_id" => parent.id, "job_id" => attrs["job_id"]}, child_attrs)
+          Map.merge(%{"parent_id" => parent.id, "group_id" => attrs["group_id"]}, child_attrs)
 
         Ecto.Multi.merge(acc, fn _ ->
           build_workflow_inserts(child_attrs)
@@ -628,7 +636,7 @@ defmodule Dashboard.Projects do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:job, Job.changeset(%Job{}, job_attrs))
     |> Ecto.Multi.merge(fn %{job: job} ->
-      workflows = Map.put(job_attrs["workflows"], "job_id", job.id)
+      workflows = Map.put(job_attrs["workflows"], "group_id", job.id)
       build_workflow_inserts(workflows)
     end)
     |> Repo.transaction()
@@ -795,5 +803,113 @@ defmodule Dashboard.Projects do
     %SampleMetadatum{}
     |> SampleMetadatum.changeset(attrs)
     |> Repo.insert()
+  end
+
+  alias Dashboard.Projects.Request
+
+  @doc """
+  Returns the list of requests.
+
+  ## Examples
+
+      iex> list_requests()
+      [%Request{}, ...]
+
+  """
+  def list_requests do
+    Repo.all(Request)
+  end
+
+  @doc """
+  Gets a single request.
+
+  Raises `Ecto.NoResultsError` if the Request does not exist.
+
+  ## Examples
+
+      iex> get_request!(123)
+      %Request{}
+
+      iex> get_request!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_request!(id), do: Repo.get!(Request, id)
+
+  @doc """
+  Creates a request.
+
+  ## Examples
+
+      iex> create_request(%{field: value})
+      {:ok, %Request{}}
+
+      iex> create_request(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_request(attrs \\ %{}) do
+    %Request{}
+    |> Request.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def find_or_create_request(request_params) do
+    query =
+      %Request{}
+      |> Request.changeset(request_params)
+      |> Repo.insert()
+
+    case query do
+      {:ok, request} -> request
+      {:error, changeset} -> Repo.one(from u in Request, where: ^Enum.to_list(changeset.changes))
+    end
+  end
+
+  @doc """
+  Updates a request.
+
+  ## Examples
+
+      iex> update_request(request, %{field: new_value})
+      {:ok, %Request{}}
+
+      iex> update_request(request, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_request(%Request{} = request, attrs) do
+    request
+    |> Request.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a request.
+
+  ## Examples
+
+      iex> delete_request(request)
+      {:ok, %Request{}}
+
+      iex> delete_request(request)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_request(%Request{} = request) do
+    Repo.delete(request)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking request changes.
+
+  ## Examples
+
+      iex> change_request(request)
+      %Ecto.Changeset{source: %Request{}}
+
+  """
+  def change_request(%Request{} = request) do
+    Request.changeset(request, %{})
   end
 end

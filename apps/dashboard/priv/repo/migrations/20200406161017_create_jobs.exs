@@ -3,7 +3,7 @@ defmodule Dashboard.Repo.Migrations.CreateJobs do
 
   def change do
     create table(:jobs) do
-      add :job_id, :string
+      add :group_id, :string
       add :sample_id, references(:samples, on_delete: :nothing)
 
       timestamps()

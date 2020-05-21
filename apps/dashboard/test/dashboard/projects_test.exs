@@ -183,9 +183,9 @@ defmodule Dashboard.ProjectsTest do
   describe "jobs" do
     alias Dashboard.Projects.Job
 
-    @valid_attrs %{job_id: "some job_id"}
-    @update_attrs %{job_id: "some updated job_id"}
-    @invalid_attrs %{job_id: nil}
+    @valid_attrs %{group_id: "some group_id"}
+    @update_attrs %{group_id: "some updated group_id"}
+    @invalid_attrs %{group_id: nil}
 
     def job_fixture(attrs \\ %{}) do
       {:ok, job} =
@@ -208,7 +208,7 @@ defmodule Dashboard.ProjectsTest do
 
     test "create_job/1 with valid data creates a job" do
       assert {:ok, %Job{} = job} = Projects.create_job(@valid_attrs)
-      assert job.job_id == "some job_id"
+      assert job.group_id == "some group_id"
     end
 
     test "create_job/1 with invalid data returns error changeset" do
@@ -218,7 +218,7 @@ defmodule Dashboard.ProjectsTest do
     test "update_job/2 with valid data updates the job" do
       job = job_fixture()
       assert {:ok, %Job{} = job} = Projects.update_job(job, @update_attrs)
-      assert job.job_id == "some updated job_id"
+      assert job.group_id == "some updated group_id"
     end
 
     test "update_job/2 with invalid data returns error changeset" do
@@ -365,6 +365,65 @@ defmodule Dashboard.ProjectsTest do
     test "change_sample_meta_data/1 returns a sample_meta_data changeset" do
       sample_meta_data = sample_meta_data_fixture()
       assert %Ecto.Changeset{} = Projects.change_sample_meta_data(sample_meta_data)
+    end
+  end
+
+  describe "requests" do
+    alias Dashboard.Projects.Request
+
+    @valid_attrs %{request_id: "some request_id"}
+    @update_attrs %{request_id: "some updated request_id"}
+    @invalid_attrs %{request_id: nil}
+
+    def request_fixture(attrs \\ %{}) do
+      {:ok, request} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Projects.create_request()
+
+      request
+    end
+
+    test "list_requests/0 returns all requests" do
+      request = request_fixture()
+      assert Projects.list_requests() == [request]
+    end
+
+    test "get_request!/1 returns the request with given id" do
+      request = request_fixture()
+      assert Projects.get_request!(request.id) == request
+    end
+
+    test "create_request/1 with valid data creates a request" do
+      assert {:ok, %Request{} = request} = Projects.create_request(@valid_attrs)
+      assert request.request_id == "some request_id"
+    end
+
+    test "create_request/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Projects.create_request(@invalid_attrs)
+    end
+
+    test "update_request/2 with valid data updates the request" do
+      request = request_fixture()
+      assert {:ok, %Request{} = request} = Projects.update_request(request, @update_attrs)
+      assert request.request_id == "some updated request_id"
+    end
+
+    test "update_request/2 with invalid data returns error changeset" do
+      request = request_fixture()
+      assert {:error, %Ecto.Changeset{}} = Projects.update_request(request, @invalid_attrs)
+      assert request == Projects.get_request!(request.id)
+    end
+
+    test "delete_request/1 deletes the request" do
+      request = request_fixture()
+      assert {:ok, %Request{}} = Projects.delete_request(request)
+      assert_raise Ecto.NoResultsError, fn -> Projects.get_request!(request.id) end
+    end
+
+    test "change_request/1 returns a request changeset" do
+      request = request_fixture()
+      assert %Ecto.Changeset{} = Projects.change_request(request)
     end
   end
 end

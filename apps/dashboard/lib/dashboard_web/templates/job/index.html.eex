@@ -11,7 +11,7 @@
   <tbody>
 <%= for job <- @jobs do %>
     <tr>
-      <td><%= job.job_id %></td>
+      <td><%= job.group_id %></td>
 
       <td>
         <span><%= link "Show", to: Routes.job_path(@conn, :show, job) %></span>

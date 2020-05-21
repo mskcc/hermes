@@ -4,9 +4,11 @@
   <h4 class="title is-4">Metadata</h4>
   <div id="metadata-editor"></div>
 
+  <%= if @sample.metadatum do %>
   <script type="application/json" id="metadata-info">
     <%=raw Jason.encode!(@sample.metadatum.content) %>
   </script>
+  <% end %>
 
   <div class="container" style="margin-top:20px">
     <h4 class="title is-4">Jobs</h4>
@@ -20,7 +22,7 @@
       <tbody>
         <%= for job <- @sample.jobs do %>
           <tr>
-            <td><%=job.job_id%></td>
+            <td><%=job.group_id%></td>
 
             <td class="workflows">
               <%= if @sample.jobs != [] do %>
@@ -48,7 +50,9 @@
         <%= for metadata <- @sample.metadata do %>
           <tr>
             <td><%=metadata.inserted_at %></td>
-            <td><%=Jason.encode!(@sample.metadatum.content) %></td>
+            <td>
+              <%=Jason.encode!(metadata.content) %>
+            </td>
           </tr>
         <%end%>
       </tbody>

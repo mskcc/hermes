@@ -5,9 +5,9 @@
     </div>
   <% end %>
 
-  <%= label f, :job_id %>
-  <%= text_input f, :job_id %>
-  <%= error_tag f, :job_id %>
+  <%= label f, :group_id %>
+  <%= text_input f, :group_id %>
+  <%= error_tag f, :group_id %>
 
   <div>
     <%= submit "Save" %>
