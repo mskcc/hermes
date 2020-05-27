@@ -3,7 +3,7 @@ defmodule Dashboard.Projects.Sample do
   import Ecto.Changeset
   alias Dashboard.Projects
 
-  @default_role SampleStatusEnum.__enum_map__()[:New]
+  @default_status SampleStatusEnum.__enum_map__()[:New]
 
   schema "samples" do
     field :mrn, :string

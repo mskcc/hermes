@@ -1,7 +1,6 @@
 defmodule DashboardWeb.StatusSearchComponent do
   use Phoenix.LiveComponent
   alias DashboardWeb.Router.Helpers, as: Routes
-  alias Dashboard.Projects
 
   def render(assigns) do
     {selected, _} = Integer.parse(Map.get(assigns.params, "status", "-1"))
@@ -15,7 +14,7 @@ defmodule DashboardWeb.StatusSearchComponent do
         <div class="control">
           <span class="select">
             <select name="status">
-              <option value="-1">--</option>
+              <option value="-1" <%=if selected == -1 do %>selected<%end%>>--</option>
               <%= for {k, v} <- statuses do %>
                 <option <%=if selected == v do %>selected<%end%> value="<%=v%>"><%=k%></option>
               <% end %>

@@ -3,10 +3,6 @@ defmodule DashboardWeb.Helpers.Table do
   import Phoenix.LiveView.Helpers
   alias DashboardWeb.Router.Helpers, as: Routes
 
-  defp is_ascending?(sort_by, field) do
-    (sort_by[field] || :asc) == :asc
-  end
-
   defp sort_by_params(params, sort_by, field) do
     sort_by_param =
       if Keyword.has_key?(sort_by, field) do
@@ -42,7 +38,7 @@ defmodule DashboardWeb.Helpers.Table do
     status = Atom.to_string(workflow.status)
 
     ~E"""
-    <a class="is-<%=workflow.status%>" style="grid-column: <%=column%>; grid-row: <%=row%>" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
+    <a class="is-<%=status%>" style="grid-column: <%=column%>; grid-row: <%=row%>" data-tooltip="<%=workflow.name%>"><i class="far fa-dot-circle"></i></a>
     """
   end
 

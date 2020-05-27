@@ -1,6 +1,4 @@
 defmodule DashboardWeb.Helpers.Input do
-  import Phoenix.HTML
-
   def label(form, field, opts \\ []) do
     Phoenix.HTML.Tag.content_tag :div, class: "label" do
       Phoenix.HTML.Form.label(form, field, opts)
@@ -83,7 +81,7 @@ defmodule DashboardWeb.Helpers.Input do
     end
   end
 
-  defp addon_button(opts \\ []) do
+  defp addon_button(opts) do
     opts = Keyword.put(opts, :class, "button is-info")
 
     Phoenix.HTML.Tag.content_tag :div, class: "control" do
