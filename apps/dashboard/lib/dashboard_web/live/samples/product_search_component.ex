@@ -1,7 +1,6 @@
 defmodule DashboardWeb.RequestSearchComponent do
   use Phoenix.LiveComponent
   alias DashboardWeb.Router.Helpers, as: Routes
-  alias Dashboard.Projects
 
   def render(assigns) do
     ~L"""

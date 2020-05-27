@@ -1,5 +1,0 @@
-<h1>Edit Sample</h1>
-
-<%= render "form.html", Map.put(assigns, :action, Routes.sample_path(@conn, :update, @sample)) %>
-
-<span><%= link "Back", to: Routes.sample_path(@conn, :index) %></span>

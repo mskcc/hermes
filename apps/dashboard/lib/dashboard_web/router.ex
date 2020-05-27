@@ -31,6 +31,9 @@ defmodule DashboardWeb.Router do
   scope "/api/v1" do
     pipe_through [:api]
     post "/jobs", DashboardWeb.Api.V1.JobController, :create
+    post "/jobs/complete", DashboardWeb.Api.V1.JobController, :complete
+    post "/jobs/fail", DashboardWeb.Api.V1.JobController, :fail
+    post "/jobs/start", DashboardWeb.Api.V1.JobController, :start
     # get "/projects", DashboardWeb.Api.V1.ProjectController, :index
     # get "/assays", DashboardWeb.Api.V1.AssayController, :index
   end

@@ -57,7 +57,8 @@ defmodule Dashboard.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:paginator, "~> 0.6"},
       {:timex, "~> 3.5"},
-      {:elixir_uuid, "~> 1.2"}
+      {:elixir_uuid, "~> 1.2"},
+      {:gearbox, "~> 0.2.1"}
     ]
   end
 

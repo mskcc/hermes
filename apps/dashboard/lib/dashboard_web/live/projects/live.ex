@@ -57,22 +57,12 @@ defmodule DashboardWeb.ProjectsLive.List do
     assign(socket, projects: projects, page_title: "Listing Projects – Page #{params["page"]}")
   end
 
-  def handle_event("filter", params, socket) do
-    IO.inspect(params)
-
-    """
-    changeset =
-      socket.assigns.user
-      |> Demo.Accounts.change_user(params)
-      |> Map.put(:action, :update)
-
-    """
-
-    {:noreply, push_patch(socket, to: Routes.live_path(socket, __MODULE__, params["project"]))}
-  end
-
   def handle_info({Projects, [:projects | _], _}, socket) do
     {:noreply, fetch(socket)}
+  end
+
+  def handle_event("filter", params, socket) do
+    {:noreply, push_patch(socket, to: Routes.live_path(socket, __MODULE__, params["project"]))}
   end
 
   def handle_event("keydown", %{"code" => "ArrowLeft"}, socket) do

@@ -136,16 +136,6 @@ defmodule Dashboard.Projects do
   alias Dashboard.Projects.Project
 
   @doc """
-  Returns the list of projects.
-
-  ## Examples
-
-      iex> list_projects()
-      [%Project{}, ...]
-
-  """
-
-  @doc """
   Returns the list of projects
 
   ## Examples
@@ -721,6 +711,9 @@ defmodule Dashboard.Projects do
 
   """
   def get_workflow!(id), do: Repo.get!(Workflow, id)
+
+  def get_workflow_by_group_and_name!(group, name),
+    do: Repo.get_by!(Workflow, group_id: group, name: name)
 
   @doc """
   Creates a workflow.

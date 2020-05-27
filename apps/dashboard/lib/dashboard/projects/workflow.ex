@@ -3,13 +3,11 @@ defmodule Dashboard.Projects.Workflow do
   import Ecto.Changeset
   alias Dashboard.Projects
 
-  @default_status WorkflowStatusEnum.__enum_map__()[:pending]
-
   schema "workflows" do
     field :name, :string
     belongs_to :job, Projects.Job
     belongs_to :parent, Projects.Workflow
-    field :status, WorkflowStatusEnum, default: @default_status
+    field :status, WorkflowStatusEnum, default: :pending
 
     # TODO maybe we want pipeline information here?
 
@@ -23,3 +21,16 @@ defmodule Dashboard.Projects.Workflow do
     |> validate_required([:name])
   end
 end
+
+defmodule WorkflowState do
+  use Gearbox,
+    field: :status,
+    states: Keyword.keys(WorkflowStatusEnum.__enum_map__()),
+    initial: :pending,
+    transitions: %{
+      :pending => [:running],
+      :running => [:success, :falure]
+    }
+end
+
+# https://hexdocs.pm/ecto/constraints-and-upserts.html

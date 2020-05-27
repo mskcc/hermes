@@ -54,7 +54,7 @@
                   <%= link sample.igo_sequencing_id, to: Routes.sample_path(@conn, :show, sample) %>
                 </td>
 
-                <td><span class="tag is-info"><%=sample.project.name%></span></td>
+                <td><span class="tag is-info"><%=sample.request.name%></span></td>
                 <td data-tooltip="<%=sample.inserted_at%>"><small>Added <%= Date.relative_to_now(sample.inserted_at)%></small></td>
                 <td class="level-right"><a class="button is-small is-primary" href="#">Action</a></td>
               </tr>

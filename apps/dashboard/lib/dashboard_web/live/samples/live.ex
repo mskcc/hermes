@@ -5,7 +5,6 @@ defmodule DashboardWeb.SamplesLive.List do
   alias Dashboard.Projects.Sample
   alias DashboardWeb.SampleView
   alias DashboardWeb.Router.Helpers, as: Routes
-  alias DashboardWeb.ProductSearchComponent
 
   @default_per_page 15
   def render(assigns), do: SampleView.render("list.html", assigns)
