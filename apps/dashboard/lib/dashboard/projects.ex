@@ -17,6 +17,7 @@ defmodule Dashboard.Projects do
 
   alias Dashboard.Projects.Assay
   alias Dashboard.Projects.Workflow
+  alias Dashboard.Projects.SampleMetadata
 
   @doc """
   Returns the list of assays.
@@ -371,9 +372,11 @@ defmodule Dashboard.Projects do
 
   """
   def get_sample!(id) do
+    metadata_query = from m in SampleMetadata, order_by: [desc: m.inserted_at]
+
     Repo.one!(
       from u in Sample,
-        preload: [:metadata, :latest_metadata, jobs: :workflows],
+        preload: [metadata: ^metadata_query, jobs: :workflows],
         where: u.id == ^id
     )
   end
@@ -452,7 +455,7 @@ defmodule Dashboard.Projects do
 
   def fetch_sample_metadata() do
     sample_groups =
-      Repo.all(from u in Sample, select: [:igo_sequencing_id, :id], preload: [:latest_metadata])
+      Repo.all(from u in Sample, select: [:igo_sequencing_id, :id], preload: :metadata)
       |> Enum.chunk_every(10)
       |> Enum.take(1)
 
@@ -467,8 +470,9 @@ defmodule Dashboard.Projects do
         {:ok, body} ->
           for {sample, new_metadata} <- Enum.zip(samples, body) do
             # TODO Redo mechanism here on error
-            case update_metadata(sample, new_metadata) do
+            case update_sample_metadata(sample, new_metadata) do
               {:ok, _} -> nil
+              :noop -> nil
               {_, message} -> Logger.error(message, %{sample: sample, metadata: new_metadata})
             end
           end
@@ -476,19 +480,32 @@ defmodule Dashboard.Projects do
     end
   end
 
-  defp update_metadata(sample, new_metadata) do
-    changed = true
-    IO.inspect(sample)
+  def update_sample_metadata(sample, new_metadata) do
+    current_metadata = List.last(sample.metadata)
 
-    case changed do
-      true ->
+    case current_metadata do
+      nil ->
         create_sample_metadata(%{
           content: new_metadata,
           sample_id: sample.id
         })
 
       _ ->
-        changed
+        changeset =
+          SampleMetadata.changeset(current_metadata, %{
+            content: new_metadata
+          })
+
+        case changeset.changes do
+          %{content: _content} ->
+            create_sample_metadata(%{
+              content: new_metadata,
+              sample_id: sample.id
+            })
+
+          _ ->
+            :noop
+        end
     end
   end
 
@@ -509,6 +526,7 @@ defmodule Dashboard.Projects do
 
       {:ok, body} ->
         assay = get_assay_by_name!("Access")
+        project = find_or_create_project(%{"name" => "Access"})
 
         samples =
           body["data"]
@@ -517,8 +535,6 @@ defmodule Dashboard.Projects do
               if s["fieldData"]["Sample_Status"] == "",
                 do: nil,
                 else: s["fieldData"]["Sample_Status"]
-
-            IO.inspect(find_or_create_project(%{"name" => s["fieldData"]["Project_ID"]}))
 
             [
               mrn: s["fieldData"]["MRN"],
@@ -531,7 +547,7 @@ defmodule Dashboard.Projects do
               request_id:
                 find_or_create_request(%{
                   "name" => s["fieldData"]["Request_ID"],
-                  "project_id" => 1
+                  "project_id" => project.id
                 }).id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)

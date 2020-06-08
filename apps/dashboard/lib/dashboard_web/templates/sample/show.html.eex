@@ -6,7 +6,7 @@
 
   <%= if @sample.latest_metadata do %>
   <script type="application/json" id="metadata-info">
-    <%=raw Jason.encode!(@sample.latest_metadata.content) %>
+    <%=raw Jason.encode!(List.first(@sample.metadata).content) %>
   </script>
   <% end %>
 
@@ -51,7 +51,11 @@
           <tr>
             <td><%=metadata.inserted_at %></td>
             <td>
-              <%=Jason.encode!(metadata.content) %>
+              <pre>
+                <code>
+                  <%=Jason.encode!(metadata.content, pretty: true) %>
+                </code>
+              </pre>
             </td>
           </tr>
         <%end%>
