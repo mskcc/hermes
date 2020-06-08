@@ -30,7 +30,7 @@ defmodule LimsClient.MixProject do
       {:mint, "~> 1.0"},
       {:ecto, "~> 3.4.4"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-{:nimble_csv, "~> 0.7"}
+      {:nimble_csv, "~> 0.7"}
     ]
   end
 end

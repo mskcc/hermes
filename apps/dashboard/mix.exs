@@ -57,7 +57,7 @@ defmodule Dashboard.MixProject do
       {:timex, "~> 3.5"},
       {:elixir_uuid, "~> 1.2"},
       {:paper_trail, "~> 0.8.4"},
-      #{:ex_state_ecto, "~> 0.2"},
+      # {:ex_state_ecto, "~> 0.2"},
       {:oban, "~> 1.2"}
     ]
   end

@@ -6,14 +6,14 @@ defmodule Dashboard.Projects do
   require Logger
   import Ecto.Query, warn: false
   alias Dashboard.Repo
-  use Oban.Worker, queue: :events,
+
+  use Oban.Worker,
+    queue: :events,
     queue: :events,
     priority: 3,
     max_attempts: 3,
     tags: ["projects"],
     unique: [period: 30]
-
-
 
   alias Dashboard.Projects.Assay
   alias Dashboard.Projects.Workflow

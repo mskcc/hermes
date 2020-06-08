@@ -59,29 +59,33 @@ defmodule LimsClient do
   )
 
   @doc false
-  #@spec fetch_samples_by_request(String.t()) :: any 
+  # @spec fetch_samples_by_request(String.t()) :: any 
   def fetch_sample_ids_by_request(request_id) do
     {:ok, response} = get("/api/getRequestSamples?" <> "request=#{request_id}")
-    
-    Enum.map(response.body["samples"], &(&1["igoSampleId"]))
+
+    Enum.map(response.body["samples"], & &1["igoSampleId"])
   end
 
   def build_csv_of_sample_metadata_from_request_id(request_id) do
-    sample_groups = fetch_sample_ids_by_request(request_id) 
-                    |> Enum.chunk_every(10)
+    sample_groups =
+      fetch_sample_ids_by_request(request_id)
+      |> Enum.chunk_every(10)
 
-    #{:ok, file} = File.open("/Users/fraihaa/Dev/seqosystem/sample_metadata", [:write])
+    # {:ok, file} = File.open("/Users/fraihaa/Dev/seqosystem/sample_metadata", [:write])
     NimbleCSV.define(MyParser, separator: "\t", escape: "\"")
 
     Enum.each(sample_groups, fn samples ->
       case LimsClient.fetch_sample_manifests(samples) do
         {:ok, body} ->
           IO.inspect(body)
-          values = Enum.map(body, &(&1 |> Map.drop(["libraries", "qc_reports"]) |> Map.values))
+          values = Enum.map(body, &(&1 |> Map.drop(["libraries", "qc_reports"]) |> Map.values()))
+
           MyParser.dump_to_stream(values)
           |> Stream.into(File.stream!("append.csv", [:append, :utf8]))
-          |> Stream.run
-        _ ->  IO.inspect("Error with #{samples}")
+          |> Stream.run()
+
+        _ ->
+          IO.inspect("Error with #{samples}")
       end
     end)
   end
