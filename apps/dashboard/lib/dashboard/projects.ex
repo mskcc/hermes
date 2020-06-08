@@ -6,6 +6,14 @@ defmodule Dashboard.Projects do
   require Logger
   import Ecto.Query, warn: false
   alias Dashboard.Repo
+  use Oban.Worker, queue: :events,
+    queue: :events,
+    priority: 3,
+    max_attempts: 3,
+    tags: ["projects"],
+    unique: [period: 30]
+
+
 
   alias Dashboard.Projects.Assay
   alias Dashboard.Projects.Workflow
@@ -345,18 +353,6 @@ defmodule Dashboard.Projects do
       |> preload([:request, jobs: :workflows])
       |> Repo.all()
 
-    """
-    Repo.all
-      from u in Sample,
-        offset: ^((page - 1) * per_page),
-        limit: ^per_page,
-        order_by: ^sort_by,
-        where: ^filters,
-        join: p in assoc(u, :project), as: :project,
-        preload: [:project, jobs: :workflows]
-    )
-    """
-
     %{entries: entries, count: count}
   end
 
@@ -377,7 +373,7 @@ defmodule Dashboard.Projects do
   def get_sample!(id) do
     Repo.one!(
       from u in Sample,
-        preload: [:metadata, :metadatum, jobs: :workflows],
+        preload: [:metadata, :latest_metadata, jobs: :workflows],
         where: u.id == ^id
     )
   end
@@ -454,9 +450,9 @@ defmodule Dashboard.Projects do
     Sample.changeset(sample, %{})
   end
 
-  def fetch_sample_metadatum() do
+  def fetch_sample_metadata() do
     sample_groups =
-      Repo.all(from u in Sample, select: [:igo_sequencing_id, :id], preload: [:metadatum])
+      Repo.all(from u in Sample, select: [:igo_sequencing_id, :id], preload: [:latest_metadata])
       |> Enum.chunk_every(10)
       |> Enum.take(1)
 
@@ -469,25 +465,25 @@ defmodule Dashboard.Projects do
           IO.inspect(body)
 
         {:ok, body} ->
-          for {sample, new_metadatum} <- Enum.zip(samples, body) do
+          for {sample, new_metadata} <- Enum.zip(samples, body) do
             # TODO Redo mechanism here on error
-            case update_metadatum(sample, new_metadatum) do
+            case update_metadata(sample, new_metadata) do
               {:ok, _} -> nil
-              {_, message} -> Logger.error(message, %{sample: sample, metadata: new_metadatum})
+              {_, message} -> Logger.error(message, %{sample: sample, metadata: new_metadata})
             end
           end
       end
     end
   end
 
-  defp update_metadatum(sample, new_metadatum) do
+  defp update_metadata(sample, new_metadata) do
     changed = true
     IO.inspect(sample)
 
     case changed do
       true ->
-        create_sample_metadatum(%{
-          content: new_metadatum,
+        create_sample_metadata(%{
+          content: new_metadata,
           sample_id: sample.id
         })
 
@@ -539,7 +535,7 @@ defmodule Dashboard.Projects do
                 }).id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
-              # metadatum: []
+              # metadata: []
             ]
           end)
 
@@ -780,23 +776,23 @@ defmodule Dashboard.Projects do
     Workflow.changeset(workflow, %{})
   end
 
-  alias Dashboard.Projects.SampleMetadatum
+  alias Dashboard.Projects.SampleMetadata
 
   @doc """
-  Creates a sample_metadatum.
+  Creates a sample_metadata.
 
   ## Examples
 
-      iex> create_sample_metadatum(%{field: value})
-      {:ok, %SampleMetadatum{}}
+      iex> create_sample_metadata(%{field: value})
+      {:ok, %SampleMetadata{}}
 
-      iex> create_sample_metadatum(%{field: bad_value})
+      iex> create_sample_metadata(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_sample_metadatum(attrs \\ %{}) do
-    %SampleMetadatum{}
-    |> SampleMetadatum.changeset(attrs)
+  def create_sample_metadata(attrs \\ %{}) do
+    %SampleMetadata{}
+    |> SampleMetadata.changeset(attrs)
     |> Repo.insert()
   end
 

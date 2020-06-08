@@ -1,7 +1,0 @@
-<%= if get_flash(@conn, :info) do  %>
-  <div class="notification is-success">
-    <%= get_flash(@conn, :info) %>
-  </div>
-<%end%>
-<%= render "form.html", Map.put(assigns, :action, Routes.assay_path(@conn, :create, layout: false)) %>
-

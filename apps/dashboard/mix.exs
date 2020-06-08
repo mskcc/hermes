@@ -53,12 +53,12 @@ defmodule Dashboard.MixProject do
       {:lims_client, in_umbrella: true},
       {:access_tracker_client, in_umbrella: true},
       {:paddle, "~> 0.1.0"},
-      {:quantum, "~> 3.0-rc"},
       {:ecto_enum, "~> 1.4"},
-      {:paginator, "~> 0.6"},
       {:timex, "~> 3.5"},
       {:elixir_uuid, "~> 1.2"},
-      {:gearbox, "~> 0.2.1"}
+      {:paper_trail, "~> 0.8.4"},
+      #{:ex_state_ecto, "~> 0.2"},
+      {:oban, "~> 1.2"}
     ]
   end
 

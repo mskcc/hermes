@@ -4,9 +4,9 @@
   <h4 class="title is-4">Metadata</h4>
   <div id="metadata-editor"></div>
 
-  <%= if @sample.metadatum do %>
+  <%= if @sample.latest_metadata do %>
   <script type="application/json" id="metadata-info">
-    <%=raw Jason.encode!(@sample.metadatum.content) %>
+    <%=raw Jason.encode!(@sample.latest_metadata.content) %>
   </script>
   <% end %>
 

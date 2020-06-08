@@ -1,8 +1,0 @@
-<h1>Show Assay</h1>
-
-<ul>
-
-</ul>
-
-<span><%= link "Edit", to: Routes.assay_path(@conn, :edit, @assay) %></span>
-<span><%= link "Back", to: Routes.assay_path(@conn, :index) %></span>

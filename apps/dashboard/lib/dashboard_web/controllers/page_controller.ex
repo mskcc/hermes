@@ -1,6 +1,5 @@
 defmodule DashboardWeb.PageController do
   use DashboardWeb, :controller
-  alias Dashboard.Projects.Sample
   alias Dashboard.Projects
 
   def index(conn, _params) do

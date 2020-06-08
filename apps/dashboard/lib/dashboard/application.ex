@@ -14,7 +14,8 @@ defmodule Dashboard.Application do
       DashboardWeb.Endpoint,
       # Starts a worker by calling: Dashboard.Worker.start_link(arg)
       # {Dashboard.Worker, arg},
-      Dashboard.Scheduler
+      #
+      {Oban, oban_config()}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -28,5 +29,18 @@ defmodule Dashboard.Application do
   def config_change(changed, _new, removed) do
     DashboardWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp oban_config do
+    opts = Application.get_env(:dashboard, Oban)
+
+    # Prevent running queues or scheduling jobs from an iex console.
+    if Code.ensure_loaded?(IEx) and IEx.started?() do
+      opts
+      |> Keyword.put(:crontab, false)
+      |> Keyword.put(:queues, false)
+    else
+      opts
+    end
   end
 end

@@ -22,6 +22,10 @@ defmodule Dashboard.Projects.Workflow do
   end
 end
 
+defmodule SaleWorkflow do
+end
+
+"""
 defmodule WorkflowState do
   use Gearbox,
     field: :status,
@@ -32,5 +36,6 @@ defmodule WorkflowState do
       :running => [:success, :falure]
     }
 end
+"""
 
 # https://hexdocs.pm/ecto/constraints-and-upserts.html

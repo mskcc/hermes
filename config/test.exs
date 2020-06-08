@@ -17,11 +17,6 @@ config :dashboard, DashboardWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-config :paddle, Paddle,
-  # host: "vsskiplappfm1.mskcc.root.mskcc.org",
-  host: "LDAPGLB.MSKCC.ORG",
-  base: "DC=MSKCC,DC=ROOT,DC=MSKCC,DC=ORG",
-  ssl: true,
-  port: 636,
-  account_subdn: "OU=Sloan Kettering Institute,OU=SKI",
-  account_identifier: "CN"
+config :tesla, adapter: Tesla.Mock
+
+config :dashboard, Oban, crontab: false, queues: false, plugins: false

@@ -34,8 +34,6 @@ defmodule DashboardWeb.Router do
     post "/jobs/complete", DashboardWeb.Api.V1.JobController, :complete
     post "/jobs/fail", DashboardWeb.Api.V1.JobController, :fail
     post "/jobs/start", DashboardWeb.Api.V1.JobController, :start
-    # get "/projects", DashboardWeb.Api.V1.ProjectController, :index
-    # get "/assays", DashboardWeb.Api.V1.AssayController, :index
   end
 
   scope "/" do
@@ -58,7 +56,6 @@ defmodule DashboardWeb.Router do
 
     get "/", PageController, :index
     resources "/samples", SampleController, except: [:index]
-    post "/assays", AssayController, :create
   end
 
   scope "/", DashboardWeb do
@@ -66,9 +63,4 @@ defmodule DashboardWeb.Router do
     live "/samples", SamplesLive.List
     live "/projects", ProjectsLive.List
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", DashboardWeb do
-  #   pipe_through :api
-  # end
 end
