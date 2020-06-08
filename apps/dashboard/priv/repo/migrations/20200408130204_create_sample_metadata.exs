@@ -5,8 +5,8 @@ defmodule Dashboard.Repo.Migrations.CreateSampleMetadata do
     create table(:sample_metadata) do
       add :content, :jsonb
       add :sample_id, :id
-      belongs_to :first_version, PaperTrail.Version
-      belongs_to :current_version, PaperTrail.Version, on_replace: :update
+      belongs_to(:first_version, PaperTrail.Version)
+      belongs_to(:current_version, PaperTrail.Version, on_replace: :update)
 
       timestamps()
     end
