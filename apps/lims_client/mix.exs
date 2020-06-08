@@ -27,7 +27,10 @@ defmodule LimsClient.MixProject do
     [
       {:tesla, "~> 1.3.0"},
       {:jason, ">= 1.0.0"},
-      {:mint, "~> 1.0"}
+      {:mint, "~> 1.0"},
+      {:ecto, "~> 3.4.4"},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+{:nimble_csv, "~> 0.7"}
     ]
   end
 end

@@ -15,8 +15,8 @@ defmodule Dashboard.Projects.Sample do
     has_one :job, Projects.Job
     belongs_to :assay, Projects.Assay
     belongs_to :request, Projects.Request
-    has_many :metadata, Projects.SampleMetadatum
-    has_one :metadatum, Projects.SampleMetadatum
+    has_many :metadata, Projects.SampleMetadata
+    has_one :latest_metadata, Projects.SampleMetadata
 
     timestamps(type: :utc_datetime)
   end
@@ -33,8 +33,7 @@ defmodule Dashboard.Projects.Sample do
     data = %{}
     filter_types = %{request: :string, status: :integer, id: :string}
 
-    filters =
-      {data, filter_types}
-      |> cast(params, Map.keys(filter_types))
+    {data, filter_types}
+    |> cast(params, Map.keys(filter_types))
   end
 end

@@ -14,7 +14,7 @@ defmodule AccessTrackerClient do
 
   """
   def fetch_samples do
-    Tesla.get(client, "/fmi/data/v1/databases/ACCESS_Tracker/layouts/samplesAPI/records")
+    Tesla.get(client(), "/fmi/data/v1/databases/ACCESS_Tracker/layouts/samplesAPI/records")
     |> process_response
   end
 
@@ -51,7 +51,7 @@ defmodule AccessTrackerClient do
   end
 
   defp client do
-    token = get_auth_token
+    token = get_auth_token()
 
     middleware = [
       {Tesla.Middleware.BaseUrl, @url},

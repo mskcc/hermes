@@ -2,7 +2,6 @@ defmodule DashboardWeb.Api.V1.JobController do
   use DashboardWeb, :controller
 
   alias Dashboard.Projects
-  alias Dashboard.Projects.Job
 
   def create(conn, params) do
     sample = Projects.get_sample_by_igo_id!(params["sample_id"])
@@ -13,7 +12,7 @@ defmodule DashboardWeb.Api.V1.JobController do
 
   def start(conn, %{
         "group_id" => group_id,
-        "sample_id" => sample_id,
+        "sample_id" => _sample_id,
         "workflow_name" => workflow_name
       }) do
     workflow = Projects.get_workflow_by_group_and_name!(group_id, workflow_name)
@@ -28,7 +27,7 @@ defmodule DashboardWeb.Api.V1.JobController do
 
   def complete(conn, %{
         "group_id" => group_id,
-        "sample_id" => sample_id,
+        "sample_id" => _sample_id,
         "workflow_name" => workflow_name
       }) do
     workflow = Projects.get_workflow_by_group_and_name!(group_id, workflow_name)
@@ -43,7 +42,7 @@ defmodule DashboardWeb.Api.V1.JobController do
 
   def fail(conn, %{
         "group_id" => group_id,
-        "sample_id" => sample_id,
+        "sample_id" => _sample_id,
         "workflow_name" => workflow_name
       }) do
     workflow = Projects.get_workflow_by_group_and_name!(group_id, workflow_name)
@@ -58,7 +57,7 @@ defmodule DashboardWeb.Api.V1.JobController do
 
   defp api_response(conn, updates) do
     case updates do
-      {:ok, job} ->
+      {:ok, _job} ->
         conn
         |> send_resp(201, "")
 

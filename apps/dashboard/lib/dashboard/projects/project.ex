@@ -4,7 +4,7 @@ defmodule Dashboard.Projects.Project do
 
   schema "projects" do
     field :name, :string
-    has_many :samples, Dashboard.Projects.Sample
+    has_many :requests, Dashboard.Projects.Request
 
     timestamps(type: :utc_datetime)
   end

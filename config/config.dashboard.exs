@@ -30,8 +30,9 @@ config :phoenix,
   json_library: Jason,
   template_engines: [leex: Phoenix.LiveView.Engine]
 
-config :dashboard, Dashboard.Scheduler,
-  jobs: [
-    # Every 15 minutes
-    # {"*/15 * * * *",   {Dashboard, :pull_samples}},
-  ]
+config :dashboard, Oban,
+  repo: Dashboard.Repo,
+  queues: [default: 10, events: 50, media: 20]
+
+config :ex_state, repo: Dashboard.Repo
+config :paper_trail, repo: Dashboard.Repo, strict_mode: true

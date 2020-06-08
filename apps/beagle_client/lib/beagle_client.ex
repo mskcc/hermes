@@ -19,7 +19,7 @@ defmodule BeagleClient do
 
   ## Examples
 
-      iex> result = LimsClient.get_sample_manifest("1000")
+      iex> result = BeagleClient.get_sample_manifest("1000")
       ...> with {_, %Tesla.Env{}} <- result, do: :passed
       iex> :passed
   """

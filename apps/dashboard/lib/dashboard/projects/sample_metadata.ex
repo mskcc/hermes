@@ -1,4 +1,4 @@
-defmodule Dashboard.Projects.SampleMetadatum do
+defmodule Dashboard.Projects.SampleMetadata do
   use Ecto.Schema
   import Ecto.Changeset
   alias Dashboard.Projects
@@ -11,8 +11,8 @@ defmodule Dashboard.Projects.SampleMetadatum do
   end
 
   @doc false
-  def changeset(sample_metadatum, attrs) do
-    sample_metadatum
+  def changeset(sample_metadata, attrs) do
+    sample_metadata
     |> cast(attrs, [:sample_id])
     |> validate_required([:sample_id])
     |> cast_embed(:content, with: &content_changeset/2)
