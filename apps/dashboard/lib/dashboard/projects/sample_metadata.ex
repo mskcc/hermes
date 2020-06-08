@@ -6,7 +6,8 @@ defmodule Dashboard.Projects.SampleMetadata do
   schema "sample_metadata" do
     belongs_to :sample, Projects.Sample
 
-    embeds_one :content, LimsClient.Ecto.MetaData
+    embeds_one :content, LimsClient.Ecto.MetaData, on_replace: :update
+
     timestamps()
   end
 

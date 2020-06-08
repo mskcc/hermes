@@ -10,6 +10,8 @@
     "bulma": "^0.8.0",
     "bulma-tooltip": "^3.0.2",
     "choices.js": "^9.0.1",
+    "highlight.js": "^10.0.3",
+    "json-formatter-js": "^2.3.4",
     "jsoneditor": "^8.6.4",
     "lodash": "^4.17.15",
     "phoenix": "file:../../../deps/phoenix",
