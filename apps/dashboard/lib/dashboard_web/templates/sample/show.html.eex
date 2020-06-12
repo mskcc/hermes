@@ -4,9 +4,9 @@
   <h4 class="title is-4">Metadata</h4>
   <div id="metadata-editor"></div>
 
-  <%= if @sample.latest_metadata do %>
+  <%= if @sample.metadata do %>
   <script type="application/json" id="metadata-info">
-    <%=raw Jason.encode!(List.first(@sample.metadata).content) %>
+    <%=raw Jason.encode!(@sample.metadata.content) %>
   </script>
   <% end %>
 
@@ -42,21 +42,19 @@
     <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Content</th>
+          <th>Changes</th>
+          <th>Date Updated</th>
+          <th>Changed By</th>
         </tr>
       </thead>
       <tbody>
-        <%= for metadata <- @sample.metadata do %>
+        <%= for version <- @metadata_history do %>
           <tr>
-            <td><%=metadata.inserted_at %></td>
             <td>
-              <pre>
-                <code>
-                  <%=Jason.encode!(metadata.content, pretty: true) %>
-                </code>
-              </pre>
+              <%=Table.render_version(version) %>
             </td>
+            <td data-tooltip="<%=version.recorded_at%>"><small><%= Date.relative_to_now(version.recorded_at)%></small></td>
+            <td></td>
           </tr>
         <%end%>
       </tbody>

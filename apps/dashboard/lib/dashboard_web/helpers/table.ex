@@ -66,4 +66,45 @@ defmodule DashboardWeb.Helpers.Table do
 
     render_workflow_tree(tree)
   end
+
+
+  def render_patched_content({:added, content}) do
+    ~E"""
+        <pre><code><%=Jason.encode!(content, pretty: true) %></code></pre>
+    """
+  end
+
+  def render_patched_content({:changed, content}) do
+    Enum.map(content, fn {field, update} ->
+      html = case update do
+        {:changed, updates} ->
+          {_, old_value, new_value} = updates
+          ~E"""
+        <span class="tag"><strong><%=field%></strong></span><span class="tag is-light is-danger"><%=old_value%></span>&nbsp;<small class="fa fa-long-arrow-alt-right"></small>&nbsp;<span class="tag is-success"><%=new_value%></span>
+          """
+        {:changed_in_list, updates} ->
+          {_, old_value, new_value} = updates
+          ~E"""
+        <span class="tag"><strong><%=field%></strong></span><span class="tag is-light is-danger"><%=old_value%></span>&nbsp;<small class="fa fa-long-arrow-alt-right"></small>&nbsp;<span class="tag is-success"><%=new_value%></span>
+          """
+        {:added, updates} ->
+          {_, new_value} = updates
+          ~E"""
+        <span class="tag"><strong><%=field%></strong></span><small class="fa fa-long-arrow-alt-right"></small>&nbsp;<span class="tag is-success"><%=new_value%></span>
+          """
+        {:removed, updates} ->
+          {_, old_value} = updates
+          ~E"""
+        <span class="tag"><strong><%=field%></strong></span><span class="tag is-light is-danger"><%=old_value%></span>
+          """
+      end
+      String.trim(safe_to_string(html))
+    end)
+    |> Enum.join("\n")
+    |> raw
+  end
+
+  def render_version(version) do
+    render_patched_content(version.patch.content)
+  end
 end

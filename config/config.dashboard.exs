@@ -35,4 +35,9 @@ config :dashboard, Oban,
   queues: [default: 10, events: 50, media: 20]
 
 config :ex_state, repo: Dashboard.Repo
-config :paper_trail, repo: Dashboard.Repo, strict_mode: true
+
+config :ex_audit,
+  version_schema: Dashboard.Audit.Version,
+  tracked_schemas: [
+    Dashboard.Projects.SampleMetadata,
+  ]

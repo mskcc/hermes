@@ -374,11 +374,9 @@ defmodule Dashboard.Projects do
 
   """
   def get_sample!(id) do
-    metadata_query = from m in SampleMetadata, order_by: [desc: m.inserted_at]
-
     Repo.one!(
       from u in Sample,
-        preload: [metadata: ^metadata_query, jobs: :workflows],
+        preload: [:metadata,  jobs: :workflows],
         where: u.id == ^id
     )
   end
@@ -483,7 +481,7 @@ defmodule Dashboard.Projects do
   end
 
   def update_sample_metadata(sample, new_metadata) do
-    current_metadata = List.last(sample.metadata)
+    current_metadata = sample.metadata
 
     case current_metadata do
       nil ->
@@ -500,15 +498,16 @@ defmodule Dashboard.Projects do
 
         case changeset.changes do
           %{content: _content} ->
-            create_sample_metadata(%{
-              content: new_metadata,
-              sample_id: sample.id
-            })
+            Repo.update(changeset)
 
           _ ->
             :noop
         end
     end
+  end
+
+  def get_sample_metadata_history(sample) do
+    Repo.history(sample.metadata)
   end
 
   @doc """

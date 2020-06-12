@@ -15,8 +15,7 @@ defmodule Dashboard.Projects.Sample do
     has_one :job, Projects.Job
     belongs_to :assay, Projects.Assay
     belongs_to :request, Projects.Request
-    has_many :metadata, Projects.SampleMetadata
-    has_one :latest_metadata, Projects.SampleMetadata
+    has_one :metadata, Projects.SampleMetadata
 
     timestamps(type: :utc_datetime)
   end
