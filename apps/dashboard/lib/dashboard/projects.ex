@@ -344,6 +344,8 @@ defmodule Dashboard.Projects do
       |> where(^filters)
       |> Repo.one()
 
+    metadata_query = from m in SampleMetadata, order_by: [desc: m.inserted_at], limit: 1
+
     entries =
       Sample
       |> join(:inner, [s], p in assoc(s, :request), as: :request)
@@ -351,7 +353,7 @@ defmodule Dashboard.Projects do
       |> limit(^per_page)
       |> order_by(^sort_by)
       |> where(^filters)
-      |> preload([:request, jobs: :workflows])
+      |> preload([:request, jobs: :workflows, metadata: ^metadata_query])
       |> Repo.all()
 
     %{entries: entries, count: count}
