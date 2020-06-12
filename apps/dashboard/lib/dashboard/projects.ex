@@ -376,7 +376,7 @@ defmodule Dashboard.Projects do
   def get_sample!(id) do
     Repo.one!(
       from u in Sample,
-        preload: [:metadata,  jobs: :workflows],
+        preload: [:metadata, jobs: :workflows],
         where: u.id == ^id
     )
   end

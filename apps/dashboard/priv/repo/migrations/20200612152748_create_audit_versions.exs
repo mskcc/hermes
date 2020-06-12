@@ -24,7 +24,7 @@ defmodule Dashboard.Repo.Migrations.CreateAuditVersions do
       # for example, it's a good idea to track who did the change
       add :actor_id, references(:users, on_update: :update_all, on_delete: :nilify_all)
     end
-    create index(:audit_versions, [:entity_schema, :entity_id])
 
+    create index(:audit_versions, [:entity_schema, :entity_id])
   end
 end

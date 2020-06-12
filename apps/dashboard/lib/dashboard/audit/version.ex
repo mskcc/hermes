@@ -3,8 +3,7 @@ defmodule Dashboard.Audit.Version do
   import Ecto.Changeset
 
   schema "audit_versions" do
-
-        # The patch in Erlang External Term Format
+    # The patch in Erlang External Term Format
     field :patch, ExAudit.Type.Patch
 
     # supports UUID and other types as well
@@ -30,6 +29,7 @@ defmodule Dashboard.Audit.Version do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:patch, :entity_id, :entity_schema, :action, :recorded_at, :rollback])
-    |> cast(params, [:actor_id]) # custom fields
+    # custom fields
+    |> cast(params, [:actor_id])
   end
 end

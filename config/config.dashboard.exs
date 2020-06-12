@@ -39,5 +39,5 @@ config :ex_state, repo: Dashboard.Repo
 config :ex_audit,
   version_schema: Dashboard.Audit.Version,
   tracked_schemas: [
-    Dashboard.Projects.SampleMetadata,
+    Dashboard.Projects.SampleMetadata
   ]
