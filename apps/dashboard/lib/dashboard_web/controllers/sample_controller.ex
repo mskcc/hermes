@@ -57,7 +57,8 @@ defmodule DashboardWeb.SampleController do
 
   def show(conn, %{"id" => id}) do
     sample = Projects.get_sample!(id)
-    render(conn, "show.html", sample: sample)
+    metadata_history = Projects.get_sample_metadata_history(sample)
+    render(conn, "show.html", sample: sample, metadata_history: metadata_history)
   end
 
   def edit(conn, %{"id" => id}) do

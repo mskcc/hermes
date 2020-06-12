@@ -1,5 +1,5 @@
-import JSONEditor from 'jsoneditor';
-import JSONFormatter from 'json-formatter-js'
+import * as JSONEditor from 'jsoneditor';
+import * as JSONFormatter from 'json-formatter-js'
 
 // create the editor
 const container = document.getElementById("metadata-editor")
