@@ -6,10 +6,10 @@ defmodule DashboardWeb.IgoSearchComponent do
     ~L"""
     <form phx-change="suggest" phx-submit="search" phx-target="<%= @myself %>">
     <div class="field">
-    <label class="label">
-    ID
-    <span class="is-tooltip" data-tooltip="IGO Sequencing ID / IGO Extraction / Tube ID"><i class="fas fa-info-circle"></i></span> </th>
-    </label>
+      <label class="label">
+      ID
+      <span class="is-tooltip" data-tooltip="IGO Sequencing ID / IGO Extraction / Tube ID"><i class="fas fa-info-circle"></i></span> 
+      </label>
       <div class="field">
         <div class="control">
           <input type="text" class="input" phx-debounce="500" name="q" autocomplete="off" value="<%= @query %>" placeholder="Search..."/>
