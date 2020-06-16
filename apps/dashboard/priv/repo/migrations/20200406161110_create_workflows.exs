@@ -7,6 +7,9 @@ defmodule Dashboard.Repo.Migrations.CreateWorkflows do
       add :group_id, references(:jobs, on_delete: :nothing)
       add :parent_id, :id
       add :status, WorkflowStatusEnum.type()
+      add :error_type, WorkflowErrorTypeEnum.type()
+      add :output, :text
+
 
       timestamps()
     end

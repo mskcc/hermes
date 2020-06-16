@@ -8,8 +8,8 @@ defmodule Dashboard.Projects.Workflow do
     belongs_to :job, Projects.Job
     belongs_to :parent, Projects.Workflow
     field :status, WorkflowStatusEnum, default: :pending
-
-    # TODO maybe we want pipeline information here?
+    field :error_type, WorkflowErrorTypeEnum
+    field :output, :string
 
     timestamps()
   end
@@ -17,12 +17,9 @@ defmodule Dashboard.Projects.Workflow do
   @doc false
   def changeset(workflow, attrs) do
     workflow
-    |> cast(attrs, [:name, :group_id, :parent_id, :status])
+    |> cast(attrs, [:name, :group_id, :parent_id, :status, :error_type, :output])
     |> validate_required([:name])
   end
-end
-
-defmodule SaleWorkflow do
 end
 
 """
