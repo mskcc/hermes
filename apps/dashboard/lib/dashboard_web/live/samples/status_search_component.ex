@@ -22,6 +22,7 @@ defmodule DashboardWeb.StatusSearchComponent do
           </span>
         </div>
       </div>
+    </div>
     </form>
     """
   end
