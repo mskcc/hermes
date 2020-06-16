@@ -43,7 +43,8 @@ defmodule DashboardWeb.Api.V1.JobController do
   def fail(conn, %{
         "group_id" => group_id,
         "sample_id" => _sample_id,
-        "workflow_name" => workflow_name
+        "workflow_name" => workflow_name,
+        "error_type" => error_type
       }) do
     workflow = Projects.get_workflow_by_group_and_name!(group_id, workflow_name)
 
