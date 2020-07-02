@@ -25,4 +25,3 @@ config :access_tracker_client,
   url: "",
   username: "",
   password: ""
-

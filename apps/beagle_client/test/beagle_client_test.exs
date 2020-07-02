@@ -2,6 +2,7 @@ defmodule BeagleClientTest do
   use ExUnit.Case
   doctest BeagleClient
   import Tesla.Mock
+
   setup do
     mock(fn
       %{method: :get} ->
