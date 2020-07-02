@@ -10,7 +10,6 @@ defmodule Dashboard.Repo.Migrations.CreateWorkflows do
       add :error_type, WorkflowErrorTypeEnum.type()
       add :output, :text
 
-
       timestamps()
     end
 
