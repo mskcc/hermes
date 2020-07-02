@@ -22,6 +22,11 @@ config :lims_client,
   username: "",
   password: ""
 
+config :beagle_client,
+  url: "",
+  username: "",
+  password: ""
+
 import_config "config.dashboard.exs"
 
 config :pow,
