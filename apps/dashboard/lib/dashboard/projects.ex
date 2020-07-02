@@ -849,19 +849,9 @@ defmodule Dashboard.Projects do
 
   ## Examples
 
-      iex> create_request(%{field: value})
+      iex> find_or_create_request(%{name: "test request"})
       {:ok, %Request{}}
-
-      iex> create_request(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
-  def create_request(attrs \\ %{}) do
-    %Request{}
-    |> Request.changeset(attrs)
-    |> Repo.insert()
-  end
-
   def find_or_create_request(request_params) do
     query =
       %Request{}
@@ -869,55 +859,14 @@ defmodule Dashboard.Projects do
       |> Repo.insert()
 
     case query do
-      {:ok, request} -> request
-      {:error, changeset} -> Repo.one(from u in Request, where: ^Enum.to_list(changeset.changes))
+      {:ok, request} ->
+        {:ok, request}
+
+      {:error, changeset} ->
+        case Repo.one(from u in Request, where: ^Enum.to_list(changeset.changes)) do
+          nil -> {:error, changeset}
+          request -> {:ok, request}
+        end
     end
-  end
-
-  @doc """
-  Updates a request.
-
-  ## Examples
-
-      iex> update_request(request, %{field: new_value})
-      {:ok, %Request{}}
-
-      iex> update_request(request, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_request(%Request{} = request, attrs) do
-    request
-    |> Request.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a request.
-
-  ## Examples
-
-      iex> delete_request(request)
-      {:ok, %Request{}}
-
-      iex> delete_request(request)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_request(%Request{} = request) do
-    Repo.delete(request)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking request changes.
-
-  ## Examples
-
-      iex> change_request(request)
-      %Ecto.Changeset{source: %Request{}}
-
-  """
-  def change_request(%Request{} = request) do
-    Request.changeset(request, %{})
   end
 end
