@@ -5,7 +5,7 @@ config :dashboard, Dashboard.Repo,
   username: "postgres",
   password: "postgres",
   database: "dashboard_test",
-  hostname: "db",
+  hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
 # We don't run a server during test. If one is required,
@@ -19,4 +19,10 @@ config :logger, level: :warn
 
 config :tesla, adapter: Tesla.Mock
 
-config :dashboard, Oban, crontab: false, queues: false, plugins: false
+config :dashboard, Oban, crontab: false, queues: false
+
+config :access_tracker_client,
+  url: "",
+  username: "",
+  password: ""
+
