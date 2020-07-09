@@ -1,6 +1,7 @@
 defmodule Dashboard.ProjectsTest do
   use Dashboard.DataCase
 
+  import Ecto.Query, warn: false
   alias Dashboard.Projects
 
   describe "assays" do
@@ -124,14 +125,19 @@ defmodule Dashboard.ProjectsTest do
   describe "samples" do
     alias Dashboard.Projects.Sample
 
-    @valid_attrs %{mrn: "some mrn"}
+    @valid_attrs %{mrn: "some mrn", tube_id: "some tube id"}
     @update_attrs %{mrn: "some updated mrn"}
     @invalid_attrs %{mrn: nil}
 
     def sample_fixture(attrs \\ %{}) do
+
+      request = request_fixture()
+      assay = assay_fixture()
+
       {:ok, sample} =
         attrs
-        |> Enum.into(@valid_attrs)
+        |> Map.merge(%{assay_id: assay.id, request_id: request.id})
+        |> Map.merge(@valid_attrs)
         |> Projects.create_sample()
 
       sample
@@ -183,8 +189,8 @@ defmodule Dashboard.ProjectsTest do
   describe "jobs" do
     alias Dashboard.Projects.Job
 
-    @valid_attrs %{group_id: "some group_id"}
-    @update_attrs %{group_id: "some updated group_id"}
+    @valid_attrs %{group_id: "some uuid"}
+    @update_attrs %{group_id: "some new uuid"}
     @invalid_attrs %{group_id: nil}
 
     def job_fixture(attrs \\ %{}) do
