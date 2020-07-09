@@ -723,10 +723,13 @@ defmodule Dashboard.Projects do
       ** (Ecto.NoResultsError)
 
   """
-  def get_workflow!(id), do: Repo.get!(Workflow, id)
-
-  def get_workflow_by_group_and_name!(group, name),
-    do: Repo.get_by!(Workflow, group_id: group, name: name)
+  def get_workflow_by_name_and_group_id!(name, group_id) do
+    Repo.one!(
+      from w in Workflow,
+      join: j in assoc(w, :job),
+      where: w.name == ^name and j.group_id == ^group_id
+    )
+  end
 
   @doc """
   Creates a workflow.
@@ -762,22 +765,6 @@ defmodule Dashboard.Projects do
     workflow
     |> Workflow.changeset(attrs)
     |> Repo.update()
-  end
-
-  @doc """
-  Deletes a workflow.
-
-  ## Examples
-
-      iex> delete_workflow(workflow)
-      {:ok, %Workflow{}}
-
-      iex> delete_workflow(workflow)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_workflow(%Workflow{} = workflow) do
-    Repo.delete(workflow)
   end
 
   @doc """
