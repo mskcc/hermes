@@ -24,7 +24,7 @@ defmodule Dashboard.MixProject do
   def application do
     [
       mod: {Dashboard.Application, []},
-      extra_applications: [:logger, :runtime_tools, :paddle]
+      extra_applications: [:logger, :runtime_tools, :paddle, :edeliver]
     ]
   end
 
@@ -58,7 +58,9 @@ defmodule Dashboard.MixProject do
       {:elixir_uuid, "~> 1.2"},
       {:ex_audit, git: "git@github.com:ZennerIoT/ex_audit.git"},
       # {:ex_state_ecto, "~> 0.2"},
-      {:oban, "~> 1.2"}
+      {:oban, "~> 1.2"},
+      {:edeliver, ">= 1.6.0"},
+      {:distillery, "~> 2.0", warn_missing: false}
     ]
   end
 
