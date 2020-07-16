@@ -130,7 +130,6 @@ defmodule Dashboard.ProjectsTest do
     @invalid_attrs %{mrn: nil}
 
     def sample_fixture(attrs \\ %{}) do
-
       request = request_fixture()
       assay = assay_fixture()
 

@@ -19,7 +19,7 @@ defmodule Seqosystem.MixProject do
     [
       {:dialyxir, "~> 1.0", only: [:dev]},
       {:jason, ">= 1.0.0"},
-      {:git_hooks, "~> 0.4.1", only: [:test, :dev], runtime: false},
+      {:git_hooks, "~> 0.4.1", only: [:test, :dev], runtime: false}
     ]
   end
 end
