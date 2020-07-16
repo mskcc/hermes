@@ -726,8 +726,8 @@ defmodule Dashboard.Projects do
   def get_workflow_by_name_and_group_id!(name, group_id) do
     Repo.one!(
       from w in Workflow,
-      join: j in assoc(w, :job),
-      where: w.name == ^name and j.group_id == ^group_id
+        join: j in assoc(w, :job),
+        where: w.name == ^name and j.group_id == ^group_id
     )
   end
 
