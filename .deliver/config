@@ -3,6 +3,8 @@ APP="seqosystem"
 AUTO_VERSION="commit-count+git-revision+branch-unless-master"
 USING_DISTILLERY=true
 
+RELEASE_DIR="$BUILD_AT/apps/$APP/rel/$APP"
+
 BUILD_HOST="access01"
 BUILD_USER="deploy"
 BUILD_AT="/tmp/edeliver/access/builds"

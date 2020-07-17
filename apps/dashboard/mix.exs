@@ -4,7 +4,7 @@ defmodule Dashboard.MixProject do
   def project do
     [
       app: :dashboard,
-      version: "0.1.0",
+      version: append_revision("0.0.1"),
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -16,6 +16,16 @@ defmodule Dashboard.MixProject do
       aliases: aliases(),
       deps: deps()
     ]
+  end
+
+  def append_revision(version) do
+    "#{version}+#{revision}"
+  end
+
+  defp revision() do
+    System.cmd("git", ["rev-parse", "--short", "HEAD"])
+    |> elem(0)
+    |> String.trim_trailing
   end
 
   # Configuration for the OTP application.
@@ -58,9 +68,7 @@ defmodule Dashboard.MixProject do
       {:elixir_uuid, "~> 1.2"},
       {:ex_audit, git: "git@github.com:ZennerIoT/ex_audit.git"},
       # {:ex_state_ecto, "~> 0.2"},
-      {:oban, "~> 1.2"},
-      {:edeliver, ">= 1.6.0"},
-      {:distillery, "~> 2.0", warn_missing: false}
+      {:oban, "~> 1.2"}
     ]
   end
 

@@ -4,7 +4,7 @@ defmodule AccessTrackerClient.MixProject do
   def project do
     [
       app: :access_tracker_client,
-      version: "0.1.0",
+      version: append_revision("0.1.0"),
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -13,6 +13,16 @@ defmodule AccessTrackerClient.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
+  end
+
+  def append_revision(version) do
+    "#{version}+#{revision}"
+  end
+
+  defp revision() do
+    System.cmd("git", ["rev-parse", "--short", "HEAD"])
+    |> elem(0)
+    |> String.trim_trailing
   end
 
   # Run "mix help compile.app" to learn about applications.
