@@ -19,12 +19,13 @@ apps/
 ## Development (TODO)
 1. Install [Docker](https://docs.docker.com/compose/install/).
 2. `docker-compose up`
-
+3. (Optional) If you plan to do releases, be sure to copy your pub key to `.ssh/authorized_keys` on deploy@<access01|access02>
 
 ## Deployment (VM)
 ### Release (causes downtime)
 ```
 mix edeliver build release
+# To release a specific branch: mix edeliver build release --branch="branch_name"
 mix edeliver deploy release to staging
 mix edeliver startstaging 
 OR (will run the above) mix edeliver update staging --start-deploy
@@ -36,23 +37,26 @@ mix edeliver upgrade staging
 mix edeliver upgrade production
 ```
 
-### Setting-up a Machine (Outdated)
+### Setting-up a Machine
 ```
 # As root, install Docker (CentOS)
-yum install -y yum-utils
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-# (Optional) You may have to install selinux:
-yum install -y http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.107-3.el7.noarch.rpm
-yum install docker-ce docker-ce-cli containerd.io
+wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_23.0.2-2~centos~7_amd64.rpm
+wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/elixir_1.10.4-1~centos~7_all.rpm
+yum remove erlang*
+yum localinstall esl-erlang_23.0.2-2~centos~7_amd64.rpm
+yum localinstall elixir_1.10.4-1~centos~7_all.rpm
 
-# Start Docker
-systemctl start docker
+vim /etc/ssh/sshd_config
+# Append `deploy` to `AllowGroups`
 
 # Set-up a Deploy user
 useradd deploy
-usermod -aG docker deploy
 su deploy
-ssh-keygen -t rsa -b 4096 -C <your@email.com>
-cat ~/.ssh/id_rsa.pub
-```
+mkdir .ssh
+vim .ssh/authorized_keys
+# Copy your local pub key
+exit # Back as root
+
+service sshd restart
+# Ensure you can ssh in as yourself and as `deploy@<server>`. Do not disconnect if not, if sshd is running you can see what's wrong in `/var/log/secure`
 
