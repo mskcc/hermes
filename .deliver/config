@@ -1,4 +1,4 @@
-APP="seqosystem"
+APP="dashboard"
 
 AUTO_VERSION="commit-count+git-revision+branch-unless-master"
 USING_DISTILLERY=true
@@ -33,7 +33,6 @@ pre_erlang_clean_compile() {
     [ -f ~/.profile ] && source ~/.profile
     set -e
 
-    mkdir '$BUILD_AT/assets'
     cd '$BUILD_AT/assets'
     npm install
   "
