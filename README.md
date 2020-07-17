@@ -43,8 +43,10 @@ mix edeliver upgrade production
 wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_23.0.2-2~centos~7_amd64.rpm
 wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/elixir_1.10.4-1~centos~7_all.rpm
 yum remove erlang*
+yum remove nodejs*
 yum localinstall esl-erlang_23.0.2-2~centos~7_amd64.rpm
 yum localinstall elixir_1.10.4-1~centos~7_all.rpm
+yum install -y nodejs
 
 vim /etc/ssh/sshd_config
 # Append `deploy` to `AllowGroups`
@@ -54,6 +56,7 @@ useradd deploy
 su deploy
 mkdir .ssh
 vim .ssh/authorized_keys
+echo "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~/.ssh/known_hosts
 # Copy your local pub key
 exit # Back as root
 
