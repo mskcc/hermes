@@ -60,3 +60,7 @@ exit # Back as root
 service sshd restart
 # Ensure you can ssh in as yourself and as `deploy@<server>`. Do not disconnect if not, if sshd is running you can see what's wrong in `/var/log/secure`
 
+# Copy over the config.
+scp config/prod.secret.exs deploy@access01:/home/deploy
+
+
