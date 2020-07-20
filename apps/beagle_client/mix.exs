@@ -22,7 +22,7 @@ defmodule BeagleClient.MixProject do
   defp revision() do
     System.cmd("git", ["rev-parse", "--short", "HEAD"])
     |> elem(0)
-    |> String.trim_trailing
+    |> String.trim_trailing()
   end
 
   # Run "mix help compile.app" to learn about applications.
