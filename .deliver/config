@@ -1,4 +1,4 @@
-APP="dashboard"
+APP="seqosystem"
 
 AUTO_VERSION="commit-count+git-revision+branch-unless-master"
 USING_DISTILLERY=true
@@ -9,7 +9,6 @@ BUILD_AT="/tmp/edeliver/access/builds"
 RELEASE_STORE=deploy@access01:releases
 
 MAIN_APP="$BUILD_AT/apps/$APP" # App to be deployed
-RELEASE_DIR="$MAIN_APP/rel/$APP"
 
 STAGING_HOSTS="access01"
 STAGING_USER="deploy"
