@@ -1,4 +1,4 @@
-import * as JSONEditor from 'jsoneditor';
+import JSONEditor from 'jsoneditor';
 import * as JSONFormatter from 'json-formatter-js'
 
 // create the editor
