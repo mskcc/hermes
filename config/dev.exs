@@ -17,6 +17,10 @@ config :dashboard, Dashboard.Repo,
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :dashboard, DashboardWeb.Endpoint,
+  signing_salt: "nqwpPBDBb2YSoPct1bYHSy0xvfr9M5xBgnXdduyz4r2B7qOPzgaUwFIzbx0fB8H0",
+  live_view: [signing_salt: "H88ziZ8BtRa35bZpaNoWVhDOFJMivKiI"],
+  url: [host: "localhost"],
+  secret_key_base: "UaLWCWni+61uYpy7J+z6g2c1jw9MOY4FPW+8tM1ZWK6GP3rkR1CQs7AjWjv2m6yt",
   http: [port: 5000],
   debug_errors: true,
   code_reloader: true,
