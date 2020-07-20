@@ -3,9 +3,9 @@ TODO Description
 
 ## Dependencies
 Tested with the following versions.
-* [Elixir 1.10.2](https://elixir-lang.org/)
+* [Elixir 1.10.4](https://elixir-lang.org/)
 * PostgreSQL 12.1
-* Node 12.16
+* Node 14.5.x
 
 ## Code Layout
 ```
@@ -46,6 +46,7 @@ yum remove erlang*
 yum remove nodejs*
 yum localinstall esl-erlang_23.0.2-2~centos~7_amd64.rpm
 yum localinstall elixir_1.10.4-1~centos~7_all.rpm
+curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
 yum install -y nodejs
 
 vim /etc/ssh/sshd_config
