@@ -39,7 +39,7 @@ mix edeliver upgrade production
 
 ### Setting-up a Machine
 ```
-# As root, install Docker (CentOS)
+# As root, install packages
 wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/esl-erlang_23.0.2-2~centos~7_amd64.rpm
 wget https://packages.erlang-solutions.com/erlang/rpm/centos/7/x86_64/elixir_1.10.4-1~centos~7_all.rpm
 yum remove erlang*
@@ -48,9 +48,11 @@ yum localinstall esl-erlang_23.0.2-2~centos~7_amd64.rpm
 yum localinstall elixir_1.10.4-1~centos~7_all.rpm
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
 yum install -y nodejs
+yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+yum install postgresql11-server
 
 vim /etc/ssh/sshd_config
-# Append `deploy` to `AllowGroups`
+# Append `deploy` to `AllowGroups` (if server is sep-up with Puppet, may require Server Admin assistance)
 
 # Set-up a Deploy user
 useradd deploy
@@ -67,4 +69,7 @@ service sshd restart
 # Copy over the config.
 scp config/prod.secret.exs deploy@access01:/home/deploy
 
-
+# Install PostgreSQL
+/usr/pgsql-11/bin/postgresql-11-setup initdb
+systemctl start postgresql-11
+systemctl enable postgresql-11

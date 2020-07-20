@@ -6,9 +6,9 @@ USING_DISTILLERY=true
 BUILD_HOST="access01"
 BUILD_USER="deploy"
 BUILD_AT="/tmp/edeliver/access/builds"
-RELEASE_STORE=deploy@access01:releases
+RELEASE_STORE=deploy@access01:/home/deploy/releases
 
-MAIN_APP="$BUILD_AT/apps/$APP" # App to be deployed
+MAIN_APP="$BUILD_AT/apps/dashboard" # App to be deployed
 
 STAGING_HOSTS="access01"
 STAGING_USER="deploy"
