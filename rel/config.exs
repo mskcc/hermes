@@ -34,10 +34,11 @@ environment :dev do
   set cookie: :test
 end
 
+# :crypto.hash(:sha256, System.get_env("COOKIE")) |> Base.encode16 |> String.to_atom
 environment :prod do
   set include_erts: true
   set include_src: false
-  set cookie: :crypto.hash(:sha256, System.get_env("COOKIE")) |> Base.encode16 |> String.to_atom
+  set cookie: :testcookie
   set vm_args: "rel/vm.args"
 end
 
