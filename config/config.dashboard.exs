@@ -37,5 +37,3 @@ config :ex_audit,
   tracked_schemas: [
     Dashboard.Projects.SampleMetadata
   ]
-
-

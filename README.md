@@ -73,3 +73,16 @@ scp config/prod.secret.exs deploy@access01:/home/deploy
 /usr/pgsql-11/bin/postgresql-11-setup initdb
 systemctl start postgresql-11
 systemctl enable postgresql-11
+
+su - postgres
+vim /var/lib/pgsql/11/data/pg_hba.conf # Change "IPv4 local connections" METHOD to md5
+createdb <DB_NAME>
+createuser <USERNAME> --interactive
+psql #ALTER USER caesar WITH password '<PASSWORD>';
+# As deploy, make sure the database url is set in the ENVAR
+
+exit
+# As root
+service postgresql-11.service restart
+
+
