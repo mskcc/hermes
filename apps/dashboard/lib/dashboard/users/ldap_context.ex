@@ -11,7 +11,8 @@ defmodule Dashboard.Users.LDAPContext do
         {:ok, user} = get_or_create(params)
         user
 
-      {:error, _message} ->
+      {:error, message} ->
+        IO.inspect(message)
         nil
     end
   end

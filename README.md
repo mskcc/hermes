@@ -37,9 +37,15 @@ mix edeliver upgrade staging
 mix edeliver upgrade production
 
 ```
-### Migrate (Not ready)
+### Migrate
+Not ready, see https://github.com/edeliver/edeliver/issues/235
 ```
-mix edeliver migrate staging # See https://github.com/edeliver/edeliver/issues/235
+mix edeliver migrate staging
+```
+instead do the following for now...
+```
+ssh deploy@<server>
+./seqosystem/bin/seqosystem rpc 'Dashboard.Release.migrate'
 ```
 
 ### Setting-up a Machine
