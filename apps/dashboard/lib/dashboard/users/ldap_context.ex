@@ -1,4 +1,5 @@
 defmodule Dashboard.Users.LDAPContext do
+  require Logger
   use Pow.Ecto.Context,
     repo: Dashboard.Repo,
     user: Dashboard.Users.User
@@ -12,7 +13,7 @@ defmodule Dashboard.Users.LDAPContext do
         user
 
       {:error, message} ->
-        IO.inspect(message)
+        Logger.debug(message)
         nil
     end
   end
