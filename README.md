@@ -25,16 +25,21 @@ apps/
 ### Release (causes downtime)
 ```
 mix edeliver build release
-# To release a specific branch: mix edeliver build release --branch="branch_name"
+# To release a specific branch: mix edeliver build release --branch="<branch_name>"
 mix edeliver deploy release to staging
-mix edeliver startstaging 
-OR (will run the above) mix edeliver update staging --start-deploy
+mix edeliver start staging 
+OR (will run the above) mix edeliver update staging --start-deploy --branch="<branch_name>"
 ```
 
 ### Release by Upgrade (Use this, this should not cause downtime)
 ```
 mix edeliver upgrade staging
 mix edeliver upgrade production
+
+```
+### Migrate (Not ready)
+```
+mix edeliver migrate staging # See https://github.com/edeliver/edeliver/issues/235
 ```
 
 ### Setting-up a Machine
