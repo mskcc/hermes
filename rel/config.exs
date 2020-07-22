@@ -36,7 +36,7 @@ end
 
 # :crypto.hash(:sha256, System.get_env("COOKIE")) |> Base.encode16 |> String.to_atom
 environment :prod do
-  set include_erts: false
+  set include_erts: true
   set include_src: false
   set cookie: :testcookie
   set vm_args: "rel/vm.args"
