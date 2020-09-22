@@ -130,7 +130,7 @@ nav.navbar {
 .workflows {
     a {
         &.is-success { color: $success; }
-        &.is-danger { color: $danger; }
+        &.is-failure { color: $danger; }
         &.is-pending { color: $grey-lighter; }
         &.is-running { color: $purple;   animation: letterSizeBounce 1s linear infinite alternate; }
     }
@@ -147,4 +147,8 @@ nav.navbar {
   100% {
       color: $blue;
   }
+}
+
+.box.is-active {
+    box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px $link-focus-border;
 }

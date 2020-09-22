@@ -4,7 +4,7 @@ defmodule Dashboard.Repo.Migrations.CreateWorkflows do
   def change do
     create table(:workflows) do
       add :name, :string
-      add :group_id, references(:jobs, on_delete: :nothing)
+      add :job_id, references(:jobs, on_delete: :nothing)
       add :parent_id, :id
       add :status, WorkflowStatusEnum.type()
       add :error_type, WorkflowErrorTypeEnum.type()
@@ -13,6 +13,6 @@ defmodule Dashboard.Repo.Migrations.CreateWorkflows do
       timestamps()
     end
 
-    create index(:workflows, [:group_id])
+    create index(:workflows, [:job_id])
   end
 end

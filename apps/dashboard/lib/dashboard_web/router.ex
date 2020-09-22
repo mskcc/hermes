@@ -34,6 +34,7 @@ defmodule DashboardWeb.Router do
     post "/jobs/complete", DashboardWeb.Api.V1.JobController, :complete
     post "/jobs/fail", DashboardWeb.Api.V1.JobController, :fail
     post "/jobs/start", DashboardWeb.Api.V1.JobController, :start
+    post "/samples/:id/metadata", DashboardWeb.Api.V1.SampleController, :update_metadata
   end
 
   scope "/" do

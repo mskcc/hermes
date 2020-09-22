@@ -24,13 +24,13 @@ defmodule Dashboard.Projects.Sample do
   def changeset(sample, attrs) do
     sample
     |> cast(attrs, [:mrn, :assay_id, :tube_id, :request_id])
-    |> validate_required([:assay_id, :tube_id, :request_id])
+    |> validate_required([:tube_id])
     |> unique_constraint([:tube_id])
   end
 
   def filter_changeset(params) do
     data = %{}
-    filter_types = %{request: :string, status: :integer, id: :string}
+    filter_types = %{request: :string, status: :integer, id: :string, job_status: :integer}
 
     {data, filter_types}
     |> cast(params, Map.keys(filter_types))

@@ -12,6 +12,7 @@ defmodule Dashboard.Users.LDAPContext do
         user
 
       {:error, message} ->
+        IO.inspect(message)
         nil
     end
   end

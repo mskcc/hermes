@@ -9,7 +9,7 @@
     <%= csrf_meta_tag() %>
   </head>
   <body>
-    <%= Map.get(assigns, :inner_layout) || render @view_module, @view_template, assigns %>
+    <%= Map.get(assigns, :inner_layout) || @inner_content %>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>

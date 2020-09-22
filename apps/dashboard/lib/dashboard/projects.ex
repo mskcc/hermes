@@ -16,6 +16,7 @@ defmodule Dashboard.Projects do
     unique: [period: 30]
 
   alias Dashboard.Projects.Assay
+  alias Dashboard.Projects.Job
   alias Dashboard.Projects.Workflow
   alias Dashboard.Projects.SampleMetadata
 
@@ -303,6 +304,13 @@ defmodule Dashboard.Projects do
 
   alias Dashboard.Projects.Sample
 
+  def get_workflow_status_for_samples(sample_ids) do
+    Repo.all(
+      from j in Job,
+        where: j.sample_id in ^sample_ids
+    )
+  end
+
   @doc """
   Returns the list of samples.
 
@@ -316,26 +324,7 @@ defmodule Dashboard.Projects do
     # invert
     sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end)
 
-    filters =
-      Enum.reduce(filters, dynamic(true), fn
-        {:request, value}, dynamic ->
-          dynamic([request: p], ^dynamic and ilike(p.name, ^"%#{value}%"))
-
-        {:status, value}, dynamic ->
-          dynamic([p], ^dynamic and p.status == ^value)
-
-        {:id, value}, dynamic ->
-          dynamic(
-            [p],
-            ^dynamic and
-              (ilike(p.igo_sequencing_id, ^"#{value}%") or
-                 ilike(p.igo_extraction_id, ^"#{value}%") or
-                 ilike(p.tube_id, ^"#{value}%"))
-          )
-
-        {_, _}, dynamic ->
-          dynamic
-      end)
+    filters = build_filter_query(filters)
 
     count =
       Sample
@@ -359,6 +348,57 @@ defmodule Dashboard.Projects do
     %{entries: entries, count: count}
   end
 
+  defp build_filter_query(filters) do
+    Enum.reduce(filters, dynamic(true), fn
+      {:request, value}, dynamic ->
+        dynamic([request: p], ^dynamic and ilike(p.name, ^"%#{value}%"))
+
+      {:status, value}, dynamic ->
+        dynamic([p], ^dynamic and p.status == ^value)
+
+      {:job_status, 20}, dynamic ->
+        # TODO There's a better way to do this and perhaps we just save the status in
+        # the job.
+        q =
+          Job
+          |> join(:inner, [j], w in Workflow, on: w.job_id == j.id and w.status != 20)
+          |> select([j, _], j.sample_id)
+          |> group_by([j, _], j.sample_id)
+          |> Repo.all()
+
+        q1 =
+          Job
+          |> join(:inner, [j], w in Workflow, on: w.job_id == j.id and w.status == 20)
+          |> select([j, _], j.sample_id)
+          |> group_by([j, _], j.sample_id)
+          |> Repo.all()
+
+        dynamic([p], ^dynamic and p.id not in ^q and p.id in ^q1)
+
+      {:job_status, value}, dynamic ->
+        q =
+          Job
+          |> join(:inner, [j], w in Workflow, on: w.job_id == j.id and w.status == ^value)
+          |> select([j, _], j.sample_id)
+          |> group_by([j, _], j.sample_id)
+          |> Repo.all()
+
+        dynamic([p], ^dynamic and p.id in ^q)
+
+      {:id, value}, dynamic ->
+        dynamic(
+          [p],
+          ^dynamic and
+            (ilike(p.igo_sequencing_id, ^"#{value}%") or
+               ilike(p.igo_extraction_id, ^"#{value}%") or
+               ilike(p.tube_id, ^"#{value}%"))
+        )
+
+      {_, _}, dynamic ->
+        dynamic
+    end)
+  end
+
   @doc """
   Gets a single sample.
 
@@ -374,9 +414,16 @@ defmodule Dashboard.Projects do
 
   """
   def get_sample!(id) do
+    jobs =
+      from(
+        a in Job,
+        order_by: [desc: a.inserted_at],
+        preload: :workflows
+      )
+
     Repo.one!(
       from u in Sample,
-        preload: [:metadata, jobs: :workflows],
+        preload: [:metadata, jobs: ^jobs],
         where: u.id == ^id
     )
   end
@@ -453,6 +500,32 @@ defmodule Dashboard.Projects do
     Sample.changeset(sample, %{})
   end
 
+  def get_or_fetch_sample_by_igo_id(sample_id) do
+    sample =
+      Repo.one(
+        from u in Sample,
+          where: u.igo_sequencing_id == ^sample_id
+      )
+
+    case sample do
+      nil ->
+        case LimsClient.fetch_sample_manifests([sample_id]) do
+          {:error, _status, body} ->
+            # TODO log/retry here
+            IO.inspect(body)
+
+          {:ok, [metadata]} ->
+            create_sample(%{
+              "sample_id" => sample_id,
+              "tube_id" => metadata["investigator_sample_name"]
+            })
+        end
+
+      sample ->
+        {:ok, sample}
+    end
+  end
+
   def fetch_sample_metadata() do
     sample_groups =
       Repo.all(from u in Sample, select: [:igo_sequencing_id, :id], preload: :metadata)
@@ -507,7 +580,11 @@ defmodule Dashboard.Projects do
   end
 
   def get_sample_metadata_history(sample) do
-    Repo.history(sample.metadata)
+    if sample.metadata do
+      Repo.history(sample.metadata)
+    else
+      []
+    end
   end
 
   @doc """
@@ -537,6 +614,12 @@ defmodule Dashboard.Projects do
                 do: nil,
                 else: s["fieldData"]["Sample_Status"]
 
+            {:ok, request} =
+              find_or_create_request(%{
+                "name" => s["fieldData"]["Request_ID"],
+                "project_id" => project.id
+              })
+
             [
               mrn: s["fieldData"]["MRN"],
               igo_sequencing_id: s["fieldData"]["IGO_ID_Sequencing"],
@@ -545,11 +628,7 @@ defmodule Dashboard.Projects do
               tube_id: s["fieldData"]["TubeID"],
               assay_id: assay.id,
               # TODO add a cache for these
-              request_id:
-                find_or_create_request(%{
-                  "name" => s["fieldData"]["Request_ID"],
-                  "project_id" => project.id
-                }).id,
+              request_id: request.id,
               inserted_at: DateTime.utc_now() |> DateTime.truncate(:second),
               updated_at: DateTime.utc_now() |> DateTime.truncate(:second)
               # metadata: []
@@ -563,6 +642,45 @@ defmodule Dashboard.Projects do
           conflict_target: [:tube_id]
         )
     end
+  end
+
+  def get_samples_completed_count(filters) do
+    filters = Map.put(filters, :job_status, 20)
+    filters = build_filter_query(filters)
+
+    Repo.one(
+      from s in Sample,
+        join: p in assoc(s, :request),
+        as: :request,
+        select: count(s.id),
+        where: ^filters
+    )
+  end
+
+  def get_samples_failed_count(filters) do
+    filters = Map.put(filters, :job_status, 30)
+    filters = build_filter_query(filters)
+
+    Repo.one(
+      from s in Sample,
+        join: p in assoc(s, :request),
+        as: :request,
+        select: count(s.id),
+        where: ^filters
+    )
+  end
+
+  def get_samples_running_count(filters) do
+    filters = Map.put(filters, :job_status, 10)
+    filters = build_filter_query(filters)
+
+    Repo.one(
+      from s in Sample,
+        join: p in assoc(s, :request),
+        as: :request,
+        select: count(s.id),
+        where: ^filters
+    )
   end
 
   alias Dashboard.Projects.Job
@@ -628,7 +746,7 @@ defmodule Dashboard.Projects do
 
       Enum.reduce(children, Ecto.Multi.new(), fn child_attrs, acc ->
         child_attrs =
-          Map.merge(%{"parent_id" => parent.id, "group_id" => attrs["group_id"]}, child_attrs)
+          Map.merge(%{"parent_id" => parent.id, "job_id" => attrs["job_id"]}, child_attrs)
 
         Ecto.Multi.merge(acc, fn _ ->
           build_workflow_inserts(child_attrs)
@@ -641,7 +759,7 @@ defmodule Dashboard.Projects do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:job, Job.changeset(%Job{}, job_attrs))
     |> Ecto.Multi.merge(fn %{job: job} ->
-      workflows = Map.put(job_attrs["workflows"], "group_id", job.id)
+      workflows = Map.put(job_attrs["workflows"], "job_id", job.id)
       build_workflow_inserts(workflows)
     end)
     |> Repo.transaction()
@@ -855,5 +973,26 @@ defmodule Dashboard.Projects do
           request -> {:ok, request}
         end
     end
+  end
+
+  def children() do
+    workflow_tree_initial_query =
+      Workflow
+      |> where([c], is_nil(c.parent_id))
+
+    workflow_tree_recursion_query =
+      Workflow
+      |> join(:inner, [c], ct in "workflow_tree", on: c.parent_id == ct.id)
+
+    workflow_tree_query =
+      workflow_tree_initial_query
+      |> union_all(^workflow_tree_recursion_query)
+
+    Job
+    |> recursive_ctes(true)
+    |> with_cte("workflow_tree", as: ^workflow_tree_query)
+    |> join(:left, [p], c in "workflow_tree", on: c.job_id == p.id)
+    |> group_by([p], p.id)
+    |> select([p, c], %{p | workflows: fragment("ARRAY_AGG(?)", c.name)})
   end
 end
