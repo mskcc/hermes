@@ -44,6 +44,12 @@ defmodule DashboardWeb.SamplesLive.List do
       Sample.filter_changeset(params)
       |> Map.fetch!(:changes)
 
+    sample_count = %{
+      "completed" => Projects.get_samples_completed_count(filters),
+      "failed" => Projects.get_samples_failed_count(filters),
+      "running" => Projects.get_samples_running_count(filters)
+    }
+
     samples =
       Projects.list_samples(%{
         sort_by: sort_by,
@@ -52,7 +58,11 @@ defmodule DashboardWeb.SamplesLive.List do
         filters: filters
       })
 
-    assign(socket, samples: samples, page_title: "Listing Samples – Page #{params["page"]}")
+    assign(socket,
+      samples: samples,
+      page_title: "Listing Samples – Page #{params["page"]}",
+      sample_count: sample_count
+    )
   end
 
   def handle_info({Projects, [:samples | _], _}, socket) do

@@ -90,15 +90,6 @@ defmodule LimsClient do
     end)
   end
 
-  """
-  defp tocsv(map) do
-    File.write!("test.csv", 
-       map
-       |> Enum.map(Enum.join(Tuple.to_list(&1), ?,))
-       |> Enum.join("\n"))
-  end
-  """
-
   @doc """
   Fetch Samples
 

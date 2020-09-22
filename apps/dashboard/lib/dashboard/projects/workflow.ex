@@ -7,6 +7,7 @@ defmodule Dashboard.Projects.Workflow do
     field :name, :string
     belongs_to :job, Projects.Job
     belongs_to :parent, Projects.Workflow
+    has_many :children, Projects.Workflow, foreign_key: :parent_id
     field :status, WorkflowStatusEnum, default: :pending
     field :error_type, WorkflowErrorTypeEnum
     field :output, :string
@@ -17,7 +18,7 @@ defmodule Dashboard.Projects.Workflow do
   @doc false
   def changeset(workflow, attrs) do
     workflow
-    |> cast(attrs, [:name, :group_id, :parent_id, :status, :error_type, :output])
+    |> cast(attrs, [:name, :job_id, :parent_id, :status, :error_type, :output])
     |> validate_required([:name])
   end
 end

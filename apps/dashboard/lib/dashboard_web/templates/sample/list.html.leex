@@ -1,6 +1,6 @@
 <div class="columns">
   <div class="column is-3">
-    <%= live_component @socket, DashboardWeb.RequestSearchComponent, id: "request-earch", params: @params %>
+    <%= live_component @socket, DashboardWeb.RequestSearchComponent, id: "request-search", params: @params %>
   </div>
   <div class="column is-3">
     <%= live_component @socket, DashboardWeb.StatusSearchComponent, id: "status-search", params: @params %>
@@ -9,7 +9,30 @@
     <%= live_component @socket, DashboardWeb.IgoSearchComponent, id: "igo-search", params: @params %>
   </div>
 </div>
+<section class="info-tiles">
+  <div class="tile is-ancestor has-text-centered">
 
+    <div class="tile is-parent">
+      <%= Table.toggle_field @socket, DashboardWeb.SamplesLive.List, @params, "job_status", "10", "tile is-child box" do %>
+
+        <p class="title"><%=@sample_count["running"]%></p>
+        <p class="subtitle">Samples Running</p>
+      <% end %>
+    </div>
+    <div class="tile is-parent">
+      <%= Table.toggle_field @socket, DashboardWeb.SamplesLive.List, @params, "job_status", "20", "tile is-child box" do %>
+        <p class="title"><%=@sample_count["completed"]%></p>
+        <p class="subtitle">Samples Completed</p>
+      <% end %>
+    </div>
+    <div class="tile is-parent">
+      <%= Table.toggle_field @socket, DashboardWeb.SamplesLive.List, @params, "job_status", "30", "tile is-child box" do %>
+        <p class="title"><%=@sample_count["failed"]%></p>
+        <p class="subtitle">Samples Failed</p>
+      <% end %>
+    </div>
+  </div>
+</section>
 <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
   <thead>
     <tr>
@@ -32,7 +55,7 @@
         <td class="workflows">
           <%= if sample.jobs != [] do %>
             <div style="grid-auto-rows:16px; grid-gap: 4px; grid-auto-columns: 16px; display: grid;">
-              <%=Table.workflow_statuses(sample.jobs)%>
+              <%=Table.workflow_statuses(List.last(sample.jobs))%>
             </div>
           <% end %>
         </td>

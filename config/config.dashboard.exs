@@ -14,7 +14,7 @@ config :dashboard,
 # Configures the endpoint
 config :dashboard, DashboardWeb.Endpoint,
   render_errors: [view: DashboardWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Dashboard.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: Dashboard.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,

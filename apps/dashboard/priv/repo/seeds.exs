@@ -13,3 +13,45 @@
 Dashboard.Repo.insert!(%Dashboard.Projects.Assay{
   name: "Access"
 })
+
+statuses = ["success", "failure", "running"]
+
+Enum.map(1..60, fn id ->
+  Dashboard.Projects.create_job_with_workflows(%{
+    "group_id" => UUID.uuid4(),
+    "sample_id" => id,
+    "workflows" => %{
+      "name" => "Beagle Initiated",
+      "status" => "success",
+      "children" => [
+        %{
+          "name" => "FASTQ to BAM",
+          "status" => "success",
+          "children" => [
+            %{
+              "name" => "MSI",
+              "status" => Enum.random(statuses),
+              "children" => []
+            },
+            %{
+              "name" => "Call variants",
+              "status" => Enum.random(statuses),
+              "children" => []
+            },
+            %{
+              "name" => "Manta",
+              "status" => Enum.random(statuses),
+              "children" => [
+                %{
+                  "name" => "Call variants",
+                  "status" => "pending",
+                  "children" => []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  })
+end)

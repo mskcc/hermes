@@ -47,10 +47,10 @@ defmodule Dashboard.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.16"},
-      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix, "~> 1.5.3"},
+      {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
-      {:phoenix_live_view, "~> 0.12.1"},
+      {:phoenix_live_view, "~> 0.14.4"},
       {:ecto, "~> 3.4.4"},
       {:ecto_sql, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
@@ -62,7 +62,7 @@ defmodule Dashboard.MixProject do
       {:pow, "~> 1.0.18"},
       {:lims_client, in_umbrella: true},
       {:access_tracker_client, in_umbrella: true},
-      {:paddle, "~> 0.1.0"},
+      {:paddle, git: "git@github.com:publica-re/paddle.git", branch: "feature-auto-reconnect"},
       {:ecto_enum, "~> 1.4"},
       {:timex, "~> 3.5"},
       {:elixir_uuid, "~> 1.2"},

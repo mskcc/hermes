@@ -6,11 +6,19 @@ defmodule DashboardWeb.PageController do
     recently_added_samples =
       Projects.list_samples(%{page: 1, per_page: 20, sort_by: [inserted_at: :asc], filters: %{}})
 
+    recently_updated_samples =
+      Projects.list_samples(%{page: 1, per_page: 20, sort_by: [updated_at: :asc], filters: %{}})
+
+    sample_count = %{
+      "completed" => Projects.get_samples_completed_count(%{}),
+      "failed" => Projects.get_samples_failed_count(%{}),
+      "running" => Projects.get_samples_running_count(%{})
+    }
+
     render(conn, "index.html",
-      recently_added_samples: recently_added_samples
-      # samples_running_count: samples_running_count,
-      # samples_completed_count: samples_completed_count,
-      # samples_failed_count: samples_failed_count,
+      recently_added_samples: recently_added_samples,
+      recently_updated_samples: recently_updated_samples,
+      sample_count: sample_count
     )
   end
 end

@@ -13,7 +13,6 @@
         <div id="navMenu" class="navbar-menu">
           <div class="navbar-start">
             <%= link "Dashboard", to: Routes.page_path(@conn, :index), class: "navbar-item" %>
-            <%= link "Projects", to: Routes.live_path(@conn, DashboardWeb.ProjectsLive.List), class: "navbar-item" %>
             <%= link "Samples", to: Routes.live_path(@conn, DashboardWeb.SamplesLive.List), class: "navbar-item" %>
           </div>
 
