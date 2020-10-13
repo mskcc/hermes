@@ -1,7 +1,7 @@
 defmodule DashboardWeb.Api.V1.SampleController do
   use DashboardWeb, :controller
 
-  alias Dashboard.Projects
+  alias Domain.Projects
 
   def update_metadata(conn, params) do
     sample = Projects.get_sample!(params["id"])

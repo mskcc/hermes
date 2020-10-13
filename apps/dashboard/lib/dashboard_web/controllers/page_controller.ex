@@ -1,6 +1,6 @@
 defmodule DashboardWeb.PageController do
   use DashboardWeb, :controller
-  alias Dashboard.Projects
+  alias Domain.Projects
 
   def index(conn, _params) do
     recently_added_samples =

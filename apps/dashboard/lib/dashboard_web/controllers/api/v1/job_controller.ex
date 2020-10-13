@@ -1,7 +1,7 @@
 defmodule DashboardWeb.Api.V1.JobController do
   use DashboardWeb, :controller
 
-  alias Dashboard.Projects
+  alias Domain.Projects
 
   def create(conn, params) do
     sample = Projects.get_or_fetch_sample_by_igo_id(params["sample_id"])
@@ -44,7 +44,7 @@ defmodule DashboardWeb.Api.V1.JobController do
         "group_id" => group_id,
         "sample_id" => _sample_id,
         "workflow_name" => workflow_name,
-        "error_type" => error_type
+        "error_type" => _error_type
       }) do
     workflow = Projects.get_workflow_by_name_and_group_id!(workflow_name, group_id)
 

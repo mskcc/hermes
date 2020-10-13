@@ -34,7 +34,7 @@ defmodule Dashboard.MixProject do
   def application do
     [
       mod: {Dashboard.Application, []},
-      extra_applications: [:logger, :runtime_tools, :paddle, :edeliver]
+      extra_applications: [:logger, :domain, :metadata_etl, :runtime_tools, :edeliver, :os_mon]
     ]
   end
 
@@ -51,24 +51,22 @@ defmodule Dashboard.MixProject do
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_live_view, "~> 0.14.4"},
-      {:ecto, "~> 3.4.4"},
-      {:ecto_sql, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_dashboard, "~> 0.1"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.2.2"},
       {:pow, "~> 1.0.18"},
       {:lims_client, in_umbrella: true},
       {:access_tracker_client, in_umbrella: true},
-      {:paddle, git: "git@github.com:publica-re/paddle.git", branch: "feature-auto-reconnect"},
-      {:ecto_enum, "~> 1.4"},
+      {:domain, in_umbrella: true},
       {:timex, "~> 3.5"},
       {:elixir_uuid, "~> 1.2"},
-      {:ex_audit, git: "git@github.com:ZennerIoT/ex_audit.git"},
+      {:metadata_etl, in_umbrella: true}
       # {:ex_state_ecto, "~> 0.2"},
-      {:oban, "~> 1.2"}
+      # {:oban, "~> 1.2"}
     ]
   end
 

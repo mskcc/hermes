@@ -1,8 +1,8 @@
 defmodule DashboardWeb.SamplesLive.List do
   use Phoenix.LiveView
 
-  alias Dashboard.Projects
-  alias Dashboard.Projects.Sample
+  alias Domain.Projects
+  alias Domain.Projects.Sample
   alias DashboardWeb.SampleView
   alias DashboardWeb.Router.Helpers, as: Routes
 

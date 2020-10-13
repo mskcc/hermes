@@ -59,35 +59,51 @@ defmodule LimsClient do
   )
 
   @doc false
-  # @spec fetch_samples_by_request(String.t()) :: any 
-  def fetch_sample_ids_by_request(request_id) do
-    {:ok, response} = get("/api/getRequestSamples?" <> "request=#{request_id}")
+  def fetch_new_requests_since(timestamp) do
+    request = get("/api/getDeliveries?" <> "timestamp=#{timestamp}")
 
-    Enum.map(response.body["samples"], & &1["igoSampleId"])
+    response =
+      case request do
+        {:ok, response} -> response
+        response -> response
+      end
+
+    case response do
+      %{status: n} when n in [200, 201] ->
+        {:ok, response.body}
+
+      {:error, error} ->
+        {:error, error}
+
+      _ ->
+        {:error, {response.status, response.body}}
+    end
   end
 
-  def build_csv_of_sample_metadata_from_request_id(request_id) do
-    sample_groups =
-      fetch_sample_ids_by_request(request_id)
-      |> Enum.chunk_every(10)
+  @doc false
+  def fetch_samples_by_request(request_name) do
+    request = get("/api/getRequestSamples?" <> "request=#{request_name}")
 
-    # {:ok, file} = File.open("/Users/fraihaa/Dev/seqosystem/sample_metadata", [:write])
-    NimbleCSV.define(MyParser, separator: "\t", escape: "\"")
-
-    Enum.each(sample_groups, fn samples ->
-      case LimsClient.fetch_sample_manifests(samples) do
-        {:ok, body} ->
-          IO.inspect(body)
-          values = Enum.map(body, &(&1 |> Map.drop(["libraries", "qc_reports"]) |> Map.values()))
-
-          MyParser.dump_to_stream(values)
-          |> Stream.into(File.stream!("append.csv", [:append, :utf8]))
-          |> Stream.run()
-
-        _ ->
-          IO.inspect("Error with #{samples}")
+    response =
+      case request do
+        {:ok, response} -> response
+        response -> response
       end
-    end)
+
+    case response do
+      %{status: n} when n in [200, 201] ->
+        {:ok,
+         %{
+           "recipe" => response.body["recipe"],
+           "sample_ids" => Enum.map(response.body["samples"], & &1["igoSampleId"])
+         }}
+
+      {:error, error} ->
+        {:error, error}
+
+      _ ->
+        {:error, {response.status, response.body}}
+    end
   end
 
   @doc """
@@ -97,7 +113,7 @@ defmodule LimsClient do
       iex> LimsClient.fetch_sample_manifests(["123"])
       {:ok, [%{"bait_set" => "MSK-ACCESS-v1_0-probesAllwFP_hg37_sort-BAITS", "cf_dna_2d_barcode" => "803555551", "cmo_patient_id" => "C-69D8HW", "cmo_sample_class" => "Unknown Tumor", "cmo_sample_name" => "C-69555-L555-d", "collection_year" => "", "igo_id" => "06555_A_555", "investigator_sample_id" => "MSK-MB-0555-CF1-msk555555-p", "libraries" => [%{"barcodeId" => "IDTdual555", "barcodeIndex" => "CTTGTCGA-GAACATCG", "captureConcentrationNm" => "8.771929825", "captureInputNg" => "500.0000000250001", "captureName" => "Pool-55555_AG-D4_1", "dnaInputNg" => 18.25, "libraryConcentrationNgul" => 57, "libraryIgoId" => "06555_A_555_1_1", "libraryVolume" => 35, "runs" => [%{"fastqs" => ["/path/to/Sample_MSK-MB-0104-CF1-msk5002913c-p_IGO_06555_A_555/MSK-MB-0104-CF1-msk5002913c-p_IGO_06555_A_555_S39_R1_001.fastq.gz", "/path/to/Sample_MSK-MB-0104-CF1-msk5002913c-p_IGO_06555_A_555/MSK-MB-0104-CF1-msk5002913c-p_IGO_06555_A_555_S39_R2_001.fastq.gz"], "flowCellId" => "H73G55555", "flowCellLanes" => [1, 2, 3, 4], "readLength" => "101/8/8/101", "runDate" => "2020-02-20", "runId" => "DIANA_5555", "runMode" => "NovaSeq S4"}]}], "onco_tree_code" => "BREAST", "preservation" => "EDTA-Streck", "qc_reports" => [%{"IGORecommendation" => "Passed", "comments" => "", "investigatorDecision" => "Continue processing", "qcReportType" => "LIBRARY"}], "sample_name" => "MSK-MB-0555-CF1-msk555555-p", "sample_origin" => "Whole Blood", "sex" => "F", "species" => "Human", "speciman_type" => nil, "tissue_location" => "", "tumor_or_normal" => "Tumor"}]}
   """
-  @spec fetch_sample_manifests(list) :: {:ok, manifest_map} | {:error, integer, String.t()}
+  @spec fetch_sample_manifests(list) :: {:ok, manifest_map} | {:error, {integer, String.t()}}
   def fetch_sample_manifests(samples) do
     query =
       samples
@@ -122,17 +138,14 @@ defmodule LimsClient do
   end
 
   @spec process_response({:ok, Tesla.Env.t()}) ::
-          {:ok, manifest_map} | {:error, integer, String.t()}
+          {:ok, manifest_map} | {:error, {integer, String.t()}}
   defp process_response({:ok, response}) do
     case response do
-      %{status: 200} ->
-        {:ok, response.body |> update_keys}
-
-      %{status: 201} ->
+      %{status: n} when n in [200, 201] ->
         {:ok, response.body |> update_keys}
 
       _ ->
-        {:error, response.status, response.body}
+        {:error, {response.status, response.body}}
     end
   end
 

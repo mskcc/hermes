@@ -8,6 +8,9 @@
   <div class="column is-3">
     <%= live_component @socket, DashboardWeb.IgoSearchComponent, id: "igo-search", params: @params %>
   </div>
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.AssaySearchComponent, id: "assay-search", params: @params %>
+  </div>
 </div>
 <section class="info-tiles">
   <div class="tile is-ancestor has-text-centered">

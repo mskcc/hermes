@@ -8,8 +8,10 @@
 use Mix.Config
 
 config :dashboard,
-  ecto_repos: [Dashboard.Repo],
-  generators: [context_app: :dashboard]
+  ecto_repos: [Domain.Repo],
+  generators: [context_app: :dashboard, migration: false]
+
+config :phoenix, :generators, model: false
 
 # Configures the endpoint
 config :dashboard, DashboardWeb.Endpoint,
@@ -26,14 +28,14 @@ config :phoenix,
   json_library: Jason,
   template_engines: [leex: Phoenix.LiveView.Engine]
 
-config :dashboard, Oban,
-  repo: Dashboard.Repo,
-  queues: [default: 10, events: 50, media: 20]
+# config :dashboard, Oban,
+#  repo: Dashboard.Repo,
+#  queues: [default: 10, events: 50, media: 20]
 
-config :ex_state, repo: Dashboard.Repo
+# config :ex_state, repo: Dashboard.Repo
 
 config :ex_audit,
-  version_schema: Dashboard.Audit.Version,
+  version_schema: Domain.Audit.Version,
   tracked_schemas: [
-    Dashboard.Projects.SampleMetadata
+    Domain.Projects.SampleMetadata
   ]

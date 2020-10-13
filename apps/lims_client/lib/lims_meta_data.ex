@@ -1,4 +1,4 @@
-defmodule LimsClient.Ecto.MetaData do
+defmodule LimsClient.Ecto.Metadata do
   use Ecto.Schema
 
   @fields [

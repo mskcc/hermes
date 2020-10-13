@@ -9,6 +9,24 @@
 # move said applications out of the umbrella.
 import Config
 
+config :domain,
+  ecto_repos: [Domain.Repo]
+
+config :metadata_etl,
+  ecto_repos: [Domain.Repo]
+
+config :metadata_etl, Oban,
+  repo: Domain.Repo,
+  plugins: [Oban.Plugins.Pruner],
+  queues: [
+    lims_fetch_requests: 1,
+    lims_fetch_samples: 3,
+    lims_fetch_sample: 10
+  ],
+  crontab: [
+    {"15 * * * *", MetadataEtl.LimsFetchRequests}
+  ]
+
 # Sample configuration:
 #
 #     config :logger, :console,
@@ -30,8 +48,8 @@ config :beagle_client,
 import_config "config.dashboard.exs"
 
 config :pow,
-  user: Dashboard.Users.User,
-  users_context: Dashboard.Users.LDAPContext,
+  user: Domain.Users.User,
+  users_context: Domain.Users.LDAPContext,
   web_module: DashboardWeb
 
 import_config "#{Mix.env()}.exs"
