@@ -1,0 +1,52 @@
+<div class="columns">
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.StateSearchComponent, id: "state-search", params: @params %>
+  </div>
+</div>
+<table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
+  <thead>
+    <tr>
+      <th>App</th>
+      <th>Worker</th>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.JobsLive.List, :queue, "Queue", @params, @sort_by) %></th>
+      <th>State</th>
+      <th>Attempts</th>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.JobsLive.List, :inserted_at, "Created", @params, @sort_by) %></th>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.JobsLive.List, :completed_at, "Completed", @params, @sort_by) %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for job <- @jobs.entries do %>
+      <tr>
+        <td>
+          <%=job.worker %>
+        </td>
+        <td>
+          <%=job.worker %>
+        </td>
+        <td>
+          <%=job.queue %>
+        </td>
+        <td>
+          <%=job.state %>
+        </td>
+        <td>
+          <%=job.attempt %> / <%=job.max_attempts %>
+        </td>
+        <td data-tooltip="<%=job.inserted_at%>"><%= Date.relative_to_now(job.inserted_at)%></td>
+        <td data-tooltip="<%=job.completed_at%>"><%= Date.relative_to_now(job.completed_at)%></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<nav class="pagination is-left" role="navigation" aria-label="pagination">
+  <strong><%=@jobs.count%> results</strong>
+  <%= if @params["page"] > 1 do %>
+    <%= live_patch "Previous", to: Routes.live_path(@socket, DashboardWeb.JobsLive.List, Table.update_params(@params, "page", @params["page"] - 1)), class: "is-primary button pagination-previous" %></span>
+  <% end %>
+  <%= if @params["page"] * @params["per_page"] < @jobs.count do %>
+    <%= live_patch "Next", to: Routes.live_path(@socket, DashboardWeb.JobsLive.List, Table.update_params(@params, "page", @params["page"] + 1)), class: "is-primary button pagination-next" %>
+  <% end %>
+  <ul class="pagination-list"></ul>
+</nav>

@@ -64,6 +64,6 @@ defmodule DashboardWeb.Router do
   scope "/", DashboardWeb do
     pipe_through [:browser, :protected, :account]
     live "/samples", SamplesLive.List
-    live "/projects", ProjectsLive.List
+    live "/jobs", JobsLive.List
   end
 end
