@@ -8,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import mskLogo from '@/public/MSKCC-logo.jpg';
 import Avatar from '@/_components/Avatar';
 import { Router, Route, Link, Redirect, Switch, useLocation } from 'react-router-dom';
 
@@ -124,7 +123,6 @@ export default function PermanentDrawerLeft(props) {
         >
             <div className={classes.drawerRoot}>
                 <div className={classes.headerPanel}>
-                    <img src={mskLogo} className={classes.logoImage}></img>
                     <Typography
                         variant="h1"
                         component="h2"

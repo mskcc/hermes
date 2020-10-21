@@ -8,5 +8,5 @@ render(
     <Provider store={store}>
         <AppContainer />
     </Provider>,
-    document.getElementById('metadata-editor')
+    document.getElementById('pointer')
 );

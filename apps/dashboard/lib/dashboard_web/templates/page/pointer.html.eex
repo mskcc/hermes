@@ -1,0 +1,4 @@
+<div id="pointer">
+</div>
+
+<script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/pointer.js") %>"></script>

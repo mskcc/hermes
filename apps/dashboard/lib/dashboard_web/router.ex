@@ -57,6 +57,7 @@ defmodule DashboardWeb.Router do
   scope "/", DashboardWeb do
     pipe_through [:browser, :protected, :account]
 
+    get "/pointer", PageController, :pointer
     get "/", PageController, :index
     resources "/samples", SampleController, except: [:index]
   end

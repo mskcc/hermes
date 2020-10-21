@@ -2,6 +2,10 @@ defmodule DashboardWeb.PageController do
   use DashboardWeb, :controller
   alias Domain.Projects
 
+  def pointer(conn, _params) do
+    render(conn, "pointer.html")
+  end
+
   def index(conn, _params) do
     recently_added_samples =
       Projects.list_samples(%{page: 1, per_page: 20, sort_by: [inserted_at: :asc], filters: %{}})
