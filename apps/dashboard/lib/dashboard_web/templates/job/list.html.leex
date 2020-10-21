@@ -2,15 +2,27 @@
   <div class="column is-3">
     <%= live_component @socket, DashboardWeb.StateSearchComponent, id: "state-search", params: @params %>
   </div>
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.QueueSearchComponent, id: "queue-search", params: @params %>
+  </div>
 </div>
 <table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
   <thead>
     <tr>
-      <th>App</th>
       <th>Worker</th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.JobsLive.List, :queue, "Queue", @params, @sort_by) %></th>
-      <th>State</th>
-      <th>Attempts</th>
+      <th class="has-text-centered">
+        State
+      </th>
+      <th class="has-text-centered">
+        Attempts
+      </th>
+      <th>
+        Args
+      </th>
+      <th>
+        Errors
+      </th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.JobsLive.List, :inserted_at, "Created", @params, @sort_by) %></th>
       <th><%= Table.sortable_field(@socket, DashboardWeb.JobsLive.List, :completed_at, "Completed", @params, @sort_by) %></th>
     </tr>
@@ -22,16 +34,28 @@
           <%=job.worker %>
         </td>
         <td>
-          <%=job.worker %>
-        </td>
-        <td>
           <%=job.queue %>
         </td>
-        <td>
-          <%=job.state %>
+        <td class="has-text-centered">
+          <%=if job.state == "discarded" do%>
+            <a phx-click="retry_job" phx-value-id="<%=job.id%>" class="is-<%=job.state%>" data-tooltip="<%=job.state%>"><i class="far fa-dot-circle"></i></a>
+          <% else %>
+            <a phx-value-id="<%=job.id%>" class="is-<%=job.state%>" data-tooltip="<%=job.state%>"><i class="far fa-dot-circle"></i></a>
+          <% end %>
+        </td>
+        <td class="has-text-centered">
+          <sup><%=job.attempt%></sup>&frasl;<sub><%=job.max_attempts%></sub>
         </td>
         <td>
-          <%=job.attempt %> / <%=job.max_attempts %>
+        <pre>
+          <%= for {k, v} <- job.args do %>
+<%=k%>: <%=v%>
+<%end%></pre>
+        </td>
+        <td>
+          <%= for error <- job.errors do %>
+          <%= error["error"] %>
+          <%end%>
         </td>
         <td data-tooltip="<%=job.inserted_at%>"><%= Date.relative_to_now(job.inserted_at)%></td>
         <td data-tooltip="<%=job.completed_at%>"><%= Date.relative_to_now(job.completed_at)%></td>

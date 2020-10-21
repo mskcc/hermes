@@ -26,7 +26,7 @@ defmodule MetadataEtl.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:oban, "~> 2.1"},
+      {:oban, "~> 2.2"},
       {:domain, in_umbrella: true},
       {:lims_client, in_umbrella: true}
       # {:dep_from_hexpm, "~> 0.3.0"},

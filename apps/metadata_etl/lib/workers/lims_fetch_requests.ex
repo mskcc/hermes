@@ -21,6 +21,7 @@ defmodule MetadataEtl.LimsFetchRequests do
     |> DateTime.to_unix(:milliseconds)
 
     process_requests(LimsClient.fetch_new_requests_since(timestamp))
+    # TODO perform redelivery event
   end
 
   defp process_requests({:ok, requests}) do

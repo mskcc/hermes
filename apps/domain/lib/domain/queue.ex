@@ -19,27 +19,23 @@ defmodule Domain.Queue do
   def list_jobs(%{page: page, per_page: per_page, sort_by: sort_by, filters: filters}) do
     sort_by = Keyword.new(sort_by, fn {key, val} -> {val, key} end)
     filters = Enum.map(filters, fn {key, value} -> {key, value} end)
-    #count =
-    #  Job
-    #  |> select([s], count(s.id))
-    #  |> where(^filters)
-    #  |> Repo.one()
+
+    count =
+      Job
+      |> select([s], count(s.id))
+      |> where(^filters)
+      |> Repo.one()
 
     query =
       Job
       |> offset(^((page - 1) * per_page))
       |> limit(^per_page)
+      |> where(^filters)
       |> order_by(^sort_by)
 
-    empty_map = %{}
-    query = filters
-            |> case do
-              ^empty_map -> query
-              _ -> query |> where(^filters)
-            end
 
     entries = Repo.all(query)
-    %{entries: entries, count: 0}
+    %{entries: entries, count: count}
   end
 
   def get_latest_completed_job_by_queue(queue) do
@@ -50,10 +46,21 @@ defmodule Domain.Queue do
     )
   end
 
+  def retry_job(id) do
+    Oban.retry_job(id)
+  end
+
   def list_states do
     Job
     |> select([j], j.state) 
     |> group_by(:state)
+    |> Repo.all
+  end
+
+  def list_queues do
+    Job
+    |> select([j], j.queue) 
+    |> group_by(:queue)
     |> Repo.all
   end
 end

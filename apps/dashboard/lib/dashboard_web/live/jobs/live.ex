@@ -69,6 +69,12 @@ defmodule DashboardWeb.JobsLive.List do
     {:noreply, go_page(socket, socket.assigns.page + 1)}
   end
 
+  def handle_event("retry_job", %{"id" => id}, socket) do
+    {id, _} = Integer.parse(id)
+    Queue.retry_job(id)
+    {:noreply, socket}
+  end
+
   def handle_event("keydown", _, socket), do: {:noreply, socket}
 
   defp go_page(socket, page) when page > 0 do
