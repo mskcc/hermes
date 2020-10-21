@@ -14,8 +14,10 @@ module.exports = (env, options) => ({
     },
     entry: {
         'app': glob.sync('./vendor/**/*.js').concat(['./js/app.js']),
-        'samples-list': './js/samples/list/index.tsx',
-        'samples-show': './js/samples/show/index.ts'
+        'samples-show': './js/samples/show/index.tsx'
+    },
+    resolve: {
+        extensions: ['.js', '.ts', '.json', '.tsx', '.jsx']
     },
     output: {
         filename: '[name].js',
@@ -25,7 +27,7 @@ module.exports = (env, options) => ({
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.js|\.jsx$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader'
