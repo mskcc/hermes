@@ -4,6 +4,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const beagleUrl = process.env.BEAGLE_URL || 'http://localhost:8000';
+
 
 module.exports = (env, options) => ({
     optimization: {
@@ -15,7 +17,14 @@ module.exports = (env, options) => ({
     entry: {
         'app': glob.sync('./vendor/**/*.js').concat(['./js/app.js']),
         'samples-list': './js/samples/list/index.tsx',
-        'samples-show': './js/samples/show/index.ts'
+        'samples-show': './js/samples/show/index.ts',
+        'pointer': './js/pointer/index.jsx'
+    },
+    resolve: {
+        extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
+        alias: {
+            '@': path.resolve(__dirname, 'js/pointer'),
+        },
     },
     output: {
         filename: '[name].js',
@@ -25,7 +34,7 @@ module.exports = (env, options) => ({
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.js|\.jsx$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader'
