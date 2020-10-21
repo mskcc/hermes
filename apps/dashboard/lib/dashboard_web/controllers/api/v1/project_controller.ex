@@ -1,6 +1,6 @@
 defmodule DashboardWeb.Api.V1.ProjectController do
   use DashboardWeb, :controller
-  alias Dashboard.Projects
+  alias Domain.Projects
 
   def index(conn, %{"q" => q}) do
     projects = Projects.filter_projects(q)

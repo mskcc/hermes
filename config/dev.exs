@@ -1,7 +1,7 @@
 use Mix.Config
 
 # Configure your database
-config :dashboard, Dashboard.Repo,
+config :domain, Domain.Repo,
   username: "postgres",
   password: "postgres",
   database: "dashboard_dev",

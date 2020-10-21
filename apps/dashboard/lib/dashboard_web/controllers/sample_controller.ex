@@ -1,70 +1,14 @@
 defmodule DashboardWeb.SampleController do
   use DashboardWeb, :controller
 
-  alias Dashboard.Projects
-  alias Dashboard.Projects.Sample
-  alias Dashboard.Projects.Assay
-  alias Dashboard.Projects.Project
-
-  def index(conn, _params) do
-    render(conn, "index.html")
-  end
-
-  def new(conn, _params) do
-    changeset = Projects.change_sample(%Sample{})
-    assay_changeset = Projects.change_assay(%Assay{})
-    project_changeset = Projects.change_project(%Project{})
-
-    render(conn, "new.html",
-      changeset: changeset,
-      projects: [],
-      assays: [],
-      assay_changeset: assay_changeset,
-      project_changeset: project_changeset
-    )
-  end
-
-  def create(conn, %{"sample" => sample_params}) do
-    case Projects.create_sample(sample_params) do
-      {:ok, sample} ->
-        conn
-        |> put_flash(:info, "Sample created successfully.")
-        |> redirect(to: Routes.sample_path(conn, :show, sample))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        projects =
-          if sample_params["project_id"],
-            do: [Projects.get_project!(sample_params["project_id"])],
-            else: []
-
-        assays =
-          if sample_params["assay_id"],
-            do: [Projects.get_assay!(sample_params["assay_id"])],
-            else: []
-
-        assay_changeset = Projects.change_assay(%Assay{})
-        project_changeset = Projects.change_project(%Project{})
-
-        render(conn, "new.html",
-          changeset: changeset,
-          projects: projects,
-          assays: assays,
-          assay_changeset: assay_changeset,
-          project_changeset: project_changeset
-        )
-    end
-  end
+  alias Domain.Projects
+  alias Domain.Projects.Sample
+  alias Domain.Projects.Assay
 
   def show(conn, %{"id" => id}) do
     sample = Projects.get_sample!(id)
     metadata_history = Projects.get_sample_metadata_history(sample)
     render(conn, "show.html", sample: sample, metadata_history: metadata_history)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    sample = Projects.get_sample!(id)
-    changeset = Projects.change_sample(sample)
-    render(conn, "edit.html", sample: sample, changeset: changeset)
   end
 
   def update(conn, %{"id" => id, "sample" => sample_params}) do

@@ -2,6 +2,7 @@ defmodule DashboardWeb.Router do
   use DashboardWeb, :router
   use Pow.Phoenix.Router
   import Phoenix.LiveView.Router
+  import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -41,6 +42,7 @@ defmodule DashboardWeb.Router do
     pipe_through [:browser, :auth]
     # Log-in/log-out routes
     pow_session_routes()
+    live_dashboard "/dashboard"
   end
 
   # Disable user registration
@@ -62,6 +64,6 @@ defmodule DashboardWeb.Router do
   scope "/", DashboardWeb do
     pipe_through [:browser, :protected, :account]
     live "/samples", SamplesLive.List
-    live "/projects", ProjectsLive.List
+    live "/jobs", JobsLive.List
   end
 end

@@ -135,7 +135,12 @@ nav.navbar {
         &.is-running { color: $purple;   animation: letterSizeBounce 1s linear infinite alternate; }
     }
 }
-/* End Workflows */
+a {
+	&.is-completed { color: $success; }
+	&.is-discarded { color: $danger; }
+	&.is-scheduled { color: $grey-lighter; }
+	&.is-executing { color: $purple;   animation: letterSizeBounce 1s linear infinite alternate; }
+}
 
 @keyframes letterSizeBounce {
   0% {
