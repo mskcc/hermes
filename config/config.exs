@@ -17,7 +17,7 @@ config :metadata_etl,
 
 config :metadata_etl, Oban,
   repo: Domain.Repo,
-  plugins: [{Oban.Plugins.Pruner, max_age: 604800}],
+  plugins: [{Oban.Plugins.Pruner, max_age: 604_800}],
   queues: [
     lims_fetch_requests: 1,
     lims_fetch_samples: 3,
