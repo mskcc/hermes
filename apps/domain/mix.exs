@@ -32,7 +32,7 @@ defmodule Domain.MixProject do
       {:ex_audit, git: "git@github.com:ZennerIoT/ex_audit.git"},
       {:postgrex, ">= 0.0.0"},
       {:paddle, git: "git@github.com:aef-/paddle.git"},
-      {:pow, "~> 1.0.18"},
+      {:pow, "~> 1.0.18"}
     ]
   end
 end
