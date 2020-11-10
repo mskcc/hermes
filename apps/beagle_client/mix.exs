@@ -37,7 +37,8 @@ defmodule BeagleClient.MixProject do
     [
       {:tesla, "~> 1.3.0"},
       {:jason, ">= 1.0.0"},
-      {:mint, "~> 1.0"}
+      {:mint, "~> 1.0"},
+      {:typed_struct, "~> 0.2.1"}
     ]
   end
 end
