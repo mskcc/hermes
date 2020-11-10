@@ -71,6 +71,7 @@ defmodule Dashboard.UserAuth do
   """
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
+
     if user_token do
       Accounts.delete_user_tokens(Accounts.get_user_by_access_token(user_token))
     end
@@ -93,16 +94,20 @@ defmodule Dashboard.UserAuth do
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_by_access_token(user_token)
+
     cond do
       is_nil(user) ->
         assign(conn, :current_user, nil)
+
       is_nil(user.access_token) ->
         log_out_user(conn)
+
       user.access_token != user_token ->
         conn
         |> renew_session()
         |> put_session(:user_token, user.access_token)
         |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(user.access_token)}")
+
       true ->
         assign(conn, :current_user, user)
     end
@@ -163,4 +168,3 @@ defmodule Dashboard.UserAuth do
 
   defp signed_in_path(_conn), do: "/"
 end
-
