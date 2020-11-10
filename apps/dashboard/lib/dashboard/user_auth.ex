@@ -96,7 +96,7 @@ defmodule Dashboard.UserAuth do
     user = user_token && Accounts.get_user_by_access_token(user_token)
 
     cond do
-      is_nil(user) ->
+      is_nil(user) || !user ->
         assign(conn, :current_user, nil)
 
       is_nil(user.access_token) ->

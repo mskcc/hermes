@@ -1,15 +1,4 @@
 defmodule BeagleClient do
-  use Tesla
-
-  plug(Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url))
-
-  plug(Tesla.Middleware.BasicAuth,
-    username: Application.fetch_env!(:beagle_client, :username),
-    password: Application.fetch_env!(:beagle_client, :password)
-  )
-
-  plug(Tesla.Middleware.DecodeJson)
-
   @moduledoc """
   Documentation for `BeagleClient`.
   """
@@ -19,44 +8,68 @@ defmodule BeagleClient do
 
   ## Examples
 
-      iex> result = BeagleClient.fetch_pipelines
+      iex> result = BeagleClient.fetch_pipelines(client)
       ...> with {_, %Tesla.Env{}} <- result, do: :passed
       iex> :passed
   """
-  def fetch_pipelines() do
-    request = get("/v0/run/pipelines/", query: [page: 1, per_page: 100])
+  def fetch_pipelines(client) do
+    request = client |> Tesla.get("/v0/run/pipelines/", query: [page: 1, per_page: 100])
 
     handle_response(request)
   end
 
   @doc false
-  def fetch_auth_token(username, password) do
+  def fetch_auth_token(username, password), do: fetch_auth_token(client(), username, password)
+
+  def fetch_auth_token(client, username, password) do
     request =
-      post("/api-token-auth/", Jason.encode!(%{username: username, password: password}),
-        headers: [{"content-type", "application/json"}]
-      )
+      client
+      |> Tesla.post("/api-token-auth/", Jason.encode!(%{username: username, password: password}))
 
     handle_response(request)
   end
 
   @doc false
-  def validate_auth_token(token) do
+  def validate_auth_token(token), do: validate_auth_token(client(), token)
+
+  def validate_auth_token(client, token) do
     request =
-      post("/api-token-verify/", Jason.encode!(%{token: token}),
-        headers: [{"content-type", "application/json"}]
-      )
+      client
+      |> Tesla.post("/api-token-verify/", Jason.encode!(%{token: token}))
 
     handle_response(request)
   end
 
   @doc false
-  def refresh_auth_token(token) do
+  def refresh_auth_token(token), do: refresh_auth_token(client(), token)
+
+  def refresh_auth_token(client, token) do
     request =
-      post("/api-token-refresh/", Jason.encode!(%{refresh: token}),
-        headers: [{"content-type", "application/json"}]
-      )
+      client
+      |> Tesla.post("/api-token-refresh/", Jason.encode!(%{refresh: token}))
 
     handle_response(request)
+  end
+
+  def client(token) when is_binary(token) do
+    middleware = [
+      {Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url)},
+      Tesla.Middleware.JSON,
+      {Tesla.Middleware.Headers,
+       [{"authorization", "Bearer: " <> token}, {"content-type", "application/json"}]}
+    ]
+
+    Tesla.client(middleware)
+  end
+
+  def client do
+    middleware = [
+      {Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url)},
+      Tesla.Middleware.JSON,
+      {Tesla.Middleware.Headers, [{"content-type", "application/json"}]}
+    ]
+
+    Tesla.client(middleware)
   end
 
   defp handle_response(request) do
