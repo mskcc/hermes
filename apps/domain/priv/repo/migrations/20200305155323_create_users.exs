@@ -4,8 +4,10 @@ defmodule Domain.Repo.Migrations.CreateUsers do
   def change do
     create table(:users) do
       add :email, :string
-      add :password_hash, :string
-      add :role, RoleEnum.type()
+      add :refresh_token, :text
+      add :access_token, :text
+      add :first_name, :string
+      add :last_name, :string
 
       timestamps(type: :utc_datetime)
     end

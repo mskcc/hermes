@@ -10,14 +10,15 @@
 import Config
 
 config :domain,
-  ecto_repos: [Domain.Repo]
+  ecto_repos: [Domain.Repo],
+  migration_primary_key: [name: :id, type: :binary_id]
 
 config :metadata_etl,
   ecto_repos: [Domain.Repo]
 
 config :metadata_etl, Oban,
   repo: Domain.Repo,
-  plugins: [{Oban.Plugins.Pruner, max_age: 604800}],
+  plugins: [{Oban.Plugins.Pruner, max_age: 604_800}],
   queues: [
     lims_fetch_requests: 1,
     lims_fetch_samples: 3,
@@ -46,11 +47,6 @@ config :beagle_client,
   password: ""
 
 import_config "config.dashboard.exs"
-
-config :pow,
-  user: Domain.Users.User,
-  users_context: Domain.Users.LDAPContext,
-  web_module: DashboardWeb
 
 import_config "#{Mix.env()}.exs"
 import_config "#{Mix.env()}.secret.exs"

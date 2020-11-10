@@ -16,6 +16,7 @@ Domain.Repo.insert!(%Domain.Projects.Assay{
 
 statuses = ["success", "failure", "running"]
 
+"""
 Enum.map(1..60, fn id ->
   Domain.Projects.create_job_with_workflows(%{
     "group_id" => UUID.uuid4(),
@@ -55,3 +56,4 @@ Enum.map(1..60, fn id ->
     }
   })
 end)
+"""

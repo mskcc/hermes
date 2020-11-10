@@ -17,7 +17,7 @@
           </div>
 
         <div class="navbar-end">
-          <%= link "Sign out", to: Routes.pow_session_path(@conn, :delete), method: :delete, class: "navbar-item" %>
+          <%= link "Log out", to: Routes.session_path(@conn, :delete), method: :delete, class: "navbar-item" %>
         </div>
       </div>
     </nav>

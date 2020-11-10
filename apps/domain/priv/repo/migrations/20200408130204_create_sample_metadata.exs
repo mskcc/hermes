@@ -4,7 +4,7 @@ defmodule Domain.Repo.Migrations.CreateSampleMetadata do
   def change do
     create table(:sample_metadata) do
       add :content, :jsonb
-      add :sample_id, :id
+      add :sample_id, references(:samples, on_delete: :nothing)
 
       timestamps()
     end

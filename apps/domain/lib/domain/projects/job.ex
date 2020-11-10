@@ -1,5 +1,5 @@
 defmodule Domain.Projects.Job do
-  use Ecto.Schema
+  use Domain.Schema
   import Ecto.Changeset
   alias Domain.Projects
 
