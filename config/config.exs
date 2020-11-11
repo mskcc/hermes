@@ -10,8 +10,7 @@
 import Config
 
 config :domain,
-  ecto_repos: [Domain.Repo],
-  migration_primary_key: [name: :id, type: :binary_id]
+  ecto_repos: [Domain.Repo]
 
 config :metadata_etl,
   ecto_repos: [Domain.Repo]
