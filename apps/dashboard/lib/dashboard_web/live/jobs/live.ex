@@ -56,10 +56,9 @@ defmodule DashboardWeb.JobsLive.List do
     )
   end
 
-  
-  #def handle_info({Projects, [:samples | _], _}, socket) do
+  # def handle_info({Projects, [:samples | _], _}, socket) do
   #  {:noreply, fetch(socket)}
-  #end
+  # end
 
   def handle_event("keydown", %{"code" => "ArrowLeft"}, socket) do
     {:noreply, go_page(socket, socket.assigns.page - 1)}

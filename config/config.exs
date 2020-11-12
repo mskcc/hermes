@@ -17,7 +17,7 @@ config :metadata_etl,
 
 config :metadata_etl, Oban,
   repo: Domain.Repo,
-  plugins: [{Oban.Plugins.Pruner, max_age: 604800}],
+  plugins: [{Oban.Plugins.Pruner, max_age: 604_800}],
   queues: [
     lims_fetch_requests: 1,
     lims_fetch_samples: 3,
@@ -46,11 +46,6 @@ config :beagle_client,
   password: ""
 
 import_config "config.dashboard.exs"
-
-config :pow,
-  user: Domain.Users.User,
-  users_context: Domain.Users.LDAPContext,
-  web_module: DashboardWeb
 
 import_config "#{Mix.env()}.exs"
 import_config "#{Mix.env()}.secret.exs"

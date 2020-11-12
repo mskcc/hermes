@@ -1,20 +1,20 @@
-defmodule Domain.Users.User do
-  use Ecto.Schema
-  use Pow.Ecto.Schema
-
-  @default_role RoleEnum.__enum_map__()[:regular]
+defmodule Domain.Accounts.User do
+  @moduledoc false
+  use Domain.Schema
 
   schema "users" do
-    pow_user_fields()
-    field(:role, RoleEnum, default: @default_role)
+    field(:access_token, :string)
+    field(:refresh_token, :string)
+    field(:email, :string)
+    field(:first_name, :string)
+    field(:last_name, :string)
 
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset_role(Ecto.Schema.t() | Ecto.Changeset.t(), map()) :: Ecto.Changeset.t()
-  def changeset_role(user_or_changeset, attrs) do
-    user_or_changeset
-    |> Ecto.Changeset.cast(attrs, [:role])
-    |> Ecto.Changeset.validate_inclusion(:role, RoleEnum.__valid_values__())
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :access_token, :refresh_token, :first_name, :last_name])
+    |> validate_required([:email])
   end
 end

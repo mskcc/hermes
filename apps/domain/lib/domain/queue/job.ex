@@ -1,5 +1,6 @@
 defmodule Domain.Queue.Job do
   import Ecto.Changeset
+
   def filter_changeset(params) do
     data = %{}
 

@@ -33,16 +33,17 @@ defmodule Domain.Queue do
       |> where(^filters)
       |> order_by(^sort_by)
 
-
     entries = Repo.all(query)
     %{entries: entries, count: count}
   end
 
   def get_latest_completed_job_by_queue(queue) do
-    Repo.one(from j in Job, 
-      where: not is_nil(j.completed_at) and j.queue == ^queue,
-      order_by: [desc: :completed_at],
-      limit: 1
+    Repo.one(
+      from(j in Job,
+        where: not is_nil(j.completed_at) and j.queue == ^queue,
+        order_by: [desc: :completed_at],
+        limit: 1
+      )
     )
   end
 
@@ -52,15 +53,15 @@ defmodule Domain.Queue do
 
   def list_states do
     Job
-    |> select([j], j.state) 
+    |> select([j], j.state)
     |> group_by(:state)
-    |> Repo.all
+    |> Repo.all()
   end
 
   def list_queues do
     Job
-    |> select([j], j.queue) 
+    |> select([j], j.queue)
     |> group_by(:queue)
-    |> Repo.all
+    |> Repo.all()
   end
 end

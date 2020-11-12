@@ -11,14 +11,15 @@ defmodule Domain.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :paddle],
+      extra_applications: [:logger],
       mod: {Domain.Application, []}
     ]
   end
@@ -31,7 +32,18 @@ defmodule Domain.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:ex_audit, git: "git@github.com:ZennerIoT/ex_audit.git"},
       {:postgrex, ">= 0.0.0"},
-      {:paddle, git: "git@github.com:aef-/paddle.git"}
+      {:beagle_client, in_umbrella: true},
+      {:phx_gen_auth, "~> 0.5", runtime: false},
+      # Required for migrations
+      {:oban, "~> 2.2"}
+    ]
+  end
+
+  defp aliases do
+    [
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end

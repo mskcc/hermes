@@ -58,7 +58,6 @@ defmodule Dashboard.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.2.2"},
-      {:pow, "~> 1.0.18"},
       {:lims_client, in_umbrella: true},
       {:access_tracker_client, in_umbrella: true},
       {:domain, in_umbrella: true},

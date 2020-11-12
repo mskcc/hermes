@@ -1,5 +1,5 @@
 defmodule Domain.Audit.Version do
-  use Ecto.Schema
+  use Domain.Schema
   import Ecto.Changeset
 
   schema "audit_versions" do

@@ -22,7 +22,7 @@ defmodule DashboardWeb.SamplesLive.List do
 
   def handle_params(params, _url, socket) do
     sort_by =
-      (params["sort_by"] || [])
+      (params["sort_by"] || ["inserted_at|desc"])
       |> Enum.map(&String.split(&1, "|"))
       |> Enum.map(fn [k, v] -> {String.to_atom(k), String.to_atom(v)} end)
 

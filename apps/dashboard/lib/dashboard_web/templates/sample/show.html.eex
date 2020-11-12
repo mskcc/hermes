@@ -62,7 +62,7 @@
               <%=Table.render_version(version) %>
             </td>
             <td data-tooltip="<%=version.recorded_at%>"><small><%= Date.relative_to_now(version.recorded_at)%></small></td>
-            <td></td>
+            <td>fraihaa</td>
           </tr>
         <%end%>
       </tbody>

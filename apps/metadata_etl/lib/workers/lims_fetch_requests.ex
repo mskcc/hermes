@@ -14,11 +14,12 @@ defmodule MetadataEtl.LimsFetchRequests do
   def perform(_job) do
     job = Domain.Queue.get_latest_completed_job_by_queue(@queue |> to_string)
 
-    timestamp = case job do
-      nil -> DateTime.utc_now()  |> DateTime.add(-@three_days_in_seconds, :second)
-      job -> job.completed_at
-    end
-    |> DateTime.to_unix(:milliseconds)
+    timestamp =
+      case job do
+        nil -> DateTime.utc_now() |> DateTime.add(-@three_days_in_seconds, :second)
+        job -> job.completed_at
+      end
+      |> DateTime.to_unix(:milliseconds)
 
     process_requests(LimsClient.fetch_new_requests_since(timestamp))
     # TODO perform redelivery event
