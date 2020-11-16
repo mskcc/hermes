@@ -1,8 +1,9 @@
 defmodule BeagleClient do
-  use Tesla, only: ~w(get)a
+  use Tesla
   import BeagleEndpoint
   import FilesQuery
   import FileGroupsList
+  import BatchPatchFiles
 
   plug(Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url))
 
@@ -29,6 +30,12 @@ defmodule BeagleClient do
 
   def list_all_file_groups() do
     list_all(BeagleEndpoint.const_file_groups, query: [])
+  end
+
+  def batch_patch_files(%BatchPatchFiles{} = batch_patch_struct) do
+    batch_patch_payload = Map.from_struct(batch_patch_struct)
+    post(BeagleEndpoint.const_batch_patch_files, batch_patch_payload)
+
   end
 
   def list_file_groups(%FileGroupsList{} = file_group_list) do
