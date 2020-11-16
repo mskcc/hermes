@@ -8,7 +8,8 @@ config :domain, Domain.Repo,
   port: 5432,
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 10,
+  migration_primary_key: [name: :id, type: :binary_id]
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

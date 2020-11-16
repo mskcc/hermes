@@ -1,6 +1,6 @@
 defmodule DashboardWeb.Router do
+  import Dashboard.UserAuth
   use DashboardWeb, :router
-  use Pow.Phoenix.Router
   import Phoenix.LiveView.Router
   import Phoenix.LiveDashboard.Router
 
@@ -10,11 +10,10 @@ defmodule DashboardWeb.Router do
     plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :protected do
-    plug Pow.Plug.RequireAuthenticated,
-      error_handler: Pow.Phoenix.PlugErrorHandler
   end
 
   pipeline :api do
@@ -39,31 +38,24 @@ defmodule DashboardWeb.Router do
   end
 
   scope "/" do
-    pipe_through [:browser, :auth]
-    # Log-in/log-out routes
-    pow_session_routes()
-    live_dashboard "/dashboard"
-  end
+    pipe_through [:browser, :auth, :redirect_if_user_is_authenticated]
 
-  # Disable user registration
-  scope "/", Pow.Phoenix, as: "pow" do
-    pipe_through [:browser, :protected]
-
-    resources "/registration", RegistrationController,
-      singleton: true,
-      only: [:edit, :update, :delete]
+    get "/login", DashboardWeb.SessionController, :new
+    post "/login", DashboardWeb.SessionController, :create
   end
 
   scope "/", DashboardWeb do
-    pipe_through [:browser, :protected, :account]
+    pipe_through [:browser, :require_authenticated_user]
+    live_dashboard "/dashboard"
+  end
+
+  scope "/", DashboardWeb do
+    pipe_through [:browser, :account, :require_authenticated_user]
 
     get "/pointer", PageController, :pointer
     get "/", PageController, :index
     resources "/samples", SampleController, except: [:index]
-  end
-
-  scope "/", DashboardWeb do
-    pipe_through [:browser, :protected, :account]
+    delete "/logout", SessionController, :delete
     live "/samples", SamplesLive.List
     live "/jobs", JobsLive.List
   end

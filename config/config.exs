@@ -47,10 +47,5 @@ config :beagle_client,
 
 import_config "config.dashboard.exs"
 
-config :pow,
-  user: Domain.Users.User,
-  users_context: Domain.Users.LDAPContext,
-  web_module: DashboardWeb
-
 import_config "#{Mix.env()}.exs"
 import_config "#{Mix.env()}.secret.exs"

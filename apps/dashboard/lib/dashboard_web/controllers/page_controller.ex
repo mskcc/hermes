@@ -8,10 +8,10 @@ defmodule DashboardWeb.PageController do
 
   def index(conn, _params) do
     recently_added_samples =
-      Projects.list_samples(%{page: 1, per_page: 20, sort_by: [inserted_at: :asc], filters: %{}})
+      Projects.list_samples(%{page: 1, per_page: 20, sort_by: [inserted_at: :desc], filters: %{}})
 
     recently_updated_samples =
-      Projects.list_samples(%{page: 1, per_page: 20, sort_by: [updated_at: :asc], filters: %{}})
+      Projects.list_samples(%{page: 1, per_page: 20, sort_by: [updated_at: :desc], filters: %{}})
 
     sample_count = %{
       "completed" => Projects.get_samples_completed_count(%{}),

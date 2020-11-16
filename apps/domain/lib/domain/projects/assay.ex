@@ -1,5 +1,5 @@
 defmodule Domain.Projects.Assay do
-  use Ecto.Schema
+  use Domain.Schema
   import Ecto.Changeset
 
   schema "assays" do
