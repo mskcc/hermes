@@ -46,6 +46,7 @@ config :beagle_client,
   password: ""
 
 import_config "config.dashboard.exs"
+import_config "config.voyager.exs"
 
 import_config "#{Mix.env()}.exs"
 import_config "#{Mix.env()}.secret.exs"

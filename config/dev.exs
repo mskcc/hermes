@@ -11,6 +11,15 @@ config :domain, Domain.Repo,
   pool_size: 10,
   migration_primary_key: [name: :id, type: :binary_id]
 
+config :voyager, Voyager.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "voyager_dev",
+  hostname: "localhost",
+  port: 5432,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -33,6 +42,21 @@ config :dashboard, DashboardWeb.Endpoint,
       "development",
       "--watch-stdin",
       cd: Path.expand("../apps/dashboard/assets", __DIR__)
+    ]
+  ]
+
+config :voyager, VoyagerWeb.Endpoint,
+  http: [port: 4000],
+  debug_errors: true,
+  code_reloader: true,
+  check_origin: false,
+  watchers: [
+    node: [
+      "node_modules/webpack/bin/webpack.js",
+      "--mode",
+      "development",
+      "--watch-stdin",
+      cd: Path.expand("../apps/voyager/assets", __DIR__)
     ]
   ]
 
@@ -68,6 +92,17 @@ config :dashboard, DashboardWeb.Endpoint,
       ~r"priv/gettext/.*(po)$",
       ~r"lib/dashboard_web/(live|views)/.*(ex)$",
       ~r"lib/dashboard_web/templates/.*(eex)$"
+    ]
+  ]
+
+
+config :voyager, VoyagerWeb.Endpoint,
+  live_reload: [
+    patterns: [
+      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/gettext/.*(po)$",
+      ~r"lib/voyager_web/(live|views)/.*(ex)$",
+      ~r"lib/voyager_web/templates/.*(eex)$"
     ]
   ]
 

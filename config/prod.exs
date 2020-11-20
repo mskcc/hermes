@@ -13,6 +13,10 @@ config :dashboard, DashboardWeb.Endpoint,
   url: [host: System.get_env("HOST"), port: System.get_env("PORT")],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :voyager, VoyagerWeb.Endpoint,
+  url: [host: System.get_env("HOST"), port: System.get_env("PORT")],
+  cache_static_manifest: "priv/static/cache_manifest.json"
+
 # Do not print debug messages in production
 config :logger, level: System.get_env("LOG_LEVEL") |> String.to_atom()
 
