@@ -57,7 +57,7 @@ defmodule Dashboard.MixProject do
       {:phoenix_live_dashboard, "~> 0.1"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.2.2"},
+      {:plug_cowboy, "~> 2.4.1"},
       {:lims_client, in_umbrella: true},
       {:access_tracker_client, in_umbrella: true},
       {:domain, in_umbrella: true},
