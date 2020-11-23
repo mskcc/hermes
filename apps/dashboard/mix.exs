@@ -34,7 +34,7 @@ defmodule Dashboard.MixProject do
   def application do
     [
       mod: {Dashboard.Application, []},
-      extra_applications: [:logger, :domain, :metadata_etl, :runtime_tools, :edeliver, :os_mon]
+      extra_applications: [:logger, :mdb, :domain, :runtime_tools, :edeliver, :os_mon]
     ]
   end
 
@@ -63,7 +63,8 @@ defmodule Dashboard.MixProject do
       {:domain, in_umbrella: true},
       {:timex, "~> 3.5"},
       {:elixir_uuid, "~> 1.2"},
-      {:metadata_etl, in_umbrella: true}
+      {:mdb, in_umbrella: true},
+
       # {:ex_state_ecto, "~> 0.2"},
       # {:oban, "~> 1.2"}
     ]
