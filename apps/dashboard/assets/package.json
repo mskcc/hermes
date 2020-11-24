@@ -9,7 +9,7 @@
     "@fortawesome/fontawesome-free": "^5.12.1",
     "bulma-tooltip": "^3.0.2",
     "choices.js": "^9.0.1",
-    "highlight.js": "^10.0.3",
+    "highlight.js": "^10.1.2",
     "json-formatter-js": "^2.3.4",
     "jsoneditor": "^8.6.3",
     "lodash": "^4.17.19",
