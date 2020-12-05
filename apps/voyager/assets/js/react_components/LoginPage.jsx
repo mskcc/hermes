@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -36,8 +37,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LoginPage(props) {
     const classes = useStyles();
-    const { login_error } = props;
-
+    const { loginRoute, formKey } = props;
+    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
+    axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -58,27 +60,43 @@ export default function LoginPage(props) {
                         username: Yup.string().required('Username is required'),
                         password: Yup.string().required('Password is required'),
                     })}
-                    onSubmit={({ username, password }, { setStatus, setErrors, setSubmitting }) => {
-                        props.pushEvent('login', { username: username, password: password });
-                        //                        this.login(username, password).then(() => {
-                        //                            setSubmitting(false);
-                        //                            if (login_error) {
-                        //                                setErrors({ password: login_error });
-                        //                            } else {
-                        //                                console.log('logged in');
-                        //                            }
-                        //                        });
+                    onSubmit={({ username, password }, { setErrors, setSubmitting }) => {
+                        axios
+                            .post(loginRoute, {
+                                [formKey]: {
+                                    username: username,
+                                    password: password,
+                                },
+                            })
+                            .then((response) => {
+                                window.location.replace(response.request.responseURL);
+                            })
+                            .catch((err) => {
+                                if (err.response) {
+                                    let data = err.response.data;
+                                    let status = err.response.status;
+                                    if (status == 400 || status == 500) {
+                                        setErrors({ password: data });
+                                    } else {
+                                        console.log('Unexpected error in login: ');
+                                        console.log('status: ' + status);
+                                        console.log('data: ' + data);
+                                    }
+                                } else {
+                                    setErrors({
+                                        password:
+                                            'Unfortunately, it looks like our webserver is down. We should have it back up shortly.',
+                                    });
+                                    console.log('Unexpected error in login: ');
+                                    console.error(err);
+                                }
+                            })
+                            .finally(() => {
+                                setSubmitting(false);
+                            });
                     }}
                 >
-                    {({
-                        values,
-                        errors,
-                        touched,
-                        handleChange,
-                        handleBlur,
-                        handleSubmit,
-                        isSubmitting,
-                    }) => (
+                    {({ values, errors, touched, handleChange, handleSubmit, isSubmitting }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
                                 variant="outlined"

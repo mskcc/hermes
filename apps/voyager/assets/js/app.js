@@ -17,8 +17,11 @@ import { Socket } from 'phoenix';
 import NProgress from 'nprogress';
 import { LiveSocket } from 'phoenix_live_view';
 import ReactPhoenix from 'react-phoenix';
-import Avatar from '@/Avatar';
 import LoginPage from '@/LoginPage';
+import MetadataFormPage from '@/MetadataFormPage';
+import MetadataPage from '@/MetadataPage';
+import SnackbarProvider from '@/SnackbarProvider';
+import Drawer from '@/_components/Drawer';
 
 // Define a `hooks` variable to keep all our defined LiveView hooks:
 let hooks = { ReactPhoenix };
@@ -39,6 +42,9 @@ liveSocket.connect();
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket;
 window.Components = {
-    Avatar,
+    Drawer,
     LoginPage,
+    SnackbarProvider,
+    MetadataFormPage,
+    MetadataPage,
 };
