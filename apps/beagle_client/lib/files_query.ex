@@ -6,7 +6,7 @@ defmodule FilesQuery do
 
   typedstruct do
 
-  	field :page, non_neg_integer()
+  	field :page, non_neg_integer(), default: 1
   	field :page_size, non_neg_integer()
   	field :file_group, list(String.t())
   	field :path, list(String.t())
