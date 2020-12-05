@@ -1,14 +1,15 @@
 defmodule VoyagerWeb.PageLive do
   use VoyagerWeb, :live_view
+  alias Domain.Accounts
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, query: "", results: %{})}
+  def mount(_params, %{"user_token" => user_token}, socket) do
+    {:ok, user} = Accounts.get_user_by_access_token(user_token)
+    {:ok, assign(socket, query: "", results: %{}, user: user.email)}
   end
 
   @impl true
   def handle_event("suggest", %{"q" => query}, socket) do
-    IO.puts "HELLO!"
     {:noreply, assign(socket, results: search(query), query: query)}
   end
 
