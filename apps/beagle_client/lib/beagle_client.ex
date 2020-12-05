@@ -155,15 +155,43 @@ defmodule BeagleClient do
         response -> response
       end
 
+
     case response do
-      %{status: n} when n in [200, 201] ->
-        {:ok, response.body}
+      %{status: n} when n in 200..299 ->
+        {:ok, :ok, response.body}
+
+      %{status: n} when n in [404] ->
+        if String.contains?(response.body,"Phoenix.Router.NoRouteError") do
+          {:error, :server_error, UserMessages.const_server_down }
+        else
+          {:error, :user_error, "Resource not found"}
+        end
+
+      %{status: n, body: body} when is_map_key(body, "detail") ->
+        message = Map.get(body, "detail")
+        case n do
+          status_code when status_code in 400..499 ->
+            {:error, :user_error, message }
+          status_code when status_code in 500..599 ->
+            {:error, :server_error, message }
+          _ ->
+            {:error, :unexpected_error, message }
+        end
+
+
+      %{status: n} when n in 400..499 ->
+        {:ok, :user_error, response.body}
+
+
+
 
       {:error, error} ->
-        {:error, error}
+        IO.inspect error
+        {:error, :unexpected_error, error}
 
       _ ->
-        {:error, {response.status, response.body}}
+        IO.inspect {:error, :unexpected_error, {response.status, response.body}}
+        {:error, :unexpected_error, {response.status, response.body}}
     end
   end
 end
