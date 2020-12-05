@@ -1,4 +1,5 @@
 defmodule VoyagerWeb.Router do
+  import Dashboard.UserAuth
   use VoyagerWeb, :router
 
   pipeline :browser do
