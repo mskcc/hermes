@@ -75,7 +75,16 @@ defmodule Domain.Accounts do
 
   def get_user_by_email_and_password_verbose(email, password)
     when is_binary(email) and is_binary(password) do
-    [username, _] = String.split(email, "@")
+      if String.contains?(email,"@") do
+        [username, _] = String.split(email, "@")
+        get_user_by_username_and_password(username, password)
+      else
+        get_user_by_username_and_password(email, password)
+     end
+  end
+
+  def get_user_by_username_and_password(username, password)
+    when is_binary(username) and is_binary(password) do
 
     case BeagleClient.fetch_auth_token(username, password) do
       {:ok, _, data} ->
