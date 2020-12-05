@@ -28,16 +28,16 @@ defmodule Domain.Accounts do
     user = Repo.get_by(User, access_token: access_token)
 
     if is_nil(user) do
-      nil
+      {:ok, nil}
     else
       case BeagleClient.validate_auth_token(access_token) do
-        {:ok, _} ->
-          user
+        {:ok, _, _} ->
+          {:ok, user}
 
-        {:error, _} ->
+        {:error, _, _} ->
           case BeagleClient.refresh_auth_token(user.refresh_token) do
-            {:ok, resp} -> update_user(user, %{"access_token" => resp["access"]})
-            {:error, _} -> update_user(user, %{"access_token" => nil, "refresh_token" => nil})
+            {:ok,_, resp} -> update_user(user, %{"access_token" => resp["access"]})
+            {:error,_, _} -> update_user(user, %{"access_token" => nil, "refresh_token" => nil})
           end
       end
     end
@@ -78,11 +78,11 @@ defmodule Domain.Accounts do
     [username, _] = String.split(email, "@")
 
     case BeagleClient.fetch_auth_token(username, password) do
-      {:ok, data} ->
+      {:ok, _, data} ->
         {:ok, create_or_update_user(data)}
 
-      {:error, message} ->
-        {:error, message}
+      {:error, type, message} ->
+        {:error, type, message}
     end
   end
 
@@ -101,11 +101,11 @@ defmodule Domain.Accounts do
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
 
-    case get_user_by_email_and_password_verbose(email, password) do
-      {:ok, data} ->
+    case get_user_by_email_and_password(email, password) do
+      {:ok,_, data} ->
         data
 
-      {:error, message} ->
+      {:error, _, message} ->
         IO.inspect(message)
         nil
     end
