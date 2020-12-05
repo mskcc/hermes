@@ -51,6 +51,18 @@ module.exports = (env, options) => {
                     test: /\.[s]?css$/,
                     use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
                 },
+                {
+                    test: /\.(png|jp(e*)g|svg)$/,
+                    use: [
+                        {
+                            loader: 'url-loader',
+                            options: {
+                                limit: 8000, // Convert images < 8kb to base64 strings
+                                name: 'public/[hash]-[name].[ext]',
+                            },
+                        },
+                    ],
+                },
             ],
         },
         plugins: [
