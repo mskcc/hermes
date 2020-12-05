@@ -132,7 +132,7 @@ defmodule BeagleClient do
       {Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url)},
       Tesla.Middleware.JSON,
       {Tesla.Middleware.Headers,
-       [{"authorization", "Bearer: " <> token}, {"content-type", "application/json"}]}
+       [{"Authorization", "Bearer " <> token}]}
     ]
 
     Tesla.client(middleware)
