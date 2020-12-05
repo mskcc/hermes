@@ -1,18 +1,8 @@
 defmodule BeagleClient do
-  use Tesla
-  import BeagleEndpoint
   import FilesQuery
   import FileGroupsList
   import BatchPatchFiles
 
-  plug(Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url))
-
-  plug(Tesla.Middleware.BasicAuth,
-    username: Application.fetch_env!(:beagle_client, :username),
-    password: Application.fetch_env!(:beagle_client, :password)
-  )
-
-  plug(Tesla.Middleware.DecodeJson)
 
   @moduledoc """
   Documentation for `BeagleClient`.
@@ -101,49 +91,40 @@ defmodule BeagleClient do
   end
 
   defp convert_to_klist(map) do
-    Enum.map(map, fn({key, value}) -> {String.to_existing_atom(key), value} end)
+    Enum.map(map, fn({key, value}) -> {key, value} end)
   end
 
-  def get_sample_manifest(sample_id) when is_binary(sample_id),
-    do: get_sample_manifest([sample_id])
-
   def fetch_pipelines(client) do
-    request = client |> Tesla.get("/v0/run/pipelines/", query: [page: 1, per_page: 100])
-
-    handle_response(request)
+    client
+      |> Tesla.get("/v0/run/pipelines/", query: [page: 1, per_page: 100])
+      |> handle_response
   end
 
   @doc false
   def fetch_auth_token(username, password), do: fetch_auth_token(client(), username, password)
 
   def fetch_auth_token(client, username, password) do
-    request =
       client
       |> Tesla.post("/api-token-auth/", Jason.encode!(%{username: username, password: password}))
-
-    handle_response(request)
+      |> handle_response
   end
 
   @doc false
   def validate_auth_token(token), do: validate_auth_token(client(), token)
 
   def validate_auth_token(client, token) do
-    request =
       client
       |> Tesla.post("/api-token-verify/", Jason.encode!(%{token: token}))
-
-    handle_response(request)
+      |> handle_response
   end
 
   @doc false
   def refresh_auth_token(token), do: refresh_auth_token(client(), token)
 
   def refresh_auth_token(client, token) do
-    request =
       client
       |> Tesla.post("/api-token-refresh/", Jason.encode!(%{refresh: token}))
-
-    handle_response(request)
+      |> handle_response
   end
 
   def client(token) when is_binary(token) do
