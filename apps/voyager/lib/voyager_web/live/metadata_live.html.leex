@@ -1,6 +1,2 @@
 
-<div phx-window-keydown="keydown">
-	<p> Hello! </p>
-</div>
-<button phx-click="inc_temperature">+</button>
-<%=react_component("Components.Avatar", %{user: @user}) %>
+<%= ReactPhoenix.ClientSide.react_component("Components.MetadataPage", %{metadataList: @metadataList, requestKeyList: @requestKeyList, emailKeyList: @emailKeyList, params: @params}) %>
