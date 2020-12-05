@@ -91,9 +91,6 @@ defmodule VoyagerWeb do
       import VoyagerWeb.Gettext
       alias VoyagerWeb.Router.Helpers, as: Routes
 
-      #Shorten React Phoenix calls
-      import ReactPhoenix.ClientSide
-
     end
   end
 
