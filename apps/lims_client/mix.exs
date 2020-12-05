@@ -16,7 +16,8 @@ defmodule LimsClient.MixProject do
   end
 
   def append_revision(version) do
-    "#{version}+#{revision}"
+    revision_str = revision()
+    "#{version}+#{revision_str}"
   end
 
   defp revision() do
