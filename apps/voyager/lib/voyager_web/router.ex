@@ -9,19 +9,31 @@ defmodule VoyagerWeb.Router do
     plug :put_root_layout, {VoyagerWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/", VoyagerWeb do
-    pipe_through :browser
+  pipeline :auth do
+    plug :put_layout, {VoyagerWeb.LayoutView, :auth}
+  end
 
-    live "/", PageLive, :index
-    live "/metadata", MetadataLive
-    live "/login", LoginLive
-    live "/logout", LogoutLive
+  scope "/" do
+    pipe_through [:browser, :redirect_if_user_is_authenticated, :auth]
+
+    get "/login", VoyagerWeb.SessionController, :new
+    post "/login", VoyagerWeb.SessionController, :create
+  end
+
+  scope "/", VoyagerWeb do
+    pipe_through [:browser, :require_authenticated_user]
+    get "/metadata/values", MetadataController, :list
+    get "/", MetadataController, :new
+    post "/metadataSubmit", MetadataController, :patch
+    live "/metadata", MetadataLive, :index
+    get "/logout", SessionController, :delete
 
   end
 
