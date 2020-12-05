@@ -28,32 +28,63 @@ defmodule BeagleClient do
       iex> :passed
   """
 
-  def list_all_file_groups() do
-    list_all(BeagleEndpoint.const_file_groups, query: [])
+
+  def list_all_file_groups(token) do
+    list_all(BeagleEndpoint.const_file_groups, [], token)
   end
 
-  def batch_patch_files(%BatchPatchFiles{} = batch_patch_struct) do
-    batch_patch_payload = Map.from_struct(batch_patch_struct)
-    post(BeagleEndpoint.const_batch_patch_files, batch_patch_payload)
-
-  end
-
-  def list_file_groups(%FileGroupsList{} = file_group_list) do
-    query_key_list = process_query_struct(file_group_list)
-    get(BeagleEndpoint.const_file_groups, query: query_key_list)
-  end
-
-  def query_files(%FilesQuery{} = file_query_struct) do
+  def list_all_query_files(%FilesQuery{} = file_query_struct, token) do
     query_key_list = process_query_struct(file_query_struct)
-    get(BeagleEndpoint.const_file_query, query: query_key_list)
+    list_all(BeagleEndpoint.const_file_query, query_key_list, token)
   end
 
-  defp list_all(endpoint, query) do
-    {:ok, response} = get(endpoint, query: query )
-    if not is_nil(response.body.next) do
-      {_, next_query} = Keyword.get_and_update(query, :page, &({&1, &1 +1}))
-      response.body.results ++ list_all(endpoint, next_query)
+  def batch_patch_files(%BatchPatchFiles{} = batch_patch_struct, token) do
+    batch_patch_payload = Map.from_struct(batch_patch_struct)
+    client(token)
+      |> Tesla.post(BeagleEndpoint.const_batch_patch_files, batch_patch_payload)
+      |> handle_response
+
+  end
+
+  def file_groups(%FileGroupsList{} = file_group_list, token) do
+    query_key_list = process_query_struct(file_group_list)
+    client(token)
+      |> Tesla.get(BeagleEndpoint.const_file_groups, query: query_key_list)
+      |> handle_response
+  end
+
+  def query_files(%FilesQuery{} = file_query_struct, token) do
+    query_key_list = process_query_struct(file_query_struct)
+    client(token)
+      |> Tesla.get(BeagleEndpoint.const_file_query, query: query_key_list)
+      |> handle_response
+  end
+
+  defp list_all(endpoint, query, token) do
+    response_obj = client(token)
+      |> Tesla.get(endpoint, query: query )
+      |> handle_response
+    case response_obj do
+      {:ok, :ok, %{"results" => results, "next" => next}} when not is_nil(next) ->
+          {_, next_query} = Keyword.get_and_update(query, :page, &({&1, &1 +1}))
+          case list_all(endpoint, next_query, token) do
+            {:ok, :ok, next_results} ->
+              results =
+                results
+                |> Enum.reject(&is_nil/1)
+              combined_results = results ++ next_results
+              {:ok, :ok, combined_results}
+            {:error, error_type, error_message} ->
+              {:error, error_type, error_message}
+          end
+      {:ok, :ok, %{"results" => results, "next" => next}} when is_nil(next) ->
+          results =
+            results
+            |> Enum.reject(&is_nil/1)
+          {:ok, :ok, results}
+      {:error, error_type, error_message} -> {:error, error_type, error_message}
     end
+
   end
 
   defp process_query_struct(query_struct) do
