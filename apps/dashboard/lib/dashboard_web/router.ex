@@ -52,7 +52,6 @@ defmodule DashboardWeb.Router do
   scope "/", DashboardWeb do
     pipe_through [:browser, :account, :require_authenticated_user]
 
-    get "/pointer", PageController, :pointer
     get "/", PageController, :index
     resources "/samples", SampleController, except: [:index]
     delete "/logout", SessionController, :delete
