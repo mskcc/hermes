@@ -15,17 +15,18 @@ config :domain,
 config :metadata_etl,
   ecto_repos: [Domain.Repo]
 
-config :metadata_etl, Oban,
-  repo: Domain.Repo,
-  plugins: [{Oban.Plugins.Pruner, max_age: 604_800}],
-  queues: [
-    lims_fetch_requests: 1,
-    lims_fetch_samples: 3,
-    lims_fetch_sample: 10
-  ],
-  crontab: [
-    {"15 * * * *", MetadataEtl.LimsFetchRequests}
-  ]
+# Disabled as we now pull through Mdb
+#config :metadata_etl, Oban,
+#  repo: Domain.Repo,
+#  plugins: [{Oban.Plugins.Pruner, max_age: 604_800}],
+#  queues: [
+#    lims_fetch_requests: 1,
+#    lims_fetch_samples: 3,
+#    lims_fetch_sample: 10
+#  ],
+#  crontab: [
+#    {"15 * * * *", MetadataEtl.LimsFetchRequests}
+#  ]
 
 # Sample configuration:
 #

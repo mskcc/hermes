@@ -1,9 +1,9 @@
-defmodule MetadataEtl.MixProject do
+defmodule Mdb.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :metadata_etl,
+      app: :mdb,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -18,7 +18,7 @@ defmodule MetadataEtl.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {MetadataEtl.Application, []},
+      mod: {Mdb.Application, []},
       extra_applications: [:logger]
     ]
   end
@@ -26,9 +26,7 @@ defmodule MetadataEtl.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:oban, "~> 2.2"},
-      {:domain, in_umbrella: true},
-      {:lims_client, in_umbrella: true}
+      {:gnat, "~> 1.2"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       # {:sibling_app_in_umbrella, in_umbrella: true}

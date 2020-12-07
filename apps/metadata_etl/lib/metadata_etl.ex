@@ -1,2 +1,0 @@
-defmodule MetadataEtl do
-end

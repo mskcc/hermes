@@ -1,5 +1,10 @@
 use Mix.Config
 
+config :mdb,
+  nat_connections: [
+    %{host: 'demo.nats.io', port: 4222}
+  ]
+
 # Configure your database
 config :domain, Domain.Repo,
   username: "postgres",
