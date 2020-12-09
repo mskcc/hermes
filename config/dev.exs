@@ -50,7 +50,12 @@ config :dashboard, DashboardWeb.Endpoint,
     ]
   ]
 
+
 config :voyager, VoyagerWeb.Endpoint,
+  signing_salt: "Ri/jdz3uB2awqvQct2IiHkRl+byAYdpW72nE+mLSCU/SVQWIq1kvSMgYEzjcvu3/",
+  live_view: [signing_salt: "vb5uxCyB"],
+  url: [host: "localhost"],
+  secret_key_base: "/HiFGvgJ4lR86prPoc0NzTSAmEP1lA8QJWc8E8tp0ZDsbzlYBpSMF1zAz0dzwUS5",
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,

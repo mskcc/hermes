@@ -3,23 +3,23 @@ APP="seqosystem"
 AUTO_VERSION="commit-count+git-revision+branch-unless-master"
 USING_DISTILLERY=true
 
-BUILD_HOST="access01"
-BUILD_USER="deploy"
-BUILD_AT="/tmp/edeliver/access/builds"
-RELEASE_STORE=deploy@access01:/home/deploy/releases
+BUILD_HOST="pi-test"
+BUILD_USER="voyager"
+BUILD_AT="/juno/work/seqosystem/temp/builds"
+RELEASE_STORE=voyager@voyager:/srv/services/seqosystem/release
 
-MAIN_APP="$BUILD_AT/apps/dashboard" # App to be deployed
+MAIN_APP="$BUILD_AT/apps/voyager" # App to be deployed
 
-STAGING_HOSTS="access01"
-STAGING_USER="deploy"
+STAGING_HOSTS="silo"
+STAGING_USER="voyager"
 DELIVER_TO="/home/deploy"
 
-PRODUCTION_HOSTS="access02"
-PRODUCTION_USER="deploy"
-DELIVER_TO="/home/deploy"
+PRODUCTION_HOSTS="voyager"
+PRODUCTION_USER="voyager"
+DELIVER_TO="/srv/services/seqosystem/deploy"
 
 pre_erlang_get_and_update_deps() {
-  local _prod_secret_path="/home/deploy/prod.secret.exs"
+  local _prod_secret_path="/srv/services/seqosystem/deploy/prod.secret.exs"
   if [ "$TARGET_MIX_ENV" = "prod" ]; then
     __sync_remote "
       ln -sfn '$_prod_secret_path' '$BUILD_AT/config/prod.secret.exs'
