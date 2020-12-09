@@ -1,4 +1,4 @@
-APP="voyager"
+APP="seqosystem"
 
 AUTO_VERSION="commit-count+git-revision+branch-unless-master"
 USING_DISTILLERY=true
