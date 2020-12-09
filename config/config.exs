@@ -46,31 +46,31 @@ config :beagle_client,
   username: "",
   password: ""
 
-if Mix.env() != :prod do
-  case Code.ensure_compiled(:git_hooks) do
-    {:module, :git_hooks} ->
-      config :git_hooks,
-        auto_install: true,
-        verbose: true,
-        hooks: [
-          pre_commit: [
-            tasks: [
-              {:cmd, "mix format"}
-            ]
-          ],
-          pre_push: [
-            verbose: false,
-            tasks: [
-              #{:cmd, "mix dialyzer"},
-              #{:cmd, "mix test"},
-              {:cmd, "echo 'success!'"}
-            ]
+
+case Code.ensure_compiled(:git_hooks) do
+  {:module, :git_hooks} ->
+    config :git_hooks,
+      auto_install: true,
+      verbose: true,
+      hooks: [
+        pre_commit: [
+          tasks: [
+            {:cmd, "mix format"}
+          ]
+        ],
+        pre_push: [
+          verbose: false,
+          tasks: [
+            #{:cmd, "mix dialyzer"},
+            #{:cmd, "mix test"},
+            {:cmd, "echo 'success!'"}
           ]
         ]
-    {:error, :nofile} ->
-      ""
-  end
+      ]
+  {:error, :nofile} ->
+    ""
 end
+
 
 import_config "config.dashboard.exs"
 import_config "config.voyager.exs"

@@ -29,7 +29,7 @@ defmodule Seqosystem.MixProject do
     [
       {:dialyxir, "~> 1.0", only: [:dev]},
       {:jason, ">= 1.0.0"},
-      {:git_hooks, "~> 0.5.1", only: [:test, :dev], runtime: false},
+      {:git_hooks, "~> 0.5.1"},
       {:edeliver, ">= 1.6.0"},
       {:distillery, "~> 2.0", warn_missing: false}
     ]
