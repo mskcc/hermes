@@ -1,0 +1,15 @@
+<%= render_layout "app.html", assigns do %>
+<section class="hero is-info is-fullheight">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+          <div class="box">
+            <%= @inner_content %> 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<%end%>

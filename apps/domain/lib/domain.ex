@@ -1,0 +1,2 @@
+defmodule Domain do
+end
