@@ -47,19 +47,18 @@ end
 # when running `mix distillery.release`, the first release in the file
 # will be used by default
 
-#release :seqosystem do
-#  set version: "0.1.0"
-#  set applications: [
-#    :runtime_tools,
-#    dashboard: :permanent,
-#  ]
-#end
-
 release :seqosystem do
-  set version: current_version(:seqosystem)
+  set version: "0.1.0"
   set applications: [
     :runtime_tools,
     dashboard: :permanent,
+  ]
+end
+
+release :voyager do
+  set version: current_version(:voyager)
+  set applications: [
+    :runtime_tools,
     voyager: :permanent,
   ]
 end
