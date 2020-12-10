@@ -80,6 +80,7 @@ const useStyles = makeStyles((theme) => ({
     },
     listText: {
         textDecoration: 'none',
+        color: 'white',
     },
     ListItem: {
         display: 'inline-flex',
