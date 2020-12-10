@@ -226,7 +226,7 @@ export default function MetadataPage(props) {
                 (singleKey) => !notSampleKeysList.includes(singleKey)
             );
 
-            const { data, keys, column, titleToField } = setupDictTable(
+            const { data, column, titleToField } = setupDictTable(
                 currentSampleMetadata,
                 sampleKeyList,
                 1,
@@ -291,7 +291,9 @@ export default function MetadataPage(props) {
                         components={{
                             EditField: getFormikEditInput(),
                             EditRow: getFormikEditRow({}),
-                            Container: (props) => <Paper {...props} elevation={0} />,
+                            Container: function createSampleContainer(props) {
+                                return <Paper {...props} elevation={0} />;
+                            },
                         }}
                         options={{
                             headerStyle: {
@@ -303,7 +305,7 @@ export default function MetadataPage(props) {
                         }}
                         editable={{
                             onRowUpdate: (newData, oldData) =>
-                                new Promise((resolve, reject) => {
+                                new Promise((resolve) => {
                                     let sampleName = stateSampleList[stateSampleIndex]['label'];
                                     let newSampleList = stateSampleList;
                                     if (!(sampleName in stateMetadataChanges['sample'])) {
@@ -358,7 +360,9 @@ export default function MetadataPage(props) {
                         columns={fileColumn}
                         title=""
                         components={{
-                            Container: (props) => <Paper {...props} elevation={0} />,
+                            Container: function createFileContainer(props) {
+                                return <Paper {...props} elevation={0} />;
+                            },
                         }}
                         options={{
                             headerStyle: {
@@ -542,13 +546,15 @@ export default function MetadataPage(props) {
                                 columns={requestColumn}
                                 title=""
                                 components={{
-                                    Container: (props) => (
-                                        <Paper
-                                            {...props}
-                                            elevation={0}
-                                            className={classes.requestTable}
-                                        />
-                                    ),
+                                    Container: function createRequestContainer(props) {
+                                        return (
+                                            <Paper
+                                                {...props}
+                                                elevation={0}
+                                                className={classes.requestTable}
+                                            />
+                                        );
+                                    },
                                     EditField: getFormikEditInput(),
                                     EditRow: getFormikEditRow(
                                         createEmailYupValidation(emailKeyList)
@@ -564,7 +570,7 @@ export default function MetadataPage(props) {
                                 }}
                                 editable={{
                                     onRowUpdate: (newData, oldData) =>
-                                        new Promise((resolve, reject) => {
+                                        new Promise((resolve) => {
                                             const index = oldData.tableData.id;
                                             let newRequestData = requestData;
                                             newRequestData[index] = newData;
@@ -667,13 +673,15 @@ export default function MetadataPage(props) {
                                 columns={table.column}
                                 title={table.title}
                                 components={{
-                                    Container: (props) => (
-                                        <Paper
-                                            {...props}
-                                            elevation={0}
-                                            className={classes.changeTable}
-                                        />
-                                    ),
+                                    Container: function createTableContainer(props) {
+                                        return (
+                                            <Paper
+                                                {...props}
+                                                elevation={0}
+                                                className={classes.changeTable}
+                                            />
+                                        );
+                                    },
                                 }}
                                 options={{
                                     headerStyle: {
