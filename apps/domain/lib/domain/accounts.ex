@@ -88,7 +88,14 @@ defmodule Domain.Accounts do
 
     case BeagleClient.fetch_auth_token(username, password) do
       {:ok, _, data} ->
-        {:ok, create_or_update_user(data)}
+        case data do
+          %{"user" => %{"email" => ""}} ->
+            new_user = %{ data["user"] | "email" => username }
+            new_data = %{ data | "user" => new_user }
+            {:ok, create_or_update_user(new_data)}
+          _ ->
+              {:ok, create_or_update_user(data)}
+        end
 
       {:error, type, message} ->
         {:error, type, message}
