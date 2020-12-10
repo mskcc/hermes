@@ -45,9 +45,6 @@ const useStyles = makeStyles((theme) => ({
 export default function LetterAvatars(props) {
     const classes = useStyles();
     const { user } = props;
-    console.log(user);
-    console.log(user.substring(0, 1));
-    const firstLetter = user.substring(0, 1);
 
     return (
         <div className={classes.root}>
