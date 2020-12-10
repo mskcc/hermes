@@ -10,8 +10,8 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :dashboard, DashboardWeb.Endpoint,
-  url: [host: System.get_env("HOST"), port: System.get_env("PORT")],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  url: [host: System.get_env("HOST"), port: System.get_env("PORT")]
+#  cache_static_manifest: "priv/static/cache_manifest.json"
 
 config :voyager, VoyagerWeb.Endpoint,
   url: [host: System.get_env("HOST"), port: System.get_env("PORT")],
