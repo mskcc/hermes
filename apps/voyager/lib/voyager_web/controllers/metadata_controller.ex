@@ -15,7 +15,7 @@ defmodule VoyagerWeb.MetadataController do
 
   def list(conn, %{@type_key => metadata_type}) do
     user_token = conn.assigns.current_user.access_token
-    response_obj = %FilesQuery{values_metadata: metadata_type, page_size: 5000}
+    response_obj = %FilesQuery{values_metadata: metadata_type, page_size: 100000}
       |> BeagleClient.list_all_query_files(user_token)
     case response_obj do
       {:ok, :ok, response} -> json(conn, response)
