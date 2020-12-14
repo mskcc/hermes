@@ -5,29 +5,47 @@ defmodule BeagleClient do
 
 
   @moduledoc """
-  Documentation for `BeagleClient`.
+  Module to interact with Beagle
   """
 
   @doc """
-  Send notification
+  List all beagle file groups
 
-  ## Examples
+  ## Parameters
 
-      iex> result = BeagleClient.fetch_pipelines(client)
-      ...> with {_, %Tesla.Env{}} <- result, do: :passed
-      iex> :passed
+    - token(string): Beagle authentication token
+
+
   """
-
-
   def list_all_file_groups(token) do
     list_all(BeagleEndpoint.const_file_groups, [], token)
   end
 
+  @doc """
+  List all beagle files from a file query
+
+  ## Parameters
+
+    - file_query_struct(FilesQuery): FileQuery object
+    - token(string): Beagle authentication token
+
+
+  """
   def list_all_query_files(%FilesQuery{} = file_query_struct, token) do
     query_key_list = process_query_struct(file_query_struct)
     list_all(BeagleEndpoint.const_file_query, query_key_list, token)
   end
 
+  @doc """
+  Batch patch files
+
+  ## Parameters
+
+    - batch_patch_struct(BatchPatchFiles): BatchPatchFiles object
+    - token(string): Beagle authentication token
+
+
+  """
   def batch_patch_files(%BatchPatchFiles{} = batch_patch_struct, token) do
     batch_patch_payload = Map.from_struct(batch_patch_struct)
     client(token)
@@ -36,6 +54,16 @@ defmodule BeagleClient do
 
   end
 
+  @doc """
+  Query File groups
+
+  ## Parameters
+
+    - file_group_list(FileGroupsList): FileGroupsList object
+    - token(string): Beagle authentication token
+
+
+  """
   def file_groups(%FileGroupsList{} = file_group_list, token) do
     query_key_list = process_query_struct(file_group_list)
     client(token)
@@ -43,6 +71,16 @@ defmodule BeagleClient do
       |> handle_response
   end
 
+  @doc """
+  Query Files
+
+  ## Parameters
+
+    - file_group_list(FileGroupsList): FileGroupsList object
+    - token(string): Beagle authentication token
+
+
+  """
   def query_files(%FilesQuery{} = file_query_struct, token) do
     query_key_list = process_query_struct(file_query_struct)
     client(token)

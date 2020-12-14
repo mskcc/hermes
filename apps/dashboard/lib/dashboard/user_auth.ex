@@ -95,9 +95,10 @@ defmodule Dashboard.UserAuth do
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     if user_token do
-      {_, user} = Accounts.get_user_by_access_token(user_token)
+      {access_token_status, user} = Accounts.get_user_by_access_token(user_token)
       cond do
-        is_nil(user) || !user ->
+
+        is_nil(user) || !user || access_token_status == :error ->
           assign(conn, :current_user, nil)
 
         is_nil(user.access_token) ->

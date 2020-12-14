@@ -45,12 +45,13 @@ const useStyles = makeStyles((theme) => ({
 export default function LetterAvatars(props) {
     const classes = useStyles();
     const { user } = props;
-    const firstLetter = user.substring(0, 1);
+    const user_formated = user.charAt(0).toUpperCase() + user.slice(1);
+    const firstLetter = user_formated.substring(0, 1);
 
     return (
         <div className={classes.root}>
             <Avatar className={classes.avatarElem}>{firstLetter}</Avatar>
-            <Typography className={classes.userElem}>{user}</Typography>
+            <Typography className={classes.userElem}>{user_formated}</Typography>
         </div>
     );
 }

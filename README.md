@@ -27,7 +27,7 @@ apps/
 mix edeliver build release
 # To release a specific branch: mix edeliver build release --branch="<branch_name>"
 mix edeliver deploy release to staging
-mix edeliver start staging 
+mix edeliver start staging
 OR (will run the above) mix edeliver update staging --start-deploy --branch="<branch_name>"
 ```
 
@@ -95,5 +95,4 @@ psql #ALTER USER caesar WITH password '<PASSWORD>';
 exit
 # As root
 service postgresql-11.service restart
-
 

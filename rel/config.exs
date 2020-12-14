@@ -55,3 +55,11 @@ release :seqosystem do
   ]
 end
 
+release :voyager do
+  set version: current_version(:voyager)
+  set applications: [
+    :runtime_tools,
+    voyager: :permanent,
+    dashboard: :permanent,
+  ]
+end

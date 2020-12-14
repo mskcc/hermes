@@ -12,11 +12,8 @@ config :voyager,
 
 # Configures the endpoint
 config :voyager, VoyagerWeb.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "/HiFGvgJ4lR86prPoc0NzTSAmEP1lA8QJWc8E8tp0ZDsbzlYBpSMF1zAz0dzwUS5",
   render_errors: [view: VoyagerWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: Voyager.PubSub,
-  live_view: [signing_salt: "vb5uxCyB"]
+  pubsub_server: Voyager.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,
