@@ -73,7 +73,8 @@ defmodule Dashboard.UserAuth do
     user_token = get_session(conn, :user_token)
 
     if user_token do
-      Accounts.delete_user_tokens(Accounts.get_user_by_access_token(user_token))
+      {_, user} = Accounts.get_user_by_access_token(user_token)
+      Accounts.delete_user_tokens(user)
     end
 
     if live_socket_id = get_session(conn, :live_socket_id) do
@@ -93,23 +94,26 @@ defmodule Dashboard.UserAuth do
   """
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
-    user = user_token && Accounts.get_user_by_access_token(user_token)
+    if user_token do
+      {_, user} = Accounts.get_user_by_access_token(user_token)
+      cond do
+        is_nil(user) || !user ->
+          assign(conn, :current_user, nil)
 
-    cond do
-      is_nil(user) || !user ->
-        assign(conn, :current_user, nil)
+        is_nil(user.access_token) ->
+          log_out_user(conn)
 
-      is_nil(user.access_token) ->
-        log_out_user(conn)
+        user.access_token != user_token ->
+          conn
+          |> renew_session()
+          |> put_session(:user_token, user.access_token)
+          |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(user.access_token)}")
 
-      user.access_token != user_token ->
-        conn
-        |> renew_session()
-        |> put_session(:user_token, user.access_token)
-        |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(user.access_token)}")
-
-      true ->
-        assign(conn, :current_user, user)
+        true ->
+          assign(conn, :current_user, user)
+      end
+    else
+      assign(conn, :current_user, nil)
     end
   end
 

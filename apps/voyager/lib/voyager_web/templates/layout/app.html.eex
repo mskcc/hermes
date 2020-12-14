@@ -1,0 +1,21 @@
+<main role="main" class="container">
+	<div style="display: flex">
+
+	<%= ReactPhoenix.ClientSide.react_component("Components.Drawer",%{pages:
+		[
+		%{ link: Routes.metadata_path(@conn, :new), icon: "local_offer", key: "metadata", text: "Metadata" },
+        %{ link: Routes.session_path(@conn, :delete), icon: "logout", key: "logout", text: "Logout" }
+		],
+		user: @conn.assigns.current_user.email
+
+		}) %>
+
+	<%= ReactPhoenix.ClientSide.react_component("Components.SnackbarProvider", %{info: get_flash(@conn, :info), error: get_flash(@conn, :error), warning: get_flash(@conn, :warning), success: get_flash(@conn, :success) }) %>
+
+	<div style="width: 100%">
+		<%= @inner_content %>
+	</div>
+
+
+    </div>
+</main>

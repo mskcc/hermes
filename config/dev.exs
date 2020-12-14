@@ -16,6 +16,15 @@ config :domain, Domain.Repo,
   pool_size: 10,
   migration_primary_key: [name: :id, type: :binary_id]
 
+config :voyager, Voyager.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "voyager_dev",
+  hostname: "localhost",
+  port: 5432,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -38,6 +47,21 @@ config :dashboard, DashboardWeb.Endpoint,
       "development",
       "--watch-stdin",
       cd: Path.expand("../apps/dashboard/assets", __DIR__)
+    ]
+  ]
+
+config :voyager, VoyagerWeb.Endpoint,
+  http: [port: 4000],
+  debug_errors: true,
+  code_reloader: true,
+  check_origin: false,
+  watchers: [
+    node: [
+      "node_modules/webpack/bin/webpack.js",
+      "--mode",
+      "development",
+      "--watch-stdin",
+      cd: Path.expand("../apps/voyager/assets", __DIR__)
     ]
   ]
 
@@ -76,8 +100,20 @@ config :dashboard, DashboardWeb.Endpoint,
     ]
   ]
 
+
+config :voyager, VoyagerWeb.Endpoint,
+  live_reload: [
+    patterns: [
+      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/gettext/.*(po)$",
+      ~r"lib/voyager_web/(live|views)/.*(ex)$",
+      ~r"lib/voyager_web/templates/.*(eex)$"
+    ]
+  ]
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
+config :logger, truncate: :infinity
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -85,21 +121,3 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
-
-config :git_hooks,
-  verbose: true,
-  hooks: [
-    pre_commit: [
-      tasks: [
-        "mix format"
-      ]
-    ],
-    pre_push: [
-      verbose: false,
-      tasks: [
-        # "mix dialyzer",
-        # "mix test",
-        "echo 'success!'"
-      ]
-    ]
-  ]

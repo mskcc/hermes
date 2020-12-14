@@ -28,16 +28,16 @@ defmodule Domain.Accounts do
     user = Repo.get_by(User, access_token: access_token)
 
     if is_nil(user) do
-      nil
+      {:ok, nil}
     else
       case BeagleClient.validate_auth_token(access_token) do
-        {:ok, _} ->
-          user
+        {:ok, _, _} ->
+          {:ok, user}
 
-        {:error, _} ->
+        {:error, _, _} ->
           case BeagleClient.refresh_auth_token(user.refresh_token) do
-            {:ok, resp} -> update_user(user, %{"access_token" => resp["access"]})
-            {:error, _} -> update_user(user, %{"access_token" => nil, "refresh_token" => nil})
+            {:ok,_, resp} -> update_user(user, %{"access_token" => resp["access"]})
+            {:error,_, _} -> update_user(user, %{"access_token" => nil, "refresh_token" => nil})
           end
       end
     end
@@ -73,6 +73,28 @@ defmodule Domain.Accounts do
     )
   end
 
+  def get_user_by_email_and_password_verbose(email, password)
+    when is_binary(email) and is_binary(password) do
+      if String.contains?(email,"@") do
+        [username, _] = String.split(email, "@")
+        get_user_by_username_and_password(username, password)
+      else
+        get_user_by_username_and_password(email, password)
+     end
+  end
+
+  def get_user_by_username_and_password(username, password)
+    when is_binary(username) and is_binary(password) do
+
+    case BeagleClient.fetch_auth_token(username, password) do
+      {:ok, _, data} ->
+        {:ok, create_or_update_user(data)}
+
+      {:error, type, message} ->
+        {:error, type, message}
+    end
+  end
+
   @doc """
   Gets a user by email and password.
 
@@ -87,13 +109,12 @@ defmodule Domain.Accounts do
   """
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
-    [username, _] = String.split(email, "@")
 
-    case BeagleClient.fetch_auth_token(username, password) do
-      {:ok, data} ->
-        create_or_update_user(data)
+    case get_user_by_email_and_password(email, password) do
+      {:ok,_, data} ->
+        data
 
-      {:error, message} ->
+      {:error, _, message} ->
         IO.inspect(message)
         nil
     end
