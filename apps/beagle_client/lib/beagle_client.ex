@@ -323,9 +323,7 @@ defmodule BeagleClient do
 
 
       %{status: n} when n in 400..499 ->
-        {:ok, :user_error, response.body}
-
-
+        {:error, :user_error, response.body}
 
 
       {:error, error} ->
