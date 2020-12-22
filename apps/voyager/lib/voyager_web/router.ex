@@ -21,6 +21,14 @@ defmodule VoyagerWeb.Router do
   end
 
   scope "/" do
+    pipe_through [:browser, :auth]
+
+    get "/register", VoyagerWeb.RegisterController, :new
+    post "/register", VoyagerWeb.RegisterController, :register
+    get "/register-success", VoyagerWeb.RegisterController, :success
+  end
+
+  scope "/" do
     pipe_through [:browser, :redirect_if_user_is_authenticated, :auth]
 
     get "/login", VoyagerWeb.SessionController, :new
