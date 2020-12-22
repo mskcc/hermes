@@ -6,6 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -33,13 +34,19 @@ const useStyles = makeStyles((theme) => ({
         width: '1.5rem !important',
         height: '1.5rem !important',
     },
+    registrationText: {
+        textAlign: 'center',
+    },
 }));
 
 export default function LoginPage(props) {
     const classes = useStyles();
-    const { loginRoute, formKey } = props;
+    const { loginRoute, registerRoute, formKey } = props;
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
+    const redirectToRegistration = () => {
+        window.location.replace(registerRoute);
+    };
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -145,6 +152,12 @@ export default function LoginPage(props) {
                             >
                                 Sign In
                             </Button>
+                            <Typography className={classes.registrationText}>
+                                Don&apos;t have an account?&nbsp;
+                                <Link href="#" onClick={redirectToRegistration}>
+                                    Register here!
+                                </Link>
+                            </Typography>
                         </form>
                     )}
                 </Formik>
