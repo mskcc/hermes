@@ -123,6 +123,25 @@ defmodule BeagleClient do
       |> handle_response
   end
 
+  @doc """
+  Register a user
+
+  ## Parameters
+
+    - register_struct(Register): Register struct
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def register_user(%Register{} = register_struct) do
+    register_payload = Map.from_struct(register_struct)
+    client()
+      |> Tesla.post(BeagleEndpoint.const_register, register_payload)
+      |> handle_response
+  end
+
   defp list_all(endpoint, query, token) do
     response_obj = client(token)
       |> Tesla.get(endpoint, query: query )
