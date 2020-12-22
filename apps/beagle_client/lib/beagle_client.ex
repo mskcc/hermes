@@ -327,8 +327,14 @@ defmodule BeagleClient do
 
 
       {:error, error} ->
-        IO.inspect error
-        {:error, :unexpected_error, error}
+        case error do
+          :econnrefused -> {:error, :server_error, UserMessages.const_server_down }
+          _ ->
+            IO.inspect error
+            {:error, :unexpected_error, error}
+        end
+
+
 
       _ ->
         IO.inspect {:error, :unexpected_error, {response.status, response.body}}
