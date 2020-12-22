@@ -117,9 +117,9 @@ defmodule Domain.Accounts do
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
 
-    case get_user_by_email_and_password(email, password) do
+    case BeagleClient.fetch_auth_token(email, password) do
       {:ok,_, data} ->
-        data
+        create_or_update_user(data)
 
       {:error, _, message} ->
         IO.inspect(message)
