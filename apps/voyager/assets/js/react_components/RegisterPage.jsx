@@ -60,22 +60,25 @@ export default function RegisterPage(props) {
                 <Formik
                     initialValues={{
                         username: '',
-                        firstName: '',
-                        lastName: '',
+                        first_name: '',
+                        last_name: '',
                     }}
                     enableReinitialize={false}
                     validationSchema={Yup.object().shape({
                         username: Yup.string().required('MKSCC username is required'),
-                        firstName: Yup.string().required('First name is required'),
-                        lastName: Yup.string().required('Last name is required'),
+                        first_name: Yup.string().required('First name is required'),
+                        last_name: Yup.string().required('Last name is required'),
                     })}
-                    onSubmit={({ username, firstName, lastName }, { setErrors, setSubmitting }) => {
+                    onSubmit={(
+                        { username, first_name, last_name },
+                        { setErrors, setSubmitting }
+                    ) => {
                         axios
                             .post(registerRoute, {
                                 [formKey]: {
                                     username: username,
-                                    first_name: firstName,
-                                    last_name: lastName,
+                                    first_name: first_name,
+                                    last_name: last_name,
                                 },
                             })
                             .then(() => {
@@ -85,8 +88,16 @@ export default function RegisterPage(props) {
                                 if (err.response) {
                                     let data = err.response.data;
                                     let status = err.response.status;
-                                    if (status == 400 || status == 500) {
-                                        setErrors({ lastName: data });
+                                    if (status == 400) {
+                                        setErrors({
+                                            username: data.username,
+                                            first_name: data.first_name,
+                                            last_name: data.last_name,
+                                        });
+                                    } else if (status == 500) {
+                                        setErrors({
+                                            last_name: data,
+                                        });
                                     } else {
                                         console.log('Unexpected error in register: ');
                                         console.log('status: ' + status);
@@ -128,30 +139,32 @@ export default function RegisterPage(props) {
                                 variant="outlined"
                                 margin="normal"
                                 fullWidth
-                                id="firstName"
+                                id="first_name"
                                 label="First Name"
-                                name="firstName"
+                                name="first_name"
                                 autoComplete="given-name"
                                 onChange={handleChange}
-                                values={values.firstName}
-                                error={errors.firstName && touched.firstName}
+                                values={values.first_name}
+                                error={errors.first_name && touched.first_name}
                                 helperText={
-                                    errors.firstName && touched.firstName ? errors.firstName : null
+                                    errors.first_name && touched.first_name
+                                        ? errors.first_name
+                                        : null
                                 }
                             />
                             <TextField
                                 variant="outlined"
                                 margin="normal"
                                 fullWidth
-                                id="lastName"
+                                id="last_name"
                                 label="Last Name"
-                                name="lastName"
+                                name="last_name"
                                 autoComplete="family-name"
                                 onChange={handleChange}
-                                values={values.lastName}
-                                error={errors.lastName && touched.lastName}
+                                values={values.last_name}
+                                error={errors.last_name && touched.last_name}
                                 helperText={
-                                    errors.lastName && touched.lastName ? errors.lastName : null
+                                    errors.last_name && touched.last_name ? errors.last_name : null
                                 }
                             />
                             <Button
