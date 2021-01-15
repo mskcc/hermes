@@ -3,7 +3,10 @@ defmodule BeagleClient do
   import FileGroupsList
   import Register
   import PipelinesList
+  import SubmitRun
+  import Pipelines
   import BatchPatchFiles
+  import RunsQuery
 
 
   @moduledoc """
@@ -60,6 +63,43 @@ defmodule BeagleClient do
   def list_all_query_files(%FilesQuery{} = file_query_struct, token) do
     query_key_list = process_query_struct(file_query_struct)
     list_all(BeagleEndpoint.const_file_query, query_key_list, token)
+  end
+
+  @doc """
+  List all beagle runs from a run query
+
+  ## Parameters
+
+    - run_query_struct(RunsQuery): RunsQuery object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def list_all_query_runs(%RunsQuery{} = runs_query_struct, token) do
+    query_key_list = process_query_struct(runs_query_struct)
+    list_all(BeagleEndpoint.const_run_query, query_key_list, token)
+  end
+
+
+  @doc """
+  List all beagle pipelines from a pipeline query
+
+  ## Parameters
+
+    - pipeline_query_struct(Pipelines): Pipelines object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def list_all_pipelines(%Pipelines{} = pipeline_query_struct, token) do
+    query_key_list = process_query_struct(pipeline_query_struct)
+    list_all(BeagleEndpoint.const_pipeline, query_key_list, token)
   end
 
   @doc """
@@ -179,6 +219,21 @@ defmodule BeagleClient do
     register_payload = Map.from_struct(register_struct)
     client()
       |> Tesla.post(BeagleEndpoint.const_register, register_payload)
+  end
+
+ @doc """
+  Query Runs
+
+  ## Parameters
+
+    - run_query_struct(RunsQuery): RunsQuery object
+    - token(string): Beagle authentication token
+
+  """
+  def query_runs(%RunsQuery{} = run_query_struct, token) do
+    query_key_list = process_query_struct(run_query_struct)
+    client(token)
+      |> Tesla.get(BeagleEndpoint.const_run_query, query: query_key_list)
       |> handle_response
   end
 
