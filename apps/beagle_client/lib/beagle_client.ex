@@ -104,11 +104,51 @@ defmodule BeagleClient do
   end
 
   @doc """
+  Query Pipelines
+
+  ## Parameters
+
+    - pipeline_query_struct(Pipelines): Pipelines object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def pipelines(%Pipelines{} = pipeline_query_struct, token) do
+    query_key_list = process_query_struct(pipeline_query_struct)
+    client(token)
+      |> Tesla.get(BeagleEndpoint.const_file_query, query: query_key_list)
+      |> handle_response
+  end
+
+  @doc """
+  Submit a run
+
+  ## Parameters
+
+    - run_struct(Runs): Runs object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def submit_run(%SubmitRun{} = run_struct, token) do
+    run_payload = Map.from_struct(run_struct)
+    client(token)
+      |> Tesla.post(BeagleEndpoint.const_submit_run, run_payload)
+      |> handle_response
+  end
+
+  @doc """
   Query Files
 
   ## Parameters
 
-    - file_group_list(FileGroupsList): FileGroupsList struct
+    - file_query_struct(FilesQuery): FilesQuery object
     - token(string): Beagle authentication token
 
   ## Returns
