@@ -4,6 +4,8 @@ defmodule VoyagerWeb.SessionController do
   alias Domain.Accounts
   alias Dashboard.UserAuth
 
+  import UserMessages
+
   @user_key "user"
 
   def new(conn, _params) do
@@ -32,7 +34,7 @@ defmodule VoyagerWeb.SessionController do
 
   def delete(conn, _params) do
     conn
-    |> put_flash(:success, "Logged out successfully.")
+    |> put_flash(:success, UserMessages.const_log_out_message)
     |> UserAuth.log_out_user()
   end
 end

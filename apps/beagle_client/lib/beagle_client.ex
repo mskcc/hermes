@@ -1,11 +1,30 @@
 defmodule BeagleClient do
   import FilesQuery
   import FileGroupsList
+  import Register
+  import PipelinesList
   import BatchPatchFiles
 
 
   @moduledoc """
   Module to interact with Beagle
+  ### API response
+  API calls return a type BeagleResponse
+  {status, status_detail, response}
+  #### status possiple values:
+   - :ok
+   - :error
+
+  #### status_detail possiple values:
+   - :ok
+   - :user_error
+   - :unexpected_error
+   - :server_error
+
+  #### response possible values:
+   - response data (obj)
+   - error message (string)
+   - error tuple (http status (int), error body (string))
   """
 
   @doc """
@@ -15,6 +34,9 @@ defmodule BeagleClient do
 
     - token(string): Beagle authentication token
 
+  ## Returns
+
+    - BeagleResponse
 
   """
   def list_all_file_groups(token) do
@@ -26,8 +48,12 @@ defmodule BeagleClient do
 
   ## Parameters
 
-    - file_query_struct(FilesQuery): FileQuery object
+    - file_query_struct(FilesQuery): FileQuery struct
     - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
 
 
   """
@@ -41,9 +67,12 @@ defmodule BeagleClient do
 
   ## Parameters
 
-    - batch_patch_struct(BatchPatchFiles): BatchPatchFiles object
+    - batch_patch_struct(BatchPatchFiles): BatchPatchFiles struct
     - token(string): Beagle authentication token
 
+  ## Returns
+
+    - BeagleResponse
 
   """
   def batch_patch_files(%BatchPatchFiles{} = batch_patch_struct, token) do
@@ -59,9 +88,12 @@ defmodule BeagleClient do
 
   ## Parameters
 
-    - file_group_list(FileGroupsList): FileGroupsList object
+    - file_group_list(FileGroupsList): FileGroupsList struct
     - token(string): Beagle authentication token
 
+  ## Returns
+
+    - BeagleResponse
 
   """
   def file_groups(%FileGroupsList{} = file_group_list, token) do
@@ -76,15 +108,37 @@ defmodule BeagleClient do
 
   ## Parameters
 
-    - file_group_list(FileGroupsList): FileGroupsList object
+    - file_group_list(FileGroupsList): FileGroupsList struct
     - token(string): Beagle authentication token
 
+  ## Returns
+
+    - BeagleResponse
 
   """
   def query_files(%FilesQuery{} = file_query_struct, token) do
     query_key_list = process_query_struct(file_query_struct)
     client(token)
       |> Tesla.get(BeagleEndpoint.const_file_query, query: query_key_list)
+      |> handle_response
+  end
+
+  @doc """
+  Register a user
+
+  ## Parameters
+
+    - register_struct(Register): Register struct
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def register_user(%Register{} = register_struct) do
+    register_payload = Map.from_struct(register_struct)
+    client()
+      |> Tesla.post(BeagleEndpoint.const_register, register_payload)
       |> handle_response
   end
 
@@ -132,40 +186,91 @@ defmodule BeagleClient do
     Enum.map(map, fn({key, value}) -> {key, value} end)
   end
 
-  def fetch_pipelines(client) do
-    client
-      |> Tesla.get("/v0/run/pipelines/", query: [page: 1, per_page: 100])
+  @doc """
+  Query Pipelines
+
+  ## Parameters
+
+    - pipelines_query_struct(PipelinesList): PipelinesList struct
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def fetch_pipelines(%PipelinesList{} = pipelines_query_struct, token) do
+    query_key_list = process_query_struct(pipelines_query_struct)
+    client(token)
+      |> Tesla.get(BeagleEndpoint.const_fetch_pipelines, query: query_key_list)
       |> handle_response
   end
 
-  @doc false
+  @doc """
+  Fetch auth token
+
+  ## Parameters
+
+    - username(string): login username
+    - password(string): login password
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
   def fetch_auth_token(username, password), do: fetch_auth_token(client(), username, password)
 
-  def fetch_auth_token(client, username, password) do
+
+  defp fetch_auth_token(client, username, password) do
       client
-      |> Tesla.post("/api-token-auth/", Jason.encode!(%{username: username, password: password}))
+      |> Tesla.post(BeagleEndpoint.const_fetch_auth_token, Jason.encode!(%{username: username, password: password}))
       |> handle_response
   end
 
-  @doc false
+  @doc """
+  Validate auth token
+
+  ## Parameters
+
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
   def validate_auth_token(token), do: validate_auth_token(client(), token)
 
-  def validate_auth_token(client, token) do
+
+  defp validate_auth_token(client, token) do
       client
-      |> Tesla.post("/api-token-verify/", Jason.encode!(%{token: token}))
+      |> Tesla.post(BeagleEndpoint.const_validate_auth_token, Jason.encode!(%{token: token}))
       |> handle_response
   end
 
-  @doc false
+  @doc """
+  Refresh auth token
+
+  ## Parameters
+
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
   def refresh_auth_token(token), do: refresh_auth_token(client(), token)
 
-  def refresh_auth_token(client, token) do
+  defp refresh_auth_token(client, token) do
       client
-      |> Tesla.post("/api-token-refresh/", Jason.encode!(%{refresh: token}))
+      |> Tesla.post(BeagleEndpoint.const_refresh_auth_token, Jason.encode!(%{refresh: token}))
       |> handle_response
   end
 
-  def client(token) when is_binary(token) do
+
+  defp client(token) when is_binary(token) do
     middleware = [
       {Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url)},
       Tesla.Middleware.JSON,
@@ -176,7 +281,7 @@ defmodule BeagleClient do
     Tesla.client(middleware)
   end
 
-  def client do
+  defp client do
     middleware = [
       {Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url)},
       Tesla.Middleware.JSON,
@@ -218,14 +323,18 @@ defmodule BeagleClient do
 
 
       %{status: n} when n in 400..499 ->
-        {:ok, :user_error, response.body}
-
-
+        {:error, :user_error, response.body}
 
 
       {:error, error} ->
-        IO.inspect error
-        {:error, :unexpected_error, error}
+        case error do
+          :econnrefused -> {:error, :server_error, UserMessages.const_server_down }
+          _ ->
+            IO.inspect error
+            {:error, :unexpected_error, error}
+        end
+
+
 
       _ ->
         IO.inspect {:error, :unexpected_error, {response.status, response.body}}

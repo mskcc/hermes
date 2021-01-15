@@ -53,27 +53,13 @@ defmodule VoyagerWeb.MetadataLive do
 	defp get_metadata_query(params) do
 		error_message = params
 			|> Map.keys
-			|> case do
-				key_list when length(key_list) == 1 ->
-					"Sorry! We do not recognize the option: " <> Enum.at(key_list,0)
-				key_list ->
-					"Sorry! We do not recognize the options: " <> Enum.join(key_list,", ")
-				end
+			|> UserMessages.queryNotRecognized
 		{:error, error_message}
-	end
-
-	defp resourceNotFound(params) do
-		key_error_message = params
-			|> Enum.map_join(", ", fn {key, val} -> "#{key}: #{val}" end)
-		"Oh no! We could not find any metadata associated with: " <> key_error_message
-
 	end
 
 	@impl true
 	def handle_event("fetch", params, socket) do
 		user_token = socket.assigns.user_token
-
-
 
 		case get_metadata_query(params) do
 			{:ok, query} ->
@@ -81,7 +67,7 @@ defmodule VoyagerWeb.MetadataLive do
       				|> BeagleClient.list_all_query_files(user_token)
       				|> case do
       					{:ok, :ok, []} ->
-      						message = resourceNotFound(params)
+      						message = UserMessages.resourceNotFound(params,"metadata")
       						socket
       							|> redirect(to: Routes.metadata_path(socket, :new))
       							|> put_flash(:error,message)

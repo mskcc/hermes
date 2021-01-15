@@ -5,6 +5,7 @@ defmodule BatchPatchFiles do
   use TypedStruct
 
   typedstruct do
+  	@typedoc "parameters to batch patch files"
 
   	field :patch_files, list(map())
 

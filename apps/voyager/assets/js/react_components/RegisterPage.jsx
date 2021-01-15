@@ -34,67 +34,81 @@ const useStyles = makeStyles((theme) => ({
         width: '1.5rem !important',
         height: '1.5rem !important',
     },
-    registrationText: {
+    loginText: {
         textAlign: 'center',
     },
 }));
 
-export default function LoginPage(props) {
+export default function RegisterPage(props) {
     const classes = useStyles();
-    const { loginRoute, registerRoute, formKey } = props;
+    const { registerRoute, registerSuccessRoute, loginRoute, formKey } = props;
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
-    const redirectToRegistration = () => {
-        window.location.replace(registerRoute);
+    const redirectToLogin = () => {
+        window.location.replace(loginRoute);
     };
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
-                    <i className="material-icons">lock_outline</i>
+                    <i className="material-icons">person_add</i>
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign in
+                    Register
                 </Typography>
                 <Formik
                     initialValues={{
                         username: '',
-                        password: '',
+                        first_name: '',
+                        last_name: '',
                     }}
                     enableReinitialize={false}
                     validationSchema={Yup.object().shape({
-                        username: Yup.string().required('Username is required'),
-                        password: Yup.string().required('Password is required'),
+                        username: Yup.string().required('MKSCC username is required'),
+                        first_name: Yup.string().required('First name is required'),
+                        last_name: Yup.string().required('Last name is required'),
                     })}
-                    onSubmit={({ username, password }, { setErrors, setSubmitting }) => {
+                    onSubmit={(
+                        { username, first_name, last_name },
+                        { setErrors, setSubmitting }
+                    ) => {
                         axios
-                            .post(loginRoute, {
+                            .post(registerRoute, {
                                 [formKey]: {
                                     username: username,
-                                    password: password,
+                                    first_name: first_name,
+                                    last_name: last_name,
                                 },
                             })
-                            .then((response) => {
-                                window.location.replace(response.request.responseURL);
+                            .then(() => {
+                                window.location.replace(registerSuccessRoute);
                             })
                             .catch((err) => {
                                 if (err.response) {
                                     let data = err.response.data;
                                     let status = err.response.status;
-                                    if (status == 400 || status == 500) {
-                                        setErrors({ password: data });
+                                    if (status == 400) {
+                                        setErrors({
+                                            username: data.username,
+                                            first_name: data.first_name,
+                                            last_name: data.last_name,
+                                        });
+                                    } else if (status == 500) {
+                                        setErrors({
+                                            last_name: data,
+                                        });
                                     } else {
-                                        console.log('Unexpected error in login: ');
+                                        console.log('Unexpected error in register: ');
                                         console.log('status: ' + status);
                                         console.log('data: ' + data);
                                     }
                                 } else {
                                     setErrors({
-                                        password:
+                                        last_name:
                                             'Unfortunately, it looks like our webserver is down. We should have it back up shortly.',
                                     });
-                                    console.log('Unexpected error in login: ');
+                                    console.log('Unexpected error in register: ');
                                     console.error(err);
                                 }
                             })
@@ -125,16 +139,32 @@ export default function LoginPage(props) {
                                 variant="outlined"
                                 margin="normal"
                                 fullWidth
-                                name="password"
-                                label="Password"
-                                type="password"
-                                id="password"
-                                autoComplete="password"
+                                id="first_name"
+                                label="First Name"
+                                name="first_name"
+                                autoComplete="given-name"
                                 onChange={handleChange}
-                                values={values.password}
-                                error={errors.password && touched.password}
+                                values={values.first_name}
+                                error={errors.first_name && touched.first_name}
                                 helperText={
-                                    errors.password && touched.password ? errors.password : null
+                                    errors.first_name && touched.first_name
+                                        ? errors.first_name
+                                        : null
+                                }
+                            />
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                fullWidth
+                                id="last_name"
+                                label="Last Name"
+                                name="last_name"
+                                autoComplete="family-name"
+                                onChange={handleChange}
+                                values={values.last_name}
+                                error={errors.last_name && touched.last_name}
+                                helperText={
+                                    errors.last_name && touched.last_name ? errors.last_name : null
                                 }
                             />
                             <Button
@@ -150,12 +180,12 @@ export default function LoginPage(props) {
                                     ) : null
                                 }
                             >
-                                Sign In
+                                Register
                             </Button>
-                            <Typography className={classes.registrationText}>
-                                Don&apos;t have an account?&nbsp;
-                                <Link href="#" onClick={redirectToRegistration}>
-                                    Register here!
+                            <Typography className={classes.loginText}>
+                                Already have an account?&nbsp;
+                                <Link href="#" onClick={redirectToLogin}>
+                                    Login here!
                                 </Link>
                             </Typography>
                         </form>
