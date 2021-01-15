@@ -338,7 +338,6 @@ defmodule BeagleClient do
         response -> response
       end
 
-
     case response do
       %{status: n} when n in 200..299 ->
         {:ok, :ok, response.body}
@@ -366,6 +365,7 @@ defmodule BeagleClient do
         {:error, :user_error, response.body}
 
 
+
       {:error, error} ->
         case error do
           :econnrefused -> {:error, :server_error, UserMessages.const_server_down }
@@ -373,7 +373,6 @@ defmodule BeagleClient do
             IO.inspect error
             {:error, :unexpected_error, error}
         end
-
 
 
       _ ->
