@@ -16,7 +16,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import axios from 'axios';
-
+import { findMatchParts } from '@/_helpers';
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),
@@ -161,57 +161,7 @@ export default function MetadataFormPage(props) {
                                     handleChange(newValue);
                                 }}
                                 renderOption={(option, { inputValue }) => {
-                                    let parts = [];
-                                    if (
-                                        inputValue &&
-                                        inputValue.length !== 0 &&
-                                        inputValue.trim().length !== 0
-                                    ) {
-                                        const match = option.search(inputValue);
-                                        if (match !== -1) {
-                                            const start = 0;
-                                            const end = option.length;
-                                            const match_start = match;
-                                            const match_end = match + inputValue.length;
-                                            if (match_start !== start) {
-                                                const part = {
-                                                    text: option.substring(start, match_start),
-                                                    highlight: false,
-                                                };
-                                                parts.push(part);
-                                            }
-                                            const matched_part = {
-                                                text: option.substring(match_start, match_end),
-                                                highlight: true,
-                                            };
-                                            parts.push(matched_part);
-                                            if (match_end !== end) {
-                                                const part = {
-                                                    text: option.substring(match_end, end),
-                                                    highlight: false,
-                                                };
-                                                parts.push(part);
-                                            }
-                                        } else {
-                                            parts = [{ text: option, highlight: false }];
-                                        }
-                                    } else {
-                                        parts = [{ text: option, highlight: false }];
-                                    }
-                                    return (
-                                        <div>
-                                            {parts.map((part, index) => (
-                                                <span
-                                                    key={index}
-                                                    style={{
-                                                        fontWeight: part.highlight ? 700 : 400,
-                                                    }}
-                                                >
-                                                    {part.text}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    );
+                                    return findMatchParts(option, inputValue);
                                 }}
                                 renderInput={(params) => (
                                     <TextField
