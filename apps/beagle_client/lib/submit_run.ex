@@ -6,8 +6,8 @@ defmodule SubmitRun do
 
   typedstruct do
 
-  	field :pipeline_id, String.t()
-  	field :request_id, String.t()
+  	field :pipeline, String.t()
+  	field :request_ids, String.t()
 
   end
 
