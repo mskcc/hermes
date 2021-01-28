@@ -40,5 +40,10 @@ defmodule UserMessages do
 	"""
 	def const_log_out_message, do: "Logged out successfully."
 
+	@doc """
+	Run successfully submitted message
+	"""
+	def const_run_submmitted_message, do: "Awesome! Your run has been successfully submitted"
+
 
 end
