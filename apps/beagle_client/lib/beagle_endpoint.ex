@@ -39,9 +39,9 @@ defmodule BeagleEndpoint do
 	"""
 	def const_register, do: "/register/"
 	@doc """
-	Route to submit a run
+	Route to submit a run by request
 	"""
-	def const_submit_run, do: "/v0/run/runs/"
+	def const_submit_run, do: "/v0/run/operator/request/"
 	@doc """
 	Route to fetch pipelines
 	"""
