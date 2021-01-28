@@ -23,6 +23,7 @@ import MetadataPage from '@/MetadataPage';
 import SnackbarProvider from '@/SnackbarProvider';
 import Drawer from '@/_components/Drawer';
 import RegisterPage from '@/RegisterPage';
+import RunPage from '@/RunPage';
 
 // Define a `hooks` variable to keep all our defined LiveView hooks:
 let hooks = { ReactPhoenix };
@@ -49,4 +50,5 @@ window.Components = {
     MetadataFormPage,
     MetadataPage,
     RegisterPage,
+    RunPage,
 };
