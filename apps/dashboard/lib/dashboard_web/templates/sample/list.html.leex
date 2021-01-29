@@ -1,0 +1,81 @@
+<div class="columns">
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.RequestSearchComponent, id: "request-search", params: @params %>
+  </div>
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.StatusSearchComponent, id: "status-search", params: @params %>
+  </div>
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.IgoSearchComponent, id: "igo-search", params: @params %>
+  </div>
+  <div class="column is-3">
+    <%= live_component @socket, DashboardWeb.AssaySearchComponent, id: "assay-search", params: @params %>
+  </div>
+</div>
+<section class="info-tiles">
+  <div class="tile is-ancestor has-text-centered">
+
+    <div class="tile is-parent">
+      <%= Table.toggle_field @socket, DashboardWeb.SamplesLive.List, @params, "job_status", "10", "tile is-child box" do %>
+
+        <p class="title"><%=@sample_count["running"]%></p>
+        <p class="subtitle">Samples Running</p>
+      <% end %>
+    </div>
+    <div class="tile is-parent">
+      <%= Table.toggle_field @socket, DashboardWeb.SamplesLive.List, @params, "job_status", "20", "tile is-child box" do %>
+        <p class="title"><%=@sample_count["completed"]%></p>
+        <p class="subtitle">Samples Completed</p>
+      <% end %>
+    </div>
+    <div class="tile is-parent">
+      <%= Table.toggle_field @socket, DashboardWeb.SamplesLive.List, @params, "job_status", "30", "tile is-child box" do %>
+        <p class="title"><%=@sample_count["failed"]%></p>
+        <p class="subtitle">Samples Failed</p>
+      <% end %>
+    </div>
+  </div>
+</section>
+<table class="is-hoverable is-fullwidth table" phx-keydown-window="keydown" phx-throttle="500">
+  <thead>
+    <tr>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :igo_sequencing_id, "IGO ID", @params, @sort_by) %></th>
+      <th>Request</th>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :status, "Status", @params, @sort_by) %></th>
+      <th>Latest Job <span class="is-tooltip" data-tooltip="Workflows"><i class="fas fa-info-circle"></i></span> </th>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :inserted_at, "Created", @params, @sort_by) %></th>
+      <th><%= Table.sortable_field(@socket, DashboardWeb.SamplesLive.List, :updated_at, "Updated", @params, @sort_by) %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for sample <- @samples.entries do %>
+      <tr>
+        <td>
+          <%= link sample.igo_sequencing_id, to: Routes.sample_path(@socket, :show, sample.id) %>
+        </td>
+        <td><%= sample.request.name%></td>
+        <td><%= sample.status%></td>
+        <td class="workflows">
+          <%= if sample.jobs != [] do %>
+            <div style="grid-auto-rows:16px; grid-gap: 4px; grid-auto-columns: 16px; display: grid;">
+              <%=Table.workflow_statuses(List.last(sample.jobs))%>
+            </div>
+          <% end %>
+        </td>
+        <td data-tooltip="<%=sample.inserted_at%>"><%= Date.relative_to_now(sample.inserted_at)%></td>
+        <td data-tooltip="<%=sample.updated_at%>"><%= Date.relative_to_now(sample.updated_at)%></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<nav class="pagination is-left" role="navigation" aria-label="pagination">
+  <strong><%=@samples.count%> results</strong>
+  <%= if @params["page"] > 1 do %>
+    <%= live_patch "Previous", to: Routes.live_path(@socket, DashboardWeb.SamplesLive.List, Table.update_params(@params, "page", @params["page"] - 1)), class: "is-primary button pagination-previous" %></span>
+  <% end %>
+  <%= if @params["page"] * @params["per_page"] < @samples.count do %>
+    <%= live_patch "Next", to: Routes.live_path(@socket, DashboardWeb.SamplesLive.List, Table.update_params(@params, "page", @params["page"] + 1)), class: "is-primary button pagination-next" %>
+  <% end %>
+  <ul class="pagination-list"></ul>
+</nav>

@@ -1,0 +1,2 @@
+
+<%= ReactPhoenix.ClientSide.react_component("Components.MetadataFormPage", %{metadataFormRoute: Routes.metadata_path(@conn, :patch), metadataQueryRoute: Routes.metadata_path(@conn, :list), formKey: @form_key, id_keys: @id_keys, initial_id_type: @initial_id_type, type_key: @type_key }) %>

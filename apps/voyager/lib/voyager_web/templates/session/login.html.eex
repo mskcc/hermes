@@ -1,0 +1,2 @@
+
+<%= ReactPhoenix.ClientSide.react_component("Components.LoginPage", %{loginRoute: Routes.session_path(@conn, :create), formKey: @form_key, registerRoute: Routes.register_path(@conn, :register) }) %>

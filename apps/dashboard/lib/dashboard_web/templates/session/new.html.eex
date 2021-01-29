@@ -1,0 +1,17 @@
+<%= form_for @conn, Routes.session_path(@conn, :create), [as: :user], fn f -> %>
+
+  <%= if @error_message do %>
+    <div class="alert alert-danger">
+      <p><%= @error_message %></p>
+    </div>
+  <% end %>
+
+
+  <%= input f, :email, label: "Username", placeholder: "e.g. doej@mskcc.org", icon: "fa-envelope", required: true %>
+
+  <%= input f, :password, label: "Password", placeholder: "********", icon: "fa-lock", required: true%>
+
+  <div class="field">
+    <%= submit "Sign in" %>
+  </div>
+<% end %>

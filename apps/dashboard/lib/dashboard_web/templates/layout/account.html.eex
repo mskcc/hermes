@@ -1,0 +1,31 @@
+<%= render_layout "app.html", assigns do %>
+  <header>
+    <nav class="navbar is-white">
+      <div class="container">
+        <div class="navbar-brand">
+          <%= link "Seqosystem", to: Routes.page_path(@conn, :index), class: "navbar-item brand-text" %>
+          <div class="navbar-burger burger" data-target="navMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+        <div id="navMenu" class="navbar-menu">
+          <div class="navbar-start">
+            <%= link "Dashboard", to: Routes.page_path(@conn, :index), class: "navbar-item" %>
+            <%= link "Samples", to: Routes.live_path(@conn, DashboardWeb.SamplesLive.List), class: "navbar-item" %>
+          </div>
+
+        <div class="navbar-end">
+          <%= link "Log out", to: Routes.session_path(@conn, :delete), method: :delete, class: "navbar-item" %>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main role="main" class="container">
+      <div class="column is-12">
+        <%= assigns[:inner_content] || render @view_module, @view_template, assigns %>
+      </div>
+    </div>
+  </main>
+<%end%>

@@ -1,0 +1,6 @@
+<main role="main" class="container">
+
+	<%= ReactPhoenix.ClientSide.react_component("Components.SnackbarProvider", %{info: get_flash(@conn, :info), error: get_flash(@conn, :error), warning: get_flash(@conn, :warning), success: get_flash(@conn, :success) }) %>
+
+  <%= @inner_content %>
+</main>
