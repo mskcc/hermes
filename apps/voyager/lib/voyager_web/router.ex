@@ -37,10 +37,16 @@ defmodule VoyagerWeb.Router do
 
   scope "/", VoyagerWeb do
     pipe_through [:browser, :require_authenticated_user]
-    get "/metadata/values", MetadataController, :list
     get "/", MetadataController, :new
+    get "/metadata/values", MetadataController, :list
     post "/metadataSubmit", MetadataController, :patch
     live "/metadata", MetadataLive, :index
+    live "/runs", RunLive, :index
+    get "/runs/submit", RunController, :new
+    get "/runs/success", RunController, :success
+    get "/runs/list", RunController, :list
+    post "/runs/submit", RunController, :submit
+    get "/runs/runJobList", RunController, :checkRunJobs
     get "/logout", SessionController, :delete
 
   end
