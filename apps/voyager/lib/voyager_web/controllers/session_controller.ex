@@ -4,8 +4,6 @@ defmodule VoyagerWeb.SessionController do
   alias Domain.Accounts
   alias Dashboard.UserAuth
 
-  import UserMessages
-
   @user_key "user"
 
   def new(conn, _params) do

@@ -46,7 +46,6 @@ defmodule VoyagerWeb.RunLive do
 		annotate_run_data = run_data
 			|> List.replace_at(@app_index,app_name)
 			|> List.replace_at(@status_index,status_name)
-		IO.inspect annotate_run_data
 		Enum.zip(@run_metadata_keys,annotate_run_data)
 			|> Enum.into(%{})
 	end
