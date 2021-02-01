@@ -24,12 +24,14 @@ module.exports = {
     rules: {
         'prettier/prettier': ['error'],
         'react/prop-types': 'off',
+        'no-unused-vars': ['error', { ignoreRestSiblings: true }],
     },
     settings: {
         react: {
             version: 'latest',
         },
         'import/resolver': 'webpack',
+        ignoreRestSiblings: true,
     },
     env: {
         browser: true,

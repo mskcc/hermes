@@ -34,10 +34,21 @@ defmodule BeagleEndpoint do
 	Route to refresh token
 	"""
 	def const_refresh_auth_token, do: "/api-token-refresh/"
-
 	@doc """
 	Route to register a user
 	"""
 	def const_register, do: "/register/"
+	@doc """
+	Route to submit a run by request
+	"""
+	def const_submit_run, do: "/v0/run/operator/request/"
+	@doc """
+	Route to fetch pipelines
+	"""
+	def const_pipeline, do: "/v0/run/pipelines/"
+	@doc """
+	Route to fetch runs
+	"""
+	def const_run_query, do: "/v0/run/api/"
 
 end

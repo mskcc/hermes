@@ -45,102 +45,117 @@ const filterOptions = createFilterOptions({
     limit: 10,
 });
 
-function changeRecommendations(
+function addRecommendations(
     id_type,
-    metadataQueryRoute,
+    runQueryRoute,
     type_key,
-    updateRecommendation,
-    updateLoading
+    updateTypeFunction,
+    updateLoadingFunction
 ) {
-    updateLoading(true);
+    updateLoadingFunction(true);
     axios
-        .get(metadataQueryRoute, {
+        .get(runQueryRoute, {
             params: {
                 [type_key]: id_type,
             },
         })
         .then((response) => {
-            updateRecommendation(response.data);
+            updateTypeFunction(response.data);
         })
         .finally(() => {
-            updateLoading(false);
+            updateLoadingFunction(false);
         });
 }
 
 export default function MetadataFormPage(props) {
     const classes = useStyles();
-    const {
-        metadataFormRoute,
-        formKey,
-        id_keys,
-        initial_id_type,
-        metadataQueryRoute,
-        type_key,
-    } = props;
-    const [recommendation, updateRecommendation] = useState([]);
-    const [current_id_type, updateIdType] = useState(initial_id_type);
-    const [loading, updateLoading] = useState(false);
+    const { runSubmitRoute, runSuccessRoute, formKey, runQueryRoute, type_key } = props;
+    const [requestRecommendation, updateRequestRecommendation] = useState([]);
+    const [requestLoading, updateRequestLoading] = useState(false);
+    const [pipelineRecommendation, updatePipelineRecommendation] = useState([]);
+    const [formatedPipelineRecommendation, updateFormatedPipelineRecommendation] = useState([]);
+    const [pipelineLoading, updatePipelineLoading] = useState(false);
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
-
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
 
-    useEffect(() => {
-        changeRecommendations(
-            current_id_type,
-            metadataQueryRoute,
+    const setup = () => {
+        addRecommendations(
+            'requestId',
+            runQueryRoute,
             type_key,
-            updateRecommendation,
-            updateLoading
+            updateRequestRecommendation,
+            updateRequestLoading
         );
-    }, [current_id_type]);
+        addRecommendations(
+            'pipeline',
+            runQueryRoute,
+            type_key,
+            updatePipelineRecommendation,
+            updatePipelineLoading
+        );
+    };
+
+    const formatPipelineList = () => {
+        const formatedList = pipelineRecommendation.map((pipeline) => pipeline.name);
+        updateFormatedPipelineRecommendation(formatedList);
+    };
+
+    useEffect(() => {
+        setup();
+    }, []);
+
+    useEffect(() => {
+        formatPipelineList();
+    }, [pipelineRecommendation]);
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
-                    <i className="material-icons">search</i>
+                    <i className="material-icons">work_outline</i>
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Enter the metadata ID
+                    Submit a run
                 </Typography>
                 <Formik
                     initialValues={{
-                        id: '',
-                        type: initial_id_type,
+                        request: '',
+                        pipeline: '',
                     }}
                     enableReinitialize={false}
                     validationSchema={Yup.object().shape({
-                        id: Yup.string().required('ID is required'),
-                        type: Yup.string().required('ID type is required'),
+                        request: Yup.string().required('Request is required'),
+                        pipeline: Yup.string().required('Pipeline is required'),
                     })}
-                    onSubmit={({ id, type }, { setErrors, setSubmitting }) => {
+                    onSubmit={({ request, pipeline }, { setErrors, setSubmitting }) => {
                         axios
-                            .post(metadataFormRoute, {
+                            .post(runSubmitRoute, {
                                 [formKey]: {
-                                    id: id,
-                                    type: type,
+                                    request: request,
+                                    pipeline: pipeline,
                                 },
                             })
                             .then((response) => {
-                                window.location.replace(response.request.responseURL);
+                                window.location.replace(runSuccessRoute);
                             })
                             .catch((err) => {
                                 if (err.response) {
                                     let data = err.response.data;
                                     let status = err.response.status;
                                     if (status == 400 || status == 500) {
-                                        setErrors({ id: data });
+                                        setErrors({ request: data });
                                     } else {
-                                        console.log('Unexpected error in metadata selection: ');
+                                        console.log('Unexpected error in run submit: ');
                                         console.log('status: ' + status);
                                         console.log('data: ' + data);
                                     }
                                 } else {
                                     setErrors({
-                                        id:
+                                        request:
                                             'Unfortunately, it looks like our webserver is down. We should have it back up shortly.',
                                     });
-                                    console.log('Unexpected error in metadata selection: ');
+                                    console.log('Unexpected error in run submit: ');
                                     console.error(err);
                                 }
                             })
@@ -153,11 +168,11 @@ export default function MetadataFormPage(props) {
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <Autocomplete
                                 disableListWrap
-                                options={recommendation}
+                                options={requestRecommendation}
                                 filterOptions={filterOptions}
-                                loading={loading}
+                                loading={requestLoading}
                                 onInputChange={(event, newValue) => {
-                                    values.id = newValue;
+                                    values.request = newValue;
                                     handleChange(newValue);
                                 }}
                                 renderOption={(option, { inputValue }) => {
@@ -169,17 +184,21 @@ export default function MetadataFormPage(props) {
                                         variant="outlined"
                                         margin="normal"
                                         fullWidth
-                                        label="Id"
-                                        name="id"
-                                        id="id"
-                                        error={errors.id && touched.id}
-                                        helperText={errors.id && touched.id ? errors.id : null}
+                                        label="Request"
+                                        name="request"
+                                        id="request"
+                                        error={errors.request && touched.request}
+                                        helperText={
+                                            errors.request && touched.request
+                                                ? errors.request
+                                                : null
+                                        }
                                         autoFocus
                                         InputProps={{
                                             ...params.InputProps,
                                             endAdornment: (
                                                 <React.Fragment>
-                                                    {loading ? (
+                                                    {requestLoading ? (
                                                         <CircularProgress
                                                             color="inherit"
                                                             size={20}
@@ -193,33 +212,51 @@ export default function MetadataFormPage(props) {
                                 )}
                             />
 
-                            <FormControl variant="outlined" className={classes.form}>
-                                <InputLabel>ID Type</InputLabel>
-                                <Select
-                                    value={values.type}
-                                    id="type"
-                                    name="type"
-                                    onChange={function updateRecommendation(event) {
-                                        const new_id_type = event.target.value;
-                                        updateIdType(new_id_type);
-                                        handleChange(event);
-                                    }}
-                                    error={errors.type && touched.type}
-                                    label="ID Type"
-                                >
-                                    {id_keys.map((value, index) => {
-                                        const [item_value, item_label] = value;
-                                        return (
-                                            <MenuItem key={index} value={item_value}>
-                                                {item_label}
-                                            </MenuItem>
-                                        );
-                                    })}
-                                </Select>
-                                <FormHelperText error={errors.type && touched.type}>
-                                    {errors.type && touched.type ? errors.type : null}
-                                </FormHelperText>
-                            </FormControl>
+                            <Autocomplete
+                                disableListWrap
+                                options={formatedPipelineRecommendation}
+                                filterOptions={filterOptions}
+                                loading={pipelineLoading}
+                                onInputChange={(event, newValue) => {
+                                    values.pipeline = newValue;
+                                    handleChange(newValue);
+                                }}
+                                renderOption={(option, { inputValue }) => {
+                                    return findMatchParts(option, inputValue);
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="outlined"
+                                        margin="normal"
+                                        fullWidth
+                                        label="Pipeline"
+                                        name="pipeline"
+                                        id="pipeline"
+                                        error={errors.pipeline && touched.pipeline}
+                                        helperText={
+                                            errors.pipeline && touched.pipeline
+                                                ? errors.pipeline
+                                                : null
+                                        }
+                                        autoFocus
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            endAdornment: (
+                                                <React.Fragment>
+                                                    {pipelineLoading ? (
+                                                        <CircularProgress
+                                                            color="inherit"
+                                                            size={20}
+                                                        />
+                                                    ) : null}
+                                                    {params.InputProps.endAdornment}
+                                                </React.Fragment>
+                                            ),
+                                        }}
+                                    />
+                                )}
+                            />
                             <Button
                                 type="submit"
                                 fullWidth

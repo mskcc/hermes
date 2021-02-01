@@ -7,26 +7,13 @@ import dompurify from 'dompurify';
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 import * as Yup from 'yup';
+import { convertToTitleCase } from '@/_helpers/common';
 
 const useStyles = makeStyles(() => ({
     editField: {
         width: '100%',
     },
 }));
-
-export function convertToTitleCase(lowerCamelCase) {
-    let addSpaces = lowerCamelCase.replace(/([A-Z])/g, ' $1');
-    let titleCase = addSpaces.charAt(0).toUpperCase() + addSpaces.slice(1);
-    titleCase = titleCase.trim();
-    if (titleCase === 'Cf D N A2d Barcode') {
-        titleCase = 'Cf DNA 2d Barcode';
-    } else if (titleCase === 'Cmo Sample Name') {
-        titleCase = 'CMO Sample Name';
-    } else if (titleCase === 'Pi Email') {
-        titleCase = 'PI Email';
-    }
-    return titleCase;
-}
 
 export function createEmailYupValidation(keyList) {
     let yupValidationObj = {};
@@ -38,9 +25,10 @@ export function createEmailYupValidation(keyList) {
     return yupValidationObj;
 }
 
-export function setupTable(dictList, columnWidth, sortKey) {
+export function setupTable(dictList, columnWidth, sortKey, ignoreList = []) {
     let column = [];
     let titleToField = {};
+
     if (dictList) {
         for (const singleKey of Object.keys(dictList[0])) {
             const titleCase = convertToTitleCase(singleKey);
@@ -49,8 +37,11 @@ export function setupTable(dictList, columnWidth, sortKey) {
                 title: titleCase,
                 field: singleKey,
             };
-            if (titleCase in columnWidth) {
-                columnObj['width'] = columnWidth[titleCase];
+            if (ignoreList.includes(singleKey)) {
+                columnObj['hidden'] = true;
+            }
+            if (singleKey in columnWidth) {
+                columnObj['width'] = columnWidth[singleKey];
             }
             column.push(columnObj);
         }
