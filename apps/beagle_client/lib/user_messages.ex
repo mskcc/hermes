@@ -45,5 +45,15 @@ defmodule UserMessages do
 	"""
 	def const_run_submmitted_message, do: "Awesome! Your run has been successfully submitted"
 
+	@doc """
+	No metadata changes ready to publish
+	"""
+	def const_no_metadata_changes_ready, do: "Hmmm, it looks like there are no changes ready to publish"
+
+	@doc """
+	No QC report data to show
+	"""
+	def const_no_qc_report_data, do: "Hmmm, there is no qc report data to show for this sample"
+
 
 end
