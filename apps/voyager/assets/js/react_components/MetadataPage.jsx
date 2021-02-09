@@ -699,13 +699,14 @@ export default function MetadataPage(props) {
     useEffect(() => {
         if (handleEvent && pushEvent) {
             if (metadata && metadata.length !== 0) {
-                sessionStorage.removeItem('sampleSearch');
                 setUp();
             } else if (metadata.length == 0 && metadataList.length != 0) {
                 updateMetadata(metadataList);
             } else {
                 pushEvent('fetch', params);
             }
+        } else {
+            sessionStorage.removeItem('sampleSearch');
         }
     }, [metadata]);
 
@@ -903,7 +904,7 @@ export default function MetadataPage(props) {
                         ))}
                         {!patchReady && (
                             <Typography component="div">
-                                <Box textAlign="center">{NO_CHANGES_MESSAGE}</Box>
+                                <Box textAlign="center">{noMetadataChangesMessage}</Box>
                             </Typography>
                         )}
 
