@@ -2,9 +2,14 @@ defmodule Mdb.Application do
   @moduledoc false
 
   use Application
-  import Supervisor.Spec
+  use Supervisor
 
-  def start(_type, _args) do
+  def start_link() do
+    Supervisor.start_link(__MODULE__,[], name: Mdb.Supervisor)
+  end
+
+  @impl true
+  def init(_) do
     gnat_supervisor_settings = %{
       name: :gnat,
       connection_settings: Application.fetch_env!(:mdb, :nat_connections)
@@ -19,10 +24,14 @@ defmodule Mdb.Application do
     }
 
     children = [
-      worker(Gnat.ConnectionSupervisor, [gnat_supervisor_settings, [name: :my_connection_supervisor]]),
-      worker(Gnat.ConsumerSupervisor, [consumer_supervisor_settings, [name: :mdb_consumer]], shutdown: 30_000)
+      Supervisor.child_spec({Gnat.ConnectionSupervisor, gnat_supervisor_settings}, id: :my_connection_supervisor),
+      Supervisor.child_spec({Gnat.ConsumerSupervisor, consumer_supervisor_settings}, id: :mdb_consumer, shutdown: 30_000)
     ]
+    Supervisor.init(children, strategy: :one_for_one)
+  end
 
-    Supervisor.start_link(children, strategy: :one_for_one, name: Mdb.Supervisor)
+  @impl true
+  def start(_type, _args) do
+    Mdb.Application.start_link()
   end
 end
