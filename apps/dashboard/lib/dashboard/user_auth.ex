@@ -74,7 +74,10 @@ defmodule Dashboard.UserAuth do
 
     if user_token do
       {_, user} = Accounts.get_user_by_access_token(user_token)
-      Accounts.delete_user_tokens(user)
+      if user do
+        Accounts.delete_user_tokens(user)
+      end
+
     end
 
     if live_socket_id = get_session(conn, :live_socket_id) do
