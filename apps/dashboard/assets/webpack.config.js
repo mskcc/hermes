@@ -1,29 +1,20 @@
 const path = require('path');
 const glob = require('glob');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const beagleUrl = process.env.BEAGLE_URL || 'http://localhost:8000';
 
 
 module.exports = (env, options) => ({
-    optimization: {
-        minimizer: [
-            new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
-            new OptimizeCSSAssetsPlugin({})
-        ]
-    },
     entry: {
         'app': glob.sync('./vendor/**/*.js').concat(['./js/app.js']),
         'samples-list': './js/samples/list/index.tsx',
-        'samples-show': './js/samples/show/index.ts',
-        'pointer': './js/pointer/index.jsx'
+        'samples-show': './js/samples/show/index.ts'
     },
     resolve: {
         extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
         alias: {
-            '@': path.resolve(__dirname, 'js/pointer'),
         },
     },
     output: {
@@ -37,7 +28,7 @@ module.exports = (env, options) => ({
                 test: /\.js|\.jsx$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'babel-loader'
+                    loader: 'babel-loader',
                 }
             },
             {
@@ -46,13 +37,17 @@ module.exports = (env, options) => ({
                 exclude: /node_modules/,
             },
             {
-                test: /\.scss|\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader',           {
-                    loader: 'sass-loader',
-                    options: {
-                        sourceMap: true,
-                    }
-                }]
+                test: /\.[s]?css$/,
+                use: [
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: '',
+                        },
+                    },
+                    'css-loader',
+                    'sass-loader',
+                ],
             },
             {
                 test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -61,6 +56,7 @@ module.exports = (env, options) => ({
                         loader: 'file-loader',
                         options: {
                             name: '[path][name].[ext]',
+                            publicPath: '',
                             outputPath: '../fonts/'
                         }
                     }
@@ -68,8 +64,11 @@ module.exports = (env, options) => ({
             }
         ]
     },
-    plugins: [
-        new MiniCssExtractPlugin({ filename: '../css/app.css' }),
-        new CopyWebpackPlugin([{ from: 'static/', to: '../' }])
-    ]
+        optimization: {
+            minimizer: ['...', new CssMinimizerPlugin()],
+        },
+        plugins: [
+            new MiniCssExtractPlugin({ filename: '../css/app.css' }),
+            new CopyWebpackPlugin({ patterns: [{ from: 'static/', to: '../' }] }),
+        ],
 });
