@@ -1,7 +1,6 @@
 defmodule VoyagerWeb.RegisterController do
   use VoyagerWeb, :controller
   import Register
-  import UserMessages
 
   @new_user_key "new_user"
 
@@ -11,9 +10,9 @@ defmodule VoyagerWeb.RegisterController do
 
   def register(conn, %{@new_user_key => new_user_params}) do
     %{"username" => username, "first_name" => first_name, "last_name" => last_name} = new_user_params
-    %Register{username: username, first_name: first_name, last_name: last_name}
-      |> BeagleClient.register_user
-      |> case do
+    response_obj = %Register{username: username, first_name: first_name, last_name: last_name}
+      |> BeagleClient.register_user()
+    case response_obj do
         {:ok, :ok, _response} ->
           conn
             |> put_status(200)
