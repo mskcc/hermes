@@ -36,10 +36,10 @@ defmodule LimsClient.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:tesla, "~> 1.3.0"},
+      {:tesla, "~> 1.4"},
       {:jason, ">= 1.0.0"},
       {:mint, "~> 1.0"},
-      {:ecto, "~> 3.4.4"},
+      {:ecto, "~> 3.5"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:nimble_csv, "~> 0.7"}
     ]
