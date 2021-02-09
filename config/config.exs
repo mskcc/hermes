@@ -12,10 +12,11 @@ import Config
 config :domain,
   ecto_repos: [Domain.Repo]
 
-config :metadata_etl,
-  ecto_repos: [Domain.Repo]
-
 # Disabled as we now pull through Mdb
+# config :metadata_etl,
+#  ecto_repos: [Domain.Repo]
+
+
 #config :metadata_etl, Oban,
 #  repo: Domain.Repo,
 #  plugins: [{Oban.Plugins.Pruner, max_age: 604_800}],
