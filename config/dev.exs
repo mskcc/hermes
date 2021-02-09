@@ -45,7 +45,8 @@ config :dashboard, DashboardWeb.Endpoint,
       "node_modules/webpack/bin/webpack.js",
       "--mode",
       "development",
-      "--watch-stdin",
+      "--watch",
+      "--watch-options-stdin",
       cd: Path.expand("../apps/dashboard/assets", __DIR__)
     ]
   ]
@@ -65,7 +66,8 @@ config :voyager, VoyagerWeb.Endpoint,
       "node_modules/webpack/bin/webpack.js",
       "--mode",
       "development",
-      "--watch-stdin",
+      "--watch",
+      "--watch-options-stdin",
       cd: Path.expand("../apps/voyager/assets", __DIR__)
     ]
   ]
