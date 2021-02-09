@@ -323,7 +323,7 @@ export default function MetadataPage(props) {
                 }
             }
 
-            let notSampleKeysList = requestKeyList.concat(fileKeyList);
+            let notSampleKeysList = requestKeyList.concat(fileKeyList, qcReportField);
             let sampleKeyList = allKeys.filter(
                 (singleKey) => !notSampleKeysList.includes(singleKey)
             );
@@ -337,21 +337,29 @@ export default function MetadataPage(props) {
                 true
             );
 
-            const fieldColumnWidth = { R: 10 };
+            const fileColumnWidth = { R: 10 };
+            const qcColumnSort = { IGORecommendation: 1, qcReportType: 2 };
 
-            const { tableData, tableColumn, tableTitleToField } = setupTable(
-                fileObjList,
-                fieldColumnWidth,
-                'R'
+            const fileTableDataObj = setupTable(fileObjList, fileColumnWidth, 'R');
+
+            const qcTableDataObj = setupTable(
+                qcObjectList,
+                {},
+                'IGORecommendation',
+                [],
+                qcColumnSort
             );
 
             return {
                 sampleMetaData: data,
                 sampleMetaColumn: column,
                 sampleTitleToField: titleToField,
-                fileData: tableData,
-                fileColumn: tableColumn,
-                fileTitleToField: tableTitleToField,
+                fileData: JSON.parse(JSON.stringify(fileTableDataObj['tableData'])),
+                fileColumn: fileTableDataObj['tableColumn'],
+                fileTitleToField: fileTableDataObj['tableTitleToField'],
+                qcData: JSON.parse(JSON.stringify(qcTableDataObj['tableData'])),
+                qcColumn: qcTableDataObj['tableColumn'],
+                qcTitleToField: qcTableDataObj['tableTitleToField'],
             };
         }
     };
@@ -371,7 +379,14 @@ export default function MetadataPage(props) {
             sampleTitleToField,
             fileData,
             fileColumn,
-        } = setUpSampleTable(stateMetadata, stateSampleList, stateSampleIndex);
+            qcData,
+            qcColumn,
+        } = setUpSampleTable(
+            stateMetadata,
+            stateSampleList,
+            stateSampleIndex,
+            stateUnlabeledSampleDict
+        );
         return (
             <span>
                 <Tabs
@@ -383,6 +398,7 @@ export default function MetadataPage(props) {
                 >
                     <Tab label="Metadata" />
                     <Tab label="Files" />
+                    <Tab label="QC Report" />
                 </Tabs>
 
                 {stateSampleInfoType === 0 && (
@@ -522,6 +538,32 @@ export default function MetadataPage(props) {
                     <MaterialTable
                         data={fileData}
                         columns={fileColumn}
+                        title=""
+                        components={{
+                            Container: function createFileContainer(props) {
+                                return <Paper {...props} elevation={0} />;
+                            },
+                        }}
+                        options={{
+                            headerStyle: {
+                                backgroundColor: 'slategrey',
+                                color: '#FFF',
+                            },
+                        }}
+                    />
+                )}
+                {stateSampleInfoType === 2 && qcData.length === 0 && (
+                    <Typography component="div">
+                        <Box textAlign="center" padding="100px">
+                            {noQcReportDataMessage}
+                        </Box>
+                    </Typography>
+                )}
+
+                {stateSampleInfoType === 2 && qcData.length !== 0 && (
+                    <MaterialTable
+                        data={qcData}
+                        columns={qcColumn}
                         title=""
                         components={{
                             Container: function createFileContainer(props) {
