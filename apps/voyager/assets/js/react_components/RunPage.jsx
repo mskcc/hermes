@@ -294,7 +294,6 @@ export default function RunPage(props) {
     };
 
     const getJobGroupColors = (jobGroupData) => {
-        console.log(jobGroupData);
         let requestIndex = {};
         let index = 0;
         let statusIndex = {};
