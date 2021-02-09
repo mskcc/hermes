@@ -3,7 +3,7 @@ defmodule DashboardWeb.Api.V1.ProjectController do
   alias Domain.Projects
 
   def index(conn, %{"q" => q}) do
-    projects = Projects.filter_projects(q)
+    projects = Projects.filter_assays(q)
 
     render(conn, "index.json", projects: projects)
   end

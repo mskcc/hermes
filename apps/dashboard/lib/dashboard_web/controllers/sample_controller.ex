@@ -2,8 +2,6 @@ defmodule DashboardWeb.SampleController do
   use DashboardWeb, :controller
 
   alias Domain.Projects
-  alias Domain.Projects.Sample
-  alias Domain.Projects.Assay
 
   def show(conn, %{"id" => id}) do
     sample = Projects.get_sample!(id)
@@ -31,6 +29,6 @@ defmodule DashboardWeb.SampleController do
 
     conn
     |> put_flash(:info, "Sample deleted successfully.")
-    |> redirect(to: Routes.sample_path(conn, :index))
+    |> redirect(to: Routes.page_path(conn, :index))
   end
 end

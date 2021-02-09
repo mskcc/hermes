@@ -34,8 +34,6 @@ defmodule DashboardWeb.Endpoint do
     plug Phoenix.CodeReloader
   end
 
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
-
   plug Phoenix.LiveDashboard.RequestLogger,
     param_key: "request_logger",
     cookie_key: "request_logger"
