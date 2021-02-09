@@ -409,7 +409,7 @@ export default function MetadataPage(props) {
                         onSearchChange={(change) => handleSampleSearchChange(change)}
                         components={{
                             EditField: getFormikEditInput(),
-                            EditRow: getFormikEditRow({}),
+                            EditRow: getFormikEditRow(createYupValidation(metadata_validation)),
                             Container: function createSampleContainer(props) {
                                 return <Paper {...props} elevation={0} />;
                             },
@@ -766,7 +766,7 @@ export default function MetadataPage(props) {
                                     },
                                     EditField: getFormikEditInput(),
                                     EditRow: getFormikEditRow(
-                                        createEmailYupValidation(emailKeyList)
+                                        createYupValidation(metadata_validation)
                                     ),
                                 }}
                                 options={{
