@@ -33,6 +33,7 @@ defmodule Domain.MixProject do
       {:ex_audit, git: "git@github.com:ZennerIoT/ex_audit.git"},
       {:postgrex, "~> 0.15.8"},
       {:beagle_client, in_umbrella: true},
+      {:lims_client, in_umbrella: true},
       {:phx_gen_auth, "~> 0.5", runtime: false},
       # Required for migrations
       {:oban, "~> 2.2"}
