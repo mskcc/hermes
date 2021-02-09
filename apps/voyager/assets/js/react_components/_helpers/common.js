@@ -3,6 +3,10 @@ let conversionFixes = {
     'Cf D N A2d Barcode': 'Cf DNA 2d Barcode',
     'Cmo Sample Name': 'CMO Sample Name',
     'Pi Email': 'PI Email',
+    'Qc Report Type': 'QC Report Type',
+    'I G O Recommendation': 'IGO Recommendation',
+    'Ci Tag': 'CI Tag',
+    'Dna Input Ng': 'DNA Input Ng',
 };
 
 export function convertToTitleCase(sampleStr) {
@@ -20,6 +24,54 @@ export function convertToTitleCase(sampleStr) {
         titleCase = conversionFixes[titleCase];
     }
     return titleCase;
+}
+
+export function convertStrToNumList(sampleStr) {
+    if (Array.isArray(sampleStr)) {
+        return sampleStr;
+    }
+    return Array.from(
+        sampleStr.split(',').map(function (singleItem) {
+            if (singleItem) {
+                const trimmedString = singleItem.trim();
+                const possibleNumber = parseFloat(trimmedString);
+                return possibleNumber;
+            }
+        })
+    ).filter(function (singleElement) {
+        return singleElement !== undefined;
+    });
+}
+
+export function convertStrToStrList(sampleStr) {
+    if (Array.isArray(sampleStr)) {
+        return sampleStr;
+    }
+    return Array.from(
+        sampleStr.split(',').map(function (singleItem) {
+            if (singleItem) {
+                const trimmedString = singleItem.trim();
+                return trimmedString;
+            }
+        })
+    ).filter(function (singleElement) {
+        return singleElement !== undefined;
+    });
+}
+
+export function convertStrToBool(sampleStr) {
+    if (
+        sampleStr.toString().toLowerCase() === 'true' ||
+        sampleStr.toString().toLowerCase() === '1'
+    ) {
+        return true;
+    } else if (
+        sampleStr.toString().toLowerCase() === 'false' ||
+        sampleStr.toString().toLowerCase() === '0'
+    ) {
+        return false;
+    }
+    return sampleStr;
 }
 
 export function findMatchParts(option, inputValue) {
