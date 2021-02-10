@@ -64,7 +64,6 @@ defmodule Voyager.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.4"},
       {:domain, in_umbrella: true},
-      {:dashboard, in_umbrella: true},
       {:beagle_client, in_umbrella: true}
 
     ]

@@ -73,7 +73,6 @@ if Mix.env() != :prod do
   end
 end
 
-import_config "config.dashboard.exs"
 import_config "config.voyager.exs"
 
 import_config "#{Mix.env()}.exs"
