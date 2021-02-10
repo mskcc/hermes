@@ -52,7 +52,7 @@ defmodule Voyager.MixProject do
       {:phoenix_ecto, "~> 4.2"},
       {:ecto_sql, "~> 3.5"},
       {:postgrex, ">= 0.15.8"},
-      {:phoenix_live_view, "<= 0.15.1"},
+      {:phoenix_live_view, "== 0.15.1"},
       {:react_phoenix, "~> 1.3.0-rc.1"},
       {:floki, ">= 0.29.0", only: :test},
       {:phoenix_html, "~> 2.14"},
