@@ -12,7 +12,8 @@ import {
     convertStrToStrList,
     convertStrToBool,
 } from '@/_helpers';
-import moment from 'moment';
+const { DateTime } = require('luxon');
+const diff = require('diff');
 
 const useStyles = makeStyles(() => ({
     editField: {
@@ -51,10 +52,10 @@ const validationTypes = {
         if (!value) {
             return true;
         }
-        if (!moment(value, 'YYYY', true).isValid()) {
+        if (!DateTime.fromFormat(value, 'yyyy').isValid) {
             return createError({
                 path,
-                message: yupErrorMessage(value, 'year', 'Please use the YYYY format'),
+                message: yupErrorMessage(value, 'year', 'Please use the yyyy format'),
             });
         }
         return true;
@@ -64,10 +65,10 @@ const validationTypes = {
         if (!value) {
             return true;
         }
-        if (!moment(value, 'YYYY-MM-DD', true).isValid()) {
+        if (!DateTime.fromFormat(value, 'yyyy-mm-dd').isValid) {
             return createError({
                 path,
-                message: yupErrorMessage(value, 'date', 'please use the YYYY-MM-DD format'),
+                message: yupErrorMessage(value, 'date', 'please use the yyyy-mm-dd format'),
             });
         }
         return true;
