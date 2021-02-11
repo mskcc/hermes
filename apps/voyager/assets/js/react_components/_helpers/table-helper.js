@@ -2,7 +2,6 @@ import React from 'react';
 import { Field, getIn } from 'formik';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import * as diff from 'diff';
 import dompurify from 'dompurify';
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
