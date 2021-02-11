@@ -26,37 +26,45 @@ export function convertToTitleCase(sampleStr) {
     return titleCase;
 }
 
-export function convertStrToNumList(sampleStr) {
+export function convertStrToList(sampleStr, delimiter, conversionFunction) {
     if (Array.isArray(sampleStr)) {
         return sampleStr;
     }
-    return Array.from(
-        sampleStr.split(',').map(function (singleItem) {
-            if (singleItem) {
-                const trimmedString = singleItem.trim();
-                const possibleNumber = parseFloat(trimmedString);
-                return possibleNumber;
+    let convertedList = [];
+    const splitList = sampleStr.split(delimiter);
+    for (const singleStr of splitList) {
+        if (singleStr) {
+            const convertedElem = conversionFunction(singleStr);
+            if (convertedElem) {
+                convertedList.push(convertedElem);
             }
-        })
-    ).filter(function (singleElement) {
-        return singleElement !== undefined;
-    });
+        }
+    }
+
+    return convertedList;
+}
+
+export function convertStrToNumList(sampleStr) {
+    const strToNumConversion = (singleStr) => {
+        const trimmedString = singleStr.trim();
+        if (trimmedString) {
+            const possibleNumber = parseFloat(singleStr);
+            return possibleNumber;
+        }
+    };
+
+    return convertStrToList(sampleStr, ',', strToNumConversion);
 }
 
 export function convertStrToStrList(sampleStr) {
-    if (Array.isArray(sampleStr)) {
-        return sampleStr;
-    }
-    return Array.from(
-        sampleStr.split(',').map(function (singleItem) {
-            if (singleItem) {
-                const trimmedString = singleItem.trim();
-                return trimmedString;
-            }
-        })
-    ).filter(function (singleElement) {
-        return singleElement !== undefined;
-    });
+    const strToStrConversion = (singleStr) => {
+        const trimmedString = singleStr.trim();
+        if (trimmedString) {
+            return trimmedString;
+        }
+    };
+
+    return convertStrToList(sampleStr, ',', strToStrConversion);
 }
 
 export function convertStrToBool(sampleStr) {
