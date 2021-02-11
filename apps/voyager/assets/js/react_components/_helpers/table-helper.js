@@ -2,12 +2,18 @@ import React from 'react';
 import { Field, getIn } from 'formik';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import * as diff from 'diff';
 import dompurify from 'dompurify';
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 import * as Yup from 'yup';
-import { convertToTitleCase } from '@/_helpers/common';
+import {
+    convertToTitleCase,
+    convertStrToNumList,
+    convertStrToStrList,
+    convertStrToBool,
+} from '@/_helpers';
+const { DateTime } = require('luxon');
+const diff = require('diff');
 
 const useStyles = makeStyles(() => ({
     editField: {
@@ -15,21 +21,124 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-export function createEmailYupValidation(keyList) {
+const yupErrorMessage = (value, type, extra = '') => {
+    const errorMessage = `${value} is not a valid ${type}`;
+    if (extra) {
+        return `${errorMessage}, ${extra}`;
+    }
+    return errorMessage;
+};
+
+const validationTypes = {
+    email: Yup.string().email(({ value }) => yupErrorMessage(value, 'email')),
+    number: Yup.string().test('numberTest', '', function (value) {
+        const { path, createError } = this;
+        if (!value) {
+            return true;
+        }
+        if (isNaN(value)) {
+            return createError({
+                path,
+                message: yupErrorMessage(value, 'number'),
+            });
+        }
+        return true;
+    }),
+    bool: Yup.boolean().typeError(({ value }) =>
+        yupErrorMessage(value, 'boolean', 'please use either true or false')
+    ),
+    year: Yup.string().test('yearTest', '', function (value) {
+        const { path, createError } = this;
+        if (!value) {
+            return true;
+        }
+        if (!DateTime.fromFormat(value, 'yyyy').isValid) {
+            return createError({
+                path,
+                message: yupErrorMessage(value, 'year', 'Please use the yyyy format'),
+            });
+        }
+        return true;
+    }),
+    date: Yup.string().test('dateTest', '', function (value) {
+        const { path, createError } = this;
+        if (!value) {
+            return true;
+        }
+        if (!DateTime.fromFormat(value, 'yyyy-mm-dd').isValid) {
+            return createError({
+                path,
+                message: yupErrorMessage(value, 'date', 'please use the yyyy-mm-dd format'),
+            });
+        }
+        return true;
+    }),
+    numberList: Yup.array()
+        .transform(function (value, originalValue) {
+            if (this.isType(value) && value !== null) {
+                return value;
+            }
+            return originalValue ? originalValue.split(/[\s,]+/) : [];
+        })
+        .of(
+            Yup.string().test('numberTest', '', function (value) {
+                const { path, createError } = this;
+                if (!value) {
+                    return true;
+                }
+                if (isNaN(value)) {
+                    return createError({
+                        path,
+                        message: yupErrorMessage(value, 'number'),
+                    });
+                }
+                return true;
+            })
+        ),
+    emailList: Yup.array()
+        .transform(function (value, originalValue) {
+            if (this.isType(value) && value !== null) {
+                return value;
+            }
+            return originalValue ? originalValue.split(/[\s,]+/) : [];
+        })
+        .of(Yup.string().email(({ value }) => yupErrorMessage(value, 'email'))),
+};
+
+export function createYupValidation(keyValidationDict) {
     let yupValidationObj = {};
-    for (const singleKey of keyList) {
+    for (const [singleKey, singleValue] of Object.entries(keyValidationDict)) {
         const titleCaseKey = convertToTitleCase(singleKey);
-        yupValidationObj[titleCaseKey] = Yup.string().email();
+        if (singleValue in validationTypes) {
+            yupValidationObj[titleCaseKey] = validationTypes[singleValue];
+        }
     }
 
     return yupValidationObj;
 }
 
-export function setupTable(dictList, columnWidth, sortKey, ignoreList = []) {
+export function deserialize(value, validation_type) {
+    if (validation_type == 'number' || validation_type == 'year') {
+        return parseFloat(value);
+    }
+    if (validation_type == 'bool') {
+        return convertStrToBool(value);
+    }
+    if (validation_type == 'numberList') {
+        return convertStrToNumList(value);
+    }
+    if (validation_type == 'emailList') {
+        return convertStrToStrList(value);
+    }
+
+    return value;
+}
+
+export function setupTable(dictList, columnWidth, sortKey, ignoreList = [], columnSort = {}) {
     let column = [];
     let titleToField = {};
 
-    if (dictList) {
+    if (dictList && dictList.length > 0) {
         for (const singleKey of Object.keys(dictList[0])) {
             const titleCase = convertToTitleCase(singleKey);
             titleToField[titleCase] = singleKey;
@@ -47,9 +156,27 @@ export function setupTable(dictList, columnWidth, sortKey, ignoreList = []) {
         }
     }
 
+    const sortedColumn = column.sort((firstElem, secondElem) => {
+        const firstElemField = firstElem['field'];
+        const secondElemFiled = secondElem['field'];
+        if (firstElemField in columnSort && secondElemFiled in columnSort) {
+            return columnSort[firstElemField] - columnSort[secondElemFiled];
+        } else if (firstElemField in columnSort) {
+            return -1;
+        } else if (secondElemFiled in columnSort) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+
     const sortedTableData = dictList.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
 
-    return { tableData: sortedTableData, tableColumn: column, tableTitleToField: titleToField };
+    return {
+        tableData: sortedTableData,
+        tableColumn: sortedColumn,
+        tableTitleToField: titleToField,
+    };
 }
 
 export function setupDictTable(dict, keyList, numColumn, fieldBackgroundColor, fieldColor, sort) {
@@ -150,7 +277,7 @@ export function setupChangesTable(dict) {
         if (currentChange === null) {
             currentChange = '';
         }
-        const diffChars = diff.diffChars(initial, currentChange);
+        const diffChars = diff.diffChars(String(initial), String(currentChange));
         let initial_html = '';
         let updated_html = '';
         for (let i = 0; i < Object.keys(diffChars).length; i++) {
@@ -229,15 +356,21 @@ function editComponent(props) {
     return (
         <Field name={props.columnDef.field}>
             {({ field, form }) => {
-                const { name, value } = field;
+                const { name } = field;
                 const { errors, setFieldValue } = form;
                 const showError = !!getIn(errors, name);
                 let helperText = null;
                 if (errors[name]) {
-                    let field_key = name.replace('value', 'field');
-                    helperText = errors[name];
-                    let field_value = form.values[field_key];
-                    helperText = helperText.replace(name, field_value);
+                    //let field_key = name.replace('value', 'field');
+                    if (Array.isArray(errors[name])) {
+                        const filteredErrors = errors[name].filter((x) => x);
+                        helperText = filteredErrors.join(', ');
+                    } else {
+                        helperText = String(errors[name]);
+                    }
+
+                    //let field_value = form.values[field_key];
+                    //helperText = helperText.replace(name, field_value);
                 }
                 return (
                     <TextField

@@ -3,6 +3,10 @@ let conversionFixes = {
     'Cf D N A2d Barcode': 'Cf DNA 2d Barcode',
     'Cmo Sample Name': 'CMO Sample Name',
     'Pi Email': 'PI Email',
+    'Qc Report Type': 'QC Report Type',
+    'I G O Recommendation': 'IGO Recommendation',
+    'Ci Tag': 'CI Tag',
+    'Dna Input Ng': 'DNA Input Ng',
 };
 
 export function convertToTitleCase(sampleStr) {
@@ -20,6 +24,62 @@ export function convertToTitleCase(sampleStr) {
         titleCase = conversionFixes[titleCase];
     }
     return titleCase;
+}
+
+export function convertStrToList(sampleStr, delimiter, conversionFunction) {
+    if (Array.isArray(sampleStr)) {
+        return sampleStr;
+    }
+    let convertedList = [];
+    const splitList = sampleStr.split(delimiter);
+    for (const singleStr of splitList) {
+        if (singleStr) {
+            const convertedElem = conversionFunction(singleStr);
+            if (convertedElem) {
+                convertedList.push(convertedElem);
+            }
+        }
+    }
+
+    return convertedList;
+}
+
+export function convertStrToNumList(sampleStr) {
+    const strToNumConversion = (singleStr) => {
+        const trimmedString = singleStr.trim();
+        if (trimmedString) {
+            const possibleNumber = parseFloat(singleStr);
+            return possibleNumber;
+        }
+    };
+
+    return convertStrToList(sampleStr, ',', strToNumConversion);
+}
+
+export function convertStrToStrList(sampleStr) {
+    const strToStrConversion = (singleStr) => {
+        const trimmedString = singleStr.trim();
+        if (trimmedString) {
+            return trimmedString;
+        }
+    };
+
+    return convertStrToList(sampleStr, ',', strToStrConversion);
+}
+
+export function convertStrToBool(sampleStr) {
+    if (
+        sampleStr.toString().toLowerCase() === 'true' ||
+        sampleStr.toString().toLowerCase() === '1'
+    ) {
+        return true;
+    } else if (
+        sampleStr.toString().toLowerCase() === 'false' ||
+        sampleStr.toString().toLowerCase() === '0'
+    ) {
+        return false;
+    }
+    return sampleStr;
 }
 
 export function findMatchParts(option, inputValue) {

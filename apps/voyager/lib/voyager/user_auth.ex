@@ -1,9 +1,9 @@
-defmodule Dashboard.UserAuth do
+defmodule Voyager.UserAuth do
   import Plug.Conn
   import Phoenix.Controller
 
   alias Domain.Accounts
-  alias DashboardWeb.Router.Helpers, as: Routes
+  alias VoyagerWeb.Router.Helpers , as: Routes
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -74,11 +74,14 @@ defmodule Dashboard.UserAuth do
 
     if user_token do
       {_, user} = Accounts.get_user_by_access_token(user_token)
-      Accounts.delete_user_tokens(user)
+      if user do
+        Accounts.delete_user_tokens(user)
+      end
+
     end
 
     if live_socket_id = get_session(conn, :live_socket_id) do
-      DashboardWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
+      VoyagerWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
     end
 
     conn

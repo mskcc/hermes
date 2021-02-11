@@ -31,26 +31,6 @@ config :voyager, Voyager.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :dashboard, DashboardWeb.Endpoint,
-  signing_salt: "nqwpPBDBb2YSoPct1bYHSy0xvfr9M5xBgnXdduyz4r2B7qOPzgaUwFIzbx0fB8H0",
-  live_view: [signing_salt: "H88ziZ8BtRa35bZpaNoWVhDOFJMivKiI"],
-  url: [host: "localhost"],
-  secret_key_base: "UaLWCWni+61uYpy7J+z6g2c1jw9MOY4FPW+8tM1ZWK6GP3rkR1CQs7AjWjv2m6yt",
-  http: [port: 5000],
-  debug_errors: true,
-  code_reloader: true,
-  check_origin: false,
-  watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch-stdin",
-      cd: Path.expand("../apps/dashboard/assets", __DIR__)
-    ]
-  ]
-
-
 config :voyager, VoyagerWeb.Endpoint,
   signing_salt: "Ri/jdz3uB2awqvQct2IiHkRl+byAYdpW72nE+mLSCU/SVQWIq1kvSMgYEzjcvu3/",
   live_view: [signing_salt: "vb5uxCyB"],
@@ -65,7 +45,8 @@ config :voyager, VoyagerWeb.Endpoint,
       "node_modules/webpack/bin/webpack.js",
       "--mode",
       "development",
-      "--watch-stdin",
+      "--watch",
+      "--watch-options-stdin",
       cd: Path.expand("../apps/voyager/assets", __DIR__)
     ]
   ]
@@ -95,17 +76,6 @@ config :voyager, VoyagerWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :dashboard, DashboardWeb.Endpoint,
-  live_reload: [
-    patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"priv/gettext/.*(po)$",
-      ~r"lib/dashboard_web/(live|views)/.*(ex)$",
-      ~r"lib/dashboard_web/templates/.*(eex)$"
-    ]
-  ]
-
-
 config :voyager, VoyagerWeb.Endpoint,
   live_reload: [
     patterns: [

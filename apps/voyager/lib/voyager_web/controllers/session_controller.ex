@@ -2,9 +2,7 @@ defmodule VoyagerWeb.SessionController do
   use VoyagerWeb, :controller
 
   alias Domain.Accounts
-  alias Dashboard.UserAuth
-
-  import UserMessages
+  alias Voyager.UserAuth
 
   @user_key "user"
 

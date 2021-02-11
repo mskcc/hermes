@@ -12,10 +12,11 @@ import Config
 config :domain,
   ecto_repos: [Domain.Repo]
 
-config :metadata_etl,
-  ecto_repos: [Domain.Repo]
-
 # Disabled as we now pull through Mdb
+# config :metadata_etl,
+#  ecto_repos: [Domain.Repo]
+
+
 #config :metadata_etl, Oban,
 #  repo: Domain.Repo,
 #  plugins: [{Oban.Plugins.Pruner, max_age: 604_800}],
@@ -72,7 +73,6 @@ if Mix.env() != :prod do
   end
 end
 
-import_config "config.dashboard.exs"
 import_config "config.voyager.exs"
 
 import_config "#{Mix.env()}.exs"

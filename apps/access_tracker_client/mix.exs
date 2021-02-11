@@ -36,7 +36,7 @@ defmodule AccessTrackerClient.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:tesla, "~> 1.3.0"},
+      {:tesla, "~> 1.4.0"},
       {:jason, ">= 1.0.0"},
       {:mint, "~> 1.0"}
     ]

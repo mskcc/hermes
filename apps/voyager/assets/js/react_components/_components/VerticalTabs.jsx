@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -54,8 +54,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function VerticalTabs(props) {
     const classes = useStyles();
-    const [value, setValue] = React.useState(0);
     const { handleChange, tabs, stateInfo } = props;
+    const [value, setValue] = useState(0);
 
     const internalHandleChange = (event, newValue) => {
         setValue(newValue);
@@ -67,7 +67,7 @@ export default function VerticalTabs(props) {
             <Tabs
                 orientation="vertical"
                 variant="scrollable"
-                value={value}
+                value={stateInfo['stateSampleIndex']}
                 onChange={internalHandleChange}
                 className={classes.verticalTabs}
             >

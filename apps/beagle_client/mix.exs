@@ -36,9 +36,9 @@ defmodule BeagleClient.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:tesla, "~> 1.3.3"},
-      {:jason, ">= 1.0.0"},
-      {:mint, "~> 1.0"},
+      {:tesla, "~> 1.4"},
+      {:jason, "~> 1.2"},
+      {:gettext, "~> 0.18.2"},
       {:typed_struct, "~> 0.2.1"}
     ]
   end

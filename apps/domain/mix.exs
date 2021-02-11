@@ -27,12 +27,13 @@ defmodule Domain.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ecto, "~> 3.4.4"},
-      {:ecto_sql, "~> 3.1"},
+      {:ecto, "~> 3.5"},
+      {:ecto_sql, "~> 3.5"},
       {:ecto_enum, "~> 1.4"},
       {:ex_audit, git: "git@github.com:ZennerIoT/ex_audit.git"},
-      {:postgrex, ">= 0.0.0"},
+      {:postgrex, "~> 0.15.8"},
       {:beagle_client, in_umbrella: true},
+      {:lims_client, in_umbrella: true},
       {:phx_gen_auth, "~> 0.5", runtime: false},
       # Required for migrations
       {:oban, "~> 2.2"}

@@ -22,7 +22,7 @@ defmodule Domain.Audit.Version do
     field(:rollback, :boolean, default: false)
 
     # custom fields
-    belongs_to(:actor, Domain.Users.User)
+    belongs_to(:actor, Domain.Accounts.User)
   end
 
   @doc false

@@ -219,6 +219,7 @@ defmodule BeagleClient do
     register_payload = Map.from_struct(register_struct)
     client()
       |> Tesla.post(BeagleEndpoint.const_register, register_payload)
+      |> handle_response
   end
 
  @doc """

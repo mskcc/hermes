@@ -22,6 +22,29 @@ defmodule VoyagerWeb.MetadataLive do
     "strand",
 	]
 
+	@sample_verification_keys [
+	"sampleId"
+	]
+
+	@metadata_validation %{
+		dataAccessEmails: "emailList",
+		dataAnalystEmail: "emailList",
+		investigatorEmail: "emailList",
+		labHeadEmail: "emailList",
+		piEmail: "emailList",
+		captureConcentrationNm: "number",
+		captureInputNg: "number",
+		collectionYear: "year",
+		flowCellLanes: "numberList",
+		igocomplete: "bool",
+		libraryConcentrationNgul: "number",
+		libraryVolume: "number",
+		otherContactEmails: "emailList",
+		qcAccessEmails: "emailList",
+		runDate: "date",
+	}
+
+
 	@email_keys [
 	"dataAccessEmails",
 	"investigatorEmail",
@@ -29,11 +52,17 @@ defmodule VoyagerWeb.MetadataLive do
 	"piEmail"
 	]
 
+	@qc_report_field "qcReports"
+
 	@impl true
 	def mount(params, %{"user_token" => user_token}, socket) do
 		{:ok, user} = Accounts.get_user_by_access_token(user_token)
 		{:ok, socket
-			|> assign(user: user.email, user_token: user_token, metadataList: [], requestKeyList: @request_metadata_keys, emailKeyList: @email_keys, params: params)
+			|> assign(user: user.email, user_token: user_token,
+					  metadataList: [], requestKeyList: @request_metadata_keys,
+					  metadata_validation: @metadata_validation, noMetadataChangesMessage: UserMessages.const_no_metadata_changes_ready(),
+					  noQcReportDataMessage: UserMessages.const_no_qc_report_data(),
+					  qcReportField: @qc_report_field, sampleVerificationKeys: @sample_verification_keys,  params: params)
 		}
 
 	end

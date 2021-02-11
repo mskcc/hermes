@@ -16,7 +16,9 @@ import {
     recordChanges,
     editObj,
     setupChangesTable,
-    createEmailYupValidation,
+    createYupValidation,
+    deserialize,
+    convertToTitleCase,
 } from '@/_helpers';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -89,7 +91,18 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MetadataPage(props) {
     const classes = useStyles();
-    const { metadataList, requestKeyList, emailKeyList, params, handleEvent, pushEvent } = props;
+    const {
+        metadataList,
+        requestKeyList,
+        metadata_validation,
+        noMetadataChangesMessage,
+        noQcReportDataMessage,
+        qcReportField,
+        sampleVerificationKeys,
+        params,
+        handleEvent,
+        pushEvent,
+    } = props;
     const [patchReady, updatePatchReady] = useState(false);
     const [resetProcessing, updateResetProcessing] = useState(false);
     const [patchProcessing, updatePatchProcessing] = useState(false);
@@ -102,13 +115,14 @@ export default function MetadataPage(props) {
     const [sampleList, updateSampleList] = useState([]);
     const [sampleIndex, updateSampleIndex] = useState(0);
     const [sampleInfoType, updateSampleInfoType] = useState(0);
-    const NO_CHANGES_MESSAGE = 'Hmmm, it looks like there are no changes ready to publish';
+    const [unlabeledSampleDict, updateUnlabeledSampleDict] = useState({});
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
     const stateInfo = {
         stateMetadata: metadata,
         stateMetadataChanges: metadataChanges,
         stateSampleList: sampleList,
+        stateUnlabeledSampleDict: unlabeledSampleDict,
         stateSampleIndex: sampleIndex,
         stateSampleInfoType: sampleInfoType,
     };
@@ -144,9 +158,13 @@ export default function MetadataPage(props) {
 
         if (Object.keys(metadataChanges['sample']).length !== 0) {
             for (const singleSample of Object.keys(metadataChanges['sample'])) {
-                const { data, column } = setupChangesTable(metadataChanges['sample'][singleSample]);
-                const title = 'Sample: ' + singleSample;
-                metadataTables.push({ data: data, column: column, title: title });
+                if (Object.keys(metadataChanges['sample'][singleSample]).length !== 0) {
+                    const { data, column } = setupChangesTable(
+                        metadataChanges['sample'][singleSample]
+                    );
+                    const title = 'Sample: ' + singleSample;
+                    metadataTables.push({ data: data, column: column, title: title });
+                }
             }
         }
         updateMetadataTables(metadataTables);
@@ -157,12 +175,59 @@ export default function MetadataPage(props) {
         }
     };
 
+    const compareSamples = (firstSample, secondSample) => {
+        for (const singleIdKey of sampleVerificationKeys) {
+            if (!(singleIdKey in firstSample) && !(singleIdKey in secondSample)) {
+                continue;
+            }
+            if (!(singleIdKey in firstSample) || !(singleIdKey in secondSample)) {
+                return false;
+            }
+            if (firstSample[singleIdKey] !== secondSample[singleIdKey]) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const isUnlabeledSample = (metadataRow, sampleName, unlabeledSamples) => {
+        if (sampleName in unlabeledSamples) {
+            return compareSamples(metadataRow, unlabeledSamples[sampleName]);
+        }
+        return false;
+    };
+
+    const findUnlabeledSample = (metadataRow, unlabeledSamples) => {
+        for (const [singleUnlabeledSampleKey, singleUnlabeledSampleValue] of Object.entries(
+            unlabeledSamples
+        )) {
+            if (compareSamples(singleUnlabeledSampleValue, metadataRow)) {
+                return singleUnlabeledSampleKey;
+            }
+        }
+        return null;
+    };
+
     const setUpSampleList = () => {
         let sampleObjs = {};
         let sampleTabObjList = [];
+        let unlabeledSampleCounter = 1;
+        let unlabeledSamples = {};
         if (metadata) {
             for (const singleFile of metadata) {
                 let sampleName = singleFile['metadata']['sampleName'];
+                if (!sampleName) {
+                    sampleName = findUnlabeledSample(singleFile['metadata'], unlabeledSamples);
+                    if (!sampleName) {
+                        let singleUnlabledFile = {};
+                        for (const singleIdKey of sampleVerificationKeys) {
+                            singleUnlabledFile[singleIdKey] = singleFile['metadata'][singleIdKey];
+                        }
+                        sampleName = `Unlabeled ${unlabeledSampleCounter}`;
+                        unlabeledSamples[sampleName] = singleUnlabledFile;
+                        unlabeledSampleCounter += 1;
+                    }
+                }
                 if (!(sampleName in sampleObjs)) {
                     sampleObjs[sampleName] = {
                         label: sampleName,
@@ -172,34 +237,68 @@ export default function MetadataPage(props) {
             }
 
             sampleTabObjList = Object.values(sampleObjs);
+            sampleTabObjList.sort(function (firstSample, secondSample) {
+                return firstSample['label'].localeCompare(secondSample['label']);
+            });
             updateSampleList(sampleTabObjList);
+            updateUnlabeledSampleDict(unlabeledSamples);
         }
-        return sampleTabObjList;
     };
 
-    const setUpSampleTable = (metadataParam, sampleListParam, sampleIndexParam) => {
+    const setUpSampleTable = (
+        metadataParam,
+        sampleListParam,
+        sampleIndexParam,
+        unlabeledSamplesParam
+    ) => {
         if (metadataParam && sampleListParam.length != 0) {
             let sampleName = sampleListParam[sampleIndexParam]['label'];
             let sampleKeyValue = {};
             let fileKeyList = [];
             let fileObjList = [];
+            let qcObjectList = [];
             for (const singleFile of metadataParam) {
-                if (singleFile['metadata']['sampleName'] === sampleName) {
+                if (
+                    singleFile['metadata']['sampleName'] === sampleName ||
+                    isUnlabeledSample(singleFile['metadata'], sampleName, unlabeledSamplesParam)
+                ) {
                     for (const [key, value] of Object.entries(singleFile['metadata'])) {
-                        if (requestKeyList.includes(key)) {
-                            continue;
-                        }
-                        if (key in sampleKeyValue) {
-                            const otherFileValue = sampleKeyValue[key];
-                            if (Array.isArray(otherFileValue) && Array.isArray(value)) {
-                                if (otherFileValue.toString() !== value.toString()) {
-                                    fileKeyList.push(otherFileValue);
+                        if (!requestKeyList.includes(key)) {
+                            if (key == qcReportField) {
+                                const qcValueList = singleFile['metadata'][qcReportField];
+                                if (qcValueList && qcValueList.length > 0) {
+                                    for (const singleQcValue of qcValueList) {
+                                        if (
+                                            singleQcValue &&
+                                            Object.keys(singleQcValue).length > 0
+                                        ) {
+                                            let unique = true;
+                                            for (const singleQcObject of qcObjectList) {
+                                                if (
+                                                    JSON.stringify(singleQcObject) ===
+                                                    JSON.stringify(singleQcValue)
+                                                ) {
+                                                    unique = false;
+                                                }
+                                            }
+                                            if (unique) {
+                                                qcObjectList.push(singleQcValue);
+                                            }
+                                        }
+                                    }
                                 }
-                            } else if (value !== sampleKeyValue[key]) {
-                                fileKeyList.push(key);
+                            } else if (key in sampleKeyValue) {
+                                const otherFileValue = sampleKeyValue[key];
+                                if (Array.isArray(otherFileValue) && Array.isArray(value)) {
+                                    if (otherFileValue.toString() !== value.toString()) {
+                                        fileKeyList.push(otherFileValue);
+                                    }
+                                } else if (value !== sampleKeyValue[key]) {
+                                    fileKeyList.push(key);
+                                }
+                            } else {
+                                sampleKeyValue[key] = value;
                             }
-                        } else {
-                            sampleKeyValue[key] = value;
                         }
                     }
                 }
@@ -209,7 +308,10 @@ export default function MetadataPage(props) {
             let currentSampleMetadata = {};
 
             for (const singleFile of metadataParam) {
-                if (singleFile['metadata']['sampleName'] == sampleName) {
+                if (
+                    singleFile['metadata']['sampleName'] == sampleName ||
+                    isUnlabeledSample(singleFile['metadata'], sampleName, unlabeledSamplesParam)
+                ) {
                     let singleFileObj = {};
                     for (const singleKey of fileKeyList) {
                         singleFileObj[singleKey] = singleFile['metadata'][singleKey];
@@ -221,7 +323,7 @@ export default function MetadataPage(props) {
                 }
             }
 
-            let notSampleKeysList = requestKeyList.concat(fileKeyList);
+            let notSampleKeysList = requestKeyList.concat(fileKeyList, qcReportField);
             let sampleKeyList = allKeys.filter(
                 (singleKey) => !notSampleKeysList.includes(singleKey)
             );
@@ -235,21 +337,29 @@ export default function MetadataPage(props) {
                 true
             );
 
-            const fieldColumnWidth = { R: 10 };
+            const fileColumnWidth = { R: 10 };
+            const qcColumnSort = { IGORecommendation: 1, qcReportType: 2 };
 
-            const { tableData, tableColumn, tableTitleToField } = setupTable(
-                fileObjList,
-                fieldColumnWidth,
-                'R'
+            const fileTableDataObj = setupTable(fileObjList, fileColumnWidth, 'R');
+
+            const qcTableDataObj = setupTable(
+                qcObjectList,
+                {},
+                'IGORecommendation',
+                [],
+                qcColumnSort
             );
 
             return {
                 sampleMetaData: data,
                 sampleMetaColumn: column,
                 sampleTitleToField: titleToField,
-                fileData: tableData,
-                fileColumn: tableColumn,
-                fileTitleToField: tableTitleToField,
+                fileData: JSON.parse(JSON.stringify(fileTableDataObj['tableData'])),
+                fileColumn: fileTableDataObj['tableColumn'],
+                fileTitleToField: fileTableDataObj['tableTitleToField'],
+                qcData: JSON.parse(JSON.stringify(qcTableDataObj['tableData'])),
+                qcColumn: qcTableDataObj['tableColumn'],
+                qcTitleToField: qcTableDataObj['tableTitleToField'],
             };
         }
     };
@@ -259,6 +369,7 @@ export default function MetadataPage(props) {
             stateMetadata,
             stateMetadataChanges,
             stateSampleList,
+            stateUnlabeledSampleDict,
             stateSampleIndex,
             stateSampleInfoType,
         } = stateInfo;
@@ -268,7 +379,14 @@ export default function MetadataPage(props) {
             sampleTitleToField,
             fileData,
             fileColumn,
-        } = setUpSampleTable(stateMetadata, stateSampleList, stateSampleIndex);
+            qcData,
+            qcColumn,
+        } = setUpSampleTable(
+            stateMetadata,
+            stateSampleList,
+            stateSampleIndex,
+            stateUnlabeledSampleDict
+        );
         return (
             <span>
                 <Tabs
@@ -280,6 +398,7 @@ export default function MetadataPage(props) {
                 >
                     <Tab label="Metadata" />
                     <Tab label="Files" />
+                    <Tab label="QC Report" />
                 </Tabs>
 
                 {stateSampleInfoType === 0 && (
@@ -290,7 +409,7 @@ export default function MetadataPage(props) {
                         onSearchChange={(change) => handleSampleSearchChange(change)}
                         components={{
                             EditField: getFormikEditInput(),
-                            EditRow: getFormikEditRow({}),
+                            EditRow: getFormikEditRow(createYupValidation(metadata_validation)),
                             Container: function createSampleContainer(props) {
                                 return <Paper {...props} elevation={0} />;
                             },
@@ -317,6 +436,40 @@ export default function MetadataPage(props) {
                                         stateMetadataChanges['sample'][sampleName],
                                         sampleTitleToField
                                     );
+                                    for (const [singleKey, singleValidationType] of Object.entries(
+                                        metadata_validation
+                                    )) {
+                                        const titleCaseKey = convertToTitleCase(singleKey);
+                                        if (
+                                            titleCaseKey in
+                                            stateMetadataChanges['sample'][sampleName]
+                                        ) {
+                                            let singleMetadataObj =
+                                                stateMetadataChanges['sample'][sampleName][
+                                                    titleCaseKey
+                                                ];
+                                            if (singleMetadataObj['current']) {
+                                                singleMetadataObj['current'] = deserialize(
+                                                    singleMetadataObj['current'],
+                                                    singleValidationType
+                                                );
+                                            }
+                                            if (singleMetadataObj['initial']) {
+                                                singleMetadataObj['initial'] = deserialize(
+                                                    singleMetadataObj['initial'],
+                                                    singleValidationType
+                                                );
+                                            }
+                                            if (
+                                                String(singleMetadataObj['initial']) ==
+                                                String(singleMetadataObj['current'])
+                                            ) {
+                                                delete stateMetadataChanges['sample'][sampleName][
+                                                    titleCaseKey
+                                                ];
+                                            }
+                                        }
+                                    }
                                     if (
                                         'Sample Name' in stateMetadataChanges['sample'][sampleName]
                                     ) {
@@ -324,16 +477,43 @@ export default function MetadataPage(props) {
                                             stateMetadataChanges['sample'][sampleName][
                                                 'Sample Name'
                                             ]['current'];
-                                        stateMetadataChanges['sample'][newSampleName] =
-                                            stateMetadataChanges['sample'][sampleName];
-                                        delete stateMetadataChanges['sample'][sampleName];
+                                        if (newSampleName !== sampleName) {
+                                            stateMetadataChanges['sample'][newSampleName] =
+                                                stateMetadataChanges['sample'][sampleName];
+                                            delete stateMetadataChanges['sample'][sampleName];
 
-                                        newSampleList[stateSampleIndex]['label'] = newSampleName;
+                                            newSampleList[stateSampleIndex][
+                                                'label'
+                                            ] = newSampleName;
+                                            const currentSelectedSample =
+                                                newSampleList[stateSampleIndex];
+                                            newSampleList.sort(function (
+                                                firstSample,
+                                                secondSample
+                                            ) {
+                                                return firstSample['label'].localeCompare(
+                                                    secondSample['label']
+                                                );
+                                            });
+                                            const newSampleIndex = newSampleList.findIndex(
+                                                (singleSample) => {
+                                                    return singleSample === currentSelectedSample;
+                                                }
+                                            );
+                                            updateSampleIndex(newSampleIndex);
+                                        }
                                     }
                                     let newMetadata = [];
                                     for (const singleFile of stateMetadata) {
                                         let fileObj = { ...singleFile };
-                                        if (singleFile['metadata']['sampleName'] === sampleName) {
+                                        if (
+                                            singleFile['metadata']['sampleName'] === sampleName ||
+                                            isUnlabeledSample(
+                                                singleFile['metadata'],
+                                                sampleName,
+                                                stateUnlabeledSampleDict
+                                            )
+                                        ) {
                                             fileObj['metadata'] = editObj(
                                                 newData,
                                                 singleFile['metadata'],
@@ -358,6 +538,32 @@ export default function MetadataPage(props) {
                     <MaterialTable
                         data={fileData}
                         columns={fileColumn}
+                        title=""
+                        components={{
+                            Container: function createFileContainer(props) {
+                                return <Paper {...props} elevation={0} />;
+                            },
+                        }}
+                        options={{
+                            headerStyle: {
+                                backgroundColor: 'slategrey',
+                                color: '#FFF',
+                            },
+                        }}
+                    />
+                )}
+                {stateSampleInfoType === 2 && qcData.length === 0 && (
+                    <Typography component="div">
+                        <Box textAlign="center" padding="100px">
+                            {noQcReportDataMessage}
+                        </Box>
+                    </Typography>
+                )}
+
+                {stateSampleInfoType === 2 && qcData.length !== 0 && (
+                    <MaterialTable
+                        data={qcData}
+                        columns={qcColumn}
                         title=""
                         components={{
                             Container: function createFileContainer(props) {
@@ -449,7 +655,10 @@ export default function MetadataPage(props) {
         for (const singleFile of metadata) {
             let metadataPatch = {};
             const file_id = singleFile['id'];
-            const sampleName = singleFile['metadata']['sampleName'];
+            let sampleName = singleFile['metadata']['sampleName'];
+            if (!sampleName) {
+                sampleName = findUnlabeledSample(singleFile['metadata'], unlabeledSampleDict);
+            }
             if (Object.keys(metadataChanges['request']).length !== 0) {
                 for (const singleRequestMetadataKey of Object.keys(metadataChanges['request'])) {
                     const requestField =
@@ -490,13 +699,14 @@ export default function MetadataPage(props) {
     useEffect(() => {
         if (handleEvent && pushEvent) {
             if (metadata && metadata.length !== 0) {
-                sessionStorage.removeItem('sampleSearch');
                 setUp();
             } else if (metadata.length == 0 && metadataList.length != 0) {
                 updateMetadata(metadataList);
             } else {
                 pushEvent('fetch', params);
             }
+        } else {
+            sessionStorage.removeItem('sampleSearch');
         }
     }, [metadata]);
 
@@ -557,7 +767,7 @@ export default function MetadataPage(props) {
                                     },
                                     EditField: getFormikEditInput(),
                                     EditRow: getFormikEditRow(
-                                        createEmailYupValidation(emailKeyList)
+                                        createYupValidation(metadata_validation)
                                     ),
                                 }}
                                 options={{
@@ -694,7 +904,7 @@ export default function MetadataPage(props) {
                         ))}
                         {!patchReady && (
                             <Typography component="div">
-                                <Box textAlign="center">{NO_CHANGES_MESSAGE}</Box>
+                                <Box textAlign="center">{noMetadataChangesMessage}</Box>
                             </Typography>
                         )}
 
