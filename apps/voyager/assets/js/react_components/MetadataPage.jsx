@@ -94,12 +94,17 @@ export default function MetadataPage(props) {
     const {
         metadataList,
         requestKeyList,
-        metadata_validation,
+        metadataValidation,
         noMetadataChangesMessage,
         noQcReportDataMessage,
         qcReportField,
         sampleVerificationKeys,
+        requestField,
+        sampleLabelKeys,
         params,
+        metadataInputRoute,
+        selectedSample,
+        defaultSampleIdType,
         handleEvent,
         pushEvent,
     } = props;
