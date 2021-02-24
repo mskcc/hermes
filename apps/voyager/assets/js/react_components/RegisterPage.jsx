@@ -124,7 +124,7 @@ export default function RegisterPage(props) {
                                 margin="normal"
                                 fullWidth
                                 id="username"
-                                label="Username"
+                                label="MSKCC Username"
                                 name="username"
                                 autoComplete="username"
                                 onChange={handleChange}
