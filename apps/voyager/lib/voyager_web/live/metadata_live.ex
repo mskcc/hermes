@@ -44,15 +44,16 @@ defmodule VoyagerWeb.MetadataLive do
 		runDate: "date",
 	}
 
-
-	@email_keys [
-	"dataAccessEmails",
-	"investigatorEmail",
-	"labHeadEmail",
-	"piEmail"
-	]
-
 	@qc_report_field "qcReports"
+	@request_id_field "requestId"
+
+	@sample_name_field "sampleName"
+	@sample_id_field "sampleId"
+
+	@sample_label_keys [
+		[@sample_name_field,"name"],
+		[@sample_id_field,"id"]
+	]
 
 	@impl true
 	def mount(params, %{"user_token" => user_token}, socket) do
