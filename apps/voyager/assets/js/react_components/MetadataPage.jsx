@@ -161,6 +161,7 @@ export default function MetadataPage(props) {
 
     const handleSampleChange = (event, newValue) => {
         updateSampleIndex(newValue);
+        updateSampleHeader(sampleList[newValue]['label']);
     };
 
     const handleInfoTypeChange = (event, newValue) => {
@@ -656,6 +657,14 @@ export default function MetadataPage(props) {
         );
     };
 
+    const checkRequestHeader = (requestId) => {
+        if (!requestId || !requestId.trim()) {
+            updateRequestHeader('Unlabeled');
+        } else {
+            updateRequestHeader(requestId.trim());
+        }
+    };
+
     const setUpRequestTable = () => {
         if (metadata) {
             const { data, column, titleToField } = setupDictTable(
@@ -666,7 +675,7 @@ export default function MetadataPage(props) {
                 FIELD_COLOR,
                 true
             );
-
+            checkRequestHeader(metadata[0]['metadata'][requestField]);
             updateRequestData(data);
             updateRequestColumn(column);
             updateRequestTitleToField(titleToField);
@@ -798,7 +807,26 @@ export default function MetadataPage(props) {
                         aria-controls="panel1a-content"
                         id="panel1a-header"
                     >
-                        <Typography className={classes.heading}>Request</Typography>
+                        <Breadcrumbs className={classes.heading}>
+                            <Typography> Request </Typography>
+                            <Breadcrumbs separator=" " className={classes.heading}>
+                                <Typography color="textPrimary"> {requestHeader} </Typography>
+                                <Button
+                                    className={classes.changeRequestButton}
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={(event) => {
+                                        window.open(
+                                            new URL(metadataInputRoute, document.location),
+                                            '_blank'
+                                        );
+                                        event.stopPropagation();
+                                    }}
+                                >
+                                    Change Request
+                                </Button>
+                            </Breadcrumbs>
+                        </Breadcrumbs>
                     </AccordionSummary>
                     <AccordionDetails className={classes.accordianDetailRoot}>
                         {!requestData ||
@@ -884,7 +912,45 @@ export default function MetadataPage(props) {
                         aria-controls="panel2a-content"
                         id="panel2a-header"
                     >
-                        <Typography className={classes.heading}>Sample</Typography>
+                        <Breadcrumbs className={classes.heading}>
+                            <Typography> {sampleHeaderLabel} </Typography>
+                            <Breadcrumbs separator=" " className={classes.heading}>
+                                <Typography color="textPrimary"> {sampleHeader} </Typography>
+                                <ButtonGroup>
+                                    {sampleLabelKeys.map((sampleKey, index) => (
+                                        <Button
+                                            key={index}
+                                            variant="outlined"
+                                            size="small"
+                                            className={
+                                                sampleKey[0] === sampleIdMetadataKey
+                                                    ? classes.sampleIdSelected
+                                                    : classes.sampleIdNotSelected
+                                            }
+                                            onClick={(event) => {
+                                                updateSampleIdMetadataKey(sampleKey[0]);
+                                                const {
+                                                    newSampleList,
+                                                    newSampleFiles,
+                                                } = setUpSampleList(
+                                                    sampleList[sampleIndex]['id'],
+                                                    metadataChanges,
+                                                    sampleKey[0]
+                                                );
+                                                renderMetaDataChanges(
+                                                    metadataChanges,
+                                                    newSampleList,
+                                                    newSampleFiles
+                                                );
+                                                event.stopPropagation();
+                                            }}
+                                        >
+                                            {sampleKey[1]}
+                                        </Button>
+                                    ))}
+                                </ButtonGroup>
+                            </Breadcrumbs>
+                        </Breadcrumbs>
                     </AccordionSummary>
                     <AccordionDetails className={classes.accordianDetailRoot}>
                         {!sampleList ||
@@ -948,7 +1014,15 @@ export default function MetadataPage(props) {
                         aria-controls="panel3a-content"
                         id="panel3a-header"
                     >
-                        <Typography className={classes.heading}>Submit</Typography>
+                        <Breadcrumbs className={classes.heading}>
+                            <Typography> {editHeaderLabel} </Typography>
+                            {editHeaderRequestLabel && (
+                                <Typography> {editHeaderRequestLabel} </Typography>
+                            )}
+                            {editHeaderSampleLabel && (
+                                <Typography> {editHeaderSampleLabel} </Typography>
+                            )}
+                        </Breadcrumbs>
                     </AccordionSummary>
                     <AccordionDetails className={classes.accordianDetailRoot}>
                         {metadataTables.map((table) => (
