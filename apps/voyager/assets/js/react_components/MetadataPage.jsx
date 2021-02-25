@@ -18,7 +18,7 @@ import {
     setupChangesTable,
     createYupValidation,
     deserialize,
-    convertToTitleCase,
+    handlePlural,
 } from '@/_helpers';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -153,25 +153,76 @@ export default function MetadataPage(props) {
         sessionStorage.setItem('sampleSearch', value);
     };
 
-    const renderMetaDataChanges = () => {
+    const getSampleName = (fileId, sampleListParam, sampleFilesParam) => {
+        const sampleId = sampleFilesParam[fileId];
+        for (const singleSample of sampleListParam) {
+            if (singleSample['id'] === sampleId) {
+                return singleSample['label'];
+            }
+        }
+
+        return '[EMPTY]';
+    };
+
+    const renderMetaDataChanges = (metadataChangesParam, sampleListParam, sampleFilesParam) => {
         let metadataTables = [];
-        if (Object.keys(metadataChanges['request']).length !== 0) {
-            const { data, column } = setupChangesTable(metadataChanges['request']);
+        const requestKeys = Object.keys(metadataChangesParam['request']);
+        const sampleKeys = Object.keys(metadataChangesParam['sample']);
+        const requestChanges = requestKeys.length;
+        let sampleChanges = 0;
+        if (requestChanges !== 0) {
+            for (const singleField of requestKeys) {
+                if (singleField === requestField) {
+                    checkRequestHeader(metadataChangesParam['request'][singleField]['current']);
+                }
+            }
+            const { data, column } = setupChangesTable(metadataChangesParam['request']);
             const title = 'Request';
             metadataTables.push({ data: data, column: column, title: title });
         }
 
-        if (Object.keys(metadataChanges['sample']).length !== 0) {
-            for (const singleSample of Object.keys(metadataChanges['sample'])) {
-                if (Object.keys(metadataChanges['sample'][singleSample]).length !== 0) {
+        if (sampleKeys.length !== 0) {
+            for (const singleSampleId of sampleKeys) {
+                const sampleChangeKeys = Object.keys(
+                    metadataChangesParam['sample'][singleSampleId]
+                );
+                if (sampleChangeKeys.length !== 0) {
                     const { data, column } = setupChangesTable(
-                        metadataChanges['sample'][singleSample]
+                        metadataChangesParam['sample'][singleSampleId]
                     );
-                    const title = 'Sample: ' + singleSample;
+                    const singleSampleName = getSampleName(
+                        singleSampleId,
+                        sampleListParam,
+                        sampleFilesParam
+                    );
+                    const title = 'Sample: ' + singleSampleName;
                     metadataTables.push({ data: data, column: column, title: title });
+                    sampleChanges += sampleChangeKeys.length;
                 }
             }
         }
+        const totalChanges = requestChanges + sampleChanges;
+        const totalChangesHeader = handlePlural(
+            totalChanges,
+            '0 Edits',
+            '1 Edit',
+            `${totalChanges} Edits`
+        );
+        const requestChangesHeader = handlePlural(
+            requestChanges,
+            '',
+            'Request 1',
+            `Request ${requestChanges}`
+        );
+        const sampleChangesHeader = handlePlural(
+            sampleChanges,
+            '',
+            'Sample 1',
+            `Sample ${sampleChanges}`
+        );
+        updateEditHeaderLabel(totalChangesHeader);
+        updateEditHeaderRequestLabel(requestChangesHeader);
+        updateEditHeaderSampleLabel(sampleChangesHeader);
         updateMetadataTables(metadataTables);
         if (metadataTables.length !== 0) {
             updatePatchReady(true);
