@@ -363,16 +363,12 @@ function editComponent(props) {
                 const showError = !!getIn(errors, name);
                 let helperText = null;
                 if (errors[name]) {
-                    //let field_key = name.replace('value', 'field');
                     if (Array.isArray(errors[name])) {
                         const filteredErrors = errors[name].filter((x) => x);
                         helperText = filteredErrors.join(', ');
                     } else {
                         helperText = String(errors[name]);
                     }
-
-                    //let field_value = form.values[field_key];
-                    //helperText = helperText.replace(name, field_value);
                 }
                 return (
                     <TextField
