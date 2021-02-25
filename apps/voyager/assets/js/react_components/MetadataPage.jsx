@@ -81,8 +81,7 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
     },
     heading: {
-        fontSize: theme.typography.pxToRem(15),
-        fontWeight: theme.typography.fontWeightRegular,
+        width: '100%',
     },
     progressSpinner: {
         width: '1.5rem !important',
@@ -687,7 +686,11 @@ export default function MetadataPage(props) {
                     }}
                 >
                     {({ submitForm }) => (
-                        <MTableEditRow {...props} onEditingApproved={submitForm} />
+                        <MTableEditRow
+                            {...props}
+                            columns={newColumns}
+                            onEditingApproved={submitForm}
+                        />
                     )}
                 </Formik>
             );
@@ -784,10 +787,6 @@ export default function MetadataPage(props) {
             sessionStorage.removeItem('sampleSearch');
         }
     }, [metadata]);
-
-    useEffect(() => {
-        renderMetaDataChanges();
-    }, [metadataChanges]);
 
     return (
         <Container component="main">
@@ -937,6 +936,7 @@ export default function MetadataPage(props) {
                                 stateInfo={stateInfo}
                                 handleChange={handleSampleChange}
                                 tabs={sampleList}
+                                currentTab={stateInfo['stateSampleIndex']}
                             />
                         )}
                     </AccordionDetails>
