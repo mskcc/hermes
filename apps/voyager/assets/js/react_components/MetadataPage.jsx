@@ -136,18 +136,26 @@ export default function MetadataPage(props) {
     const [requestColumn, updateRequestColumn] = useState([]);
     const [requestTitleToField, updateRequestTitleToField] = useState({});
     const [sampleList, updateSampleList] = useState([]);
+    const [sampleFiles, updateSampleFiles] = useState({});
     const [sampleIndex, updateSampleIndex] = useState(0);
     const [sampleInfoType, updateSampleInfoType] = useState(0);
-    const [unlabeledSampleDict, updateUnlabeledSampleDict] = useState({});
+    const [sampleIdMetadataKey, updateSampleIdMetadataKey] = useState(defaultSampleIdType);
+    const [sampleHeader, updateSampleHeader] = useState('loading...');
+    const [sampleHeaderLabel, updateSampleHeaderLabel] = useState('Sample');
+    const [editHeaderLabel, updateEditHeaderLabel] = useState('0 Edits');
+    const [editHeaderSampleLabel, updateEditHeaderSampleLabel] = useState('');
+    const [editHeaderRequestLabel, updateEditHeaderRequestLabel] = useState('');
+    const [requestHeader, updateRequestHeader] = useState('loading...');
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
     const stateInfo = {
         stateMetadata: metadata,
         stateMetadataChanges: metadataChanges,
         stateSampleList: sampleList,
-        stateUnlabeledSampleDict: unlabeledSampleDict,
+        stateSampleFiles: sampleFiles,
         stateSampleIndex: sampleIndex,
         stateSampleInfoType: sampleInfoType,
+        stateSampleIdMetadataKey: sampleIdMetadataKey,
     };
 
     const loadingRequestWidth = [1, 2, 4, 2, 3, 1, 2, 4, 2, 3, 1, 2, 4, 2, 3];
@@ -155,7 +163,12 @@ export default function MetadataPage(props) {
     const loadingSampleListWidth = [11, 11, 11, 11, 11, 11];
 
     const setUp = () => {
-        setUpSampleList();
+        if (sampleList.length !== 0) {
+            setUpSampleList(sampleList[sampleIndex]['id'], metadataChanges, sampleIdMetadataKey);
+        } else {
+            updateSampleIdMetadataKey(defaultSampleIdType);
+            setUpSampleList(selectedSample, metadataChanges, defaultSampleIdType);
+        }
         setUpRequestTable();
     };
 
@@ -265,137 +278,159 @@ export default function MetadataPage(props) {
         return true;
     };
 
-    const isUnlabeledSample = (metadataRow, sampleName, unlabeledSamples) => {
-        if (sampleName in unlabeledSamples) {
-            return compareSamples(metadataRow, unlabeledSamples[sampleName]);
-        }
-        return false;
-    };
-
-    const findUnlabeledSample = (metadataRow, unlabeledSamples) => {
-        for (const [singleUnlabeledSampleKey, singleUnlabeledSampleValue] of Object.entries(
-            unlabeledSamples
-        )) {
-            if (compareSamples(singleUnlabeledSampleValue, metadataRow)) {
-                return singleUnlabeledSampleKey;
+    const findUnlabeledSample = (metadataRow, currentSamples) => {
+        for (const [, singleUnlabeledSampleValue] of Object.entries(currentSamples)) {
+            if (compareSamples(singleUnlabeledSampleValue['metadata'], metadataRow)) {
+                return singleUnlabeledSampleValue['label'];
             }
         }
         return null;
     };
 
-    const setUpSampleList = () => {
-        let sampleObjs = {};
-        let sampleTabObjList = [];
+    const setUpSampleList = (currentFileId, currentMetadataChanges, currentSampleIdMetadataKey) => {
+        let labeledSampleDict = {};
+        let newSampleFiles = {};
         let unlabeledSampleCounter = 1;
-        let unlabeledSamples = {};
-        if (metadata) {
-            for (const singleFile of metadata) {
-                let sampleName = singleFile['metadata']['sampleName'];
-                if (!sampleName) {
-                    sampleName = findUnlabeledSample(singleFile['metadata'], unlabeledSamples);
-                    if (!sampleName) {
-                        let singleUnlabledFile = {};
-                        for (const singleIdKey of sampleVerificationKeys) {
-                            singleUnlabledFile[singleIdKey] = singleFile['metadata'][singleIdKey];
-                        }
-                        sampleName = `Unlabeled ${unlabeledSampleCounter}`;
-                        unlabeledSamples[sampleName] = singleUnlabledFile;
-                        unlabeledSampleCounter += 1;
-                    }
-                }
-                if (!(sampleName in sampleObjs)) {
-                    sampleObjs[sampleName] = {
-                        label: sampleName,
-                        page: renderTab,
-                    };
+        if (!metadata) {
+            return;
+        }
+        for (const singleFile of metadata) {
+            let sampleObj = {};
+            sampleObj['metadata'] = singleFile['metadata'];
+            const { id: fileId } = singleFile;
+            let sampleId = fileId;
+            sampleObj['id'] = fileId;
+            sampleObj['page'] = renderTab;
+            if (fileId in sampleFiles) {
+                sampleId = sampleFiles[fileId];
+            }
+            let {
+                sample: {
+                    [sampleId]: {
+                        [currentSampleIdMetadataKey]: { current: currentLabel = null } = {},
+                    } = {},
+                } = {},
+            } = currentMetadataChanges;
+            let {
+                metadata: { [currentSampleIdMetadataKey]: sampleLabel },
+            } = singleFile;
+
+            if (currentLabel) {
+                sampleLabel = currentLabel;
+            } else if (sampleLabel) {
+                sampleObj['label'] = sampleLabel;
+            } else {
+                const unlabeledSampleName = findUnlabeledSample(
+                    singleFile['metadata'],
+                    labeledSampleDict
+                );
+                if (!unlabeledSampleName) {
+                    sampleLabel = `Unlabeled ${unlabeledSampleCounter}`;
+                    unlabeledSampleCounter += 1;
+                } else {
+                    newSampleFiles[fileId] = labeledSampleDict[unlabeledSampleName]['id'];
+                    continue;
                 }
             }
-
-            sampleTabObjList = Object.values(sampleObjs);
-            sampleTabObjList.sort(function (firstSample, secondSample) {
-                return firstSample['label'].localeCompare(secondSample['label']);
-            });
-            updateSampleList(sampleTabObjList);
-            updateUnlabeledSampleDict(unlabeledSamples);
+            if (!(sampleLabel in labeledSampleDict)) {
+                sampleObj['label'] = sampleLabel;
+                sampleObj['id'] = fileId;
+                labeledSampleDict[sampleLabel] = sampleObj;
+                newSampleFiles[fileId] = fileId;
+            } else {
+                newSampleFiles[fileId] = labeledSampleDict[sampleLabel]['id'];
+            }
         }
+
+        let newSampleList = Object.values(labeledSampleDict);
+
+        newSampleList.sort(function (firstSample, secondSample) {
+            return firstSample['label'].localeCompare(secondSample['label']);
+        });
+        const newSampleHeaderLabel = handlePlural(
+            newSampleList.length,
+            '0 Samples',
+            `${newSampleList.length} Sample`,
+            `${newSampleList.length} Samples`
+        );
+        updateSampleHeaderLabel(newSampleHeaderLabel);
+
+        let newSampleIndex = sampleIndex;
+        if (currentFileId) {
+            let currentSampleId = currentFileId;
+            if (currentFileId in newSampleFiles) {
+                currentSampleId = newSampleFiles[currentFileId];
+            }
+            newSampleIndex = newSampleList.findIndex((singleSample) => {
+                return singleSample['id'] === currentSampleId;
+            });
+        }
+        updateSampleIndex(newSampleIndex);
+        updateSampleList(newSampleList);
+        updateSampleFiles(newSampleFiles);
+        updateSampleHeader(newSampleList[newSampleIndex]['label']);
+        return { newSampleList, newSampleFiles };
     };
 
     const setUpSampleTable = (
         metadataParam,
         sampleListParam,
-        sampleIndexParam,
-        unlabeledSamplesParam
+        sampleFilesParam,
+        sampleIndexParam
     ) => {
         if (metadataParam && sampleListParam.length != 0) {
-            let sampleName = sampleListParam[sampleIndexParam]['label'];
+            const { id: sampleId } = sampleListParam[sampleIndexParam];
             let sampleKeyValue = {};
             let fileKeyList = [];
             let fileObjList = [];
             let qcObjectList = [];
-            for (const singleFile of metadataParam) {
-                if (
-                    singleFile['metadata']['sampleName'] === sampleName ||
-                    isUnlabeledSample(singleFile['metadata'], sampleName, unlabeledSamplesParam)
-                ) {
-                    for (const [key, value] of Object.entries(singleFile['metadata'])) {
-                        if (!requestKeyList.includes(key)) {
-                            if (key == qcReportField) {
-                                const qcValueList = singleFile['metadata'][qcReportField];
-                                if (qcValueList && qcValueList.length > 0) {
-                                    for (const singleQcValue of qcValueList) {
-                                        if (
-                                            singleQcValue &&
-                                            Object.keys(singleQcValue).length > 0
-                                        ) {
-                                            let unique = true;
-                                            for (const singleQcObject of qcObjectList) {
-                                                if (
-                                                    JSON.stringify(singleQcObject) ===
-                                                    JSON.stringify(singleQcValue)
-                                                ) {
-                                                    unique = false;
-                                                }
-                                            }
-                                            if (unique) {
-                                                qcObjectList.push(singleQcValue);
-                                            }
+            let qcStrObjList = [];
+
+            const metadataSampleFiles = metadataParam.filter(
+                (singleFile) => sampleFilesParam[singleFile['id']] === sampleId
+            );
+
+            for (const singleFile of metadataSampleFiles) {
+                for (const [key, value] of Object.entries(singleFile['metadata'])) {
+                    if (!requestKeyList.includes(key)) {
+                        if (key == qcReportField) {
+                            const {
+                                metadata: { [qcReportField]: qcValueList = {} },
+                            } = singleFile;
+                            if (qcValueList && qcValueList.length > 0) {
+                                for (const singleQcValue of qcValueList) {
+                                    if (singleQcValue && Object.keys(singleQcValue).length > 0) {
+                                        const singleQcValueStr = JSON.stringify(singleQcValue);
+                                        if (!qcStrObjList.includes(singleQcValueStr)) {
+                                            qcObjectList.push(singleQcValue);
+                                            qcStrObjList.push(singleQcValueStr);
                                         }
                                     }
                                 }
-                            } else if (key in sampleKeyValue) {
-                                const otherFileValue = sampleKeyValue[key];
-                                if (Array.isArray(otherFileValue) && Array.isArray(value)) {
-                                    if (otherFileValue.toString() !== value.toString()) {
-                                        fileKeyList.push(otherFileValue);
-                                    }
-                                } else if (value !== sampleKeyValue[key]) {
-                                    fileKeyList.push(key);
-                                }
-                            } else {
-                                sampleKeyValue[key] = value;
                             }
+                        } else if (key in sampleKeyValue) {
+                            const { [key]: otherFileValue } = sampleKeyValue;
+                            if (JSON.stringify(value) !== JSON.stringify(otherFileValue)) {
+                                fileKeyList.push(key);
+                            }
+                        } else {
+                            sampleKeyValue[key] = value;
                         }
                     }
                 }
             }
 
-            let allKeys = [];
-            let currentSampleMetadata = {};
-
-            for (const singleFile of metadataParam) {
-                if (
-                    singleFile['metadata']['sampleName'] == sampleName ||
-                    isUnlabeledSample(singleFile['metadata'], sampleName, unlabeledSamplesParam)
-                ) {
-                    let singleFileObj = {};
-                    for (const singleKey of fileKeyList) {
-                        singleFileObj[singleKey] = singleFile['metadata'][singleKey];
-                    }
-                    singleFileObj['fileName'] = singleFile['file_name'];
-                    currentSampleMetadata = singleFile['metadata'];
-                    fileObjList.push(singleFileObj);
-                    allKeys = Object.keys(singleFile['metadata']);
+            const singleSample = metadataSampleFiles[0];
+            let allKeys = Object.keys(singleSample['metadata']);
+            let { metadata: currentSampleMetadata } = singleSample;
+            for (const singleFile of metadataSampleFiles) {
+                let singleFileObj = {};
+                for (const singleKey of fileKeyList) {
+                    singleFileObj[singleKey] = singleFile['metadata'][singleKey];
                 }
+                singleFileObj['fileName'] = singleFile['file_name'];
+
+                fileObjList.push(singleFileObj);
             }
 
             let notSampleKeysList = requestKeyList.concat(fileKeyList, qcReportField);
@@ -439,14 +474,32 @@ export default function MetadataPage(props) {
         }
     };
 
+    const deserializeSample = (sampleChanges) => {
+        for (const [singleKey, singleValidationType] of Object.entries(metadataValidation)) {
+            let { [singleKey]: { current } = {}, [singleKey]: { initial } = {} } = sampleChanges;
+            if (current) {
+                sampleChanges[singleKey]['current'] = deserialize(current, singleValidationType);
+            }
+            if (initial) {
+                sampleChanges[singleKey]['initial'] = deserialize(initial, singleValidationType);
+            }
+            if (String(initial) === String(current)) {
+                delete sampleChanges[singleKey];
+            }
+        }
+
+        return sampleChanges;
+    };
+
     const renderTab = (stateInfo) => {
         const {
             stateMetadata,
             stateMetadataChanges,
             stateSampleList,
-            stateUnlabeledSampleDict,
+            stateSampleFiles,
             stateSampleIndex,
             stateSampleInfoType,
+            stateSampleIdMetadataKey,
         } = stateInfo;
         const {
             sampleMetaData,
@@ -456,12 +509,7 @@ export default function MetadataPage(props) {
             fileColumn,
             qcData,
             qcColumn,
-        } = setUpSampleTable(
-            stateMetadata,
-            stateSampleList,
-            stateSampleIndex,
-            stateUnlabeledSampleDict
-        );
+        } = setUpSampleTable(stateMetadata, stateSampleList, stateSampleFiles, stateSampleIndex);
         return (
             <span>
                 <Tabs
@@ -500,95 +548,28 @@ export default function MetadataPage(props) {
                         editable={{
                             onRowUpdate: (newData, oldData) =>
                                 new Promise((resolve) => {
-                                    let sampleName = stateSampleList[stateSampleIndex]['label'];
-                                    let newSampleList = stateSampleList;
-                                    if (!(sampleName in stateMetadataChanges['sample'])) {
-                                        stateMetadataChanges['sample'][sampleName] = {};
-                                    }
-                                    stateMetadataChanges['sample'][sampleName] = recordChanges(
+                                    const { id: sampleId } = stateSampleList[stateSampleIndex];
+                                    let {
+                                        sample: { [sampleId]: currentSampleChanges = {} } = {},
+                                    } = stateMetadataChanges;
+                                    currentSampleChanges = recordChanges(
                                         oldData,
                                         newData,
-                                        stateMetadataChanges['sample'][sampleName],
+                                        currentSampleChanges,
                                         sampleTitleToField
                                     );
-                                    for (const [singleKey, singleValidationType] of Object.entries(
-                                        metadata_validation
-                                    )) {
-                                        const titleCaseKey = convertToTitleCase(singleKey);
-                                        if (
-                                            titleCaseKey in
-                                            stateMetadataChanges['sample'][sampleName]
-                                        ) {
-                                            let singleMetadataObj =
-                                                stateMetadataChanges['sample'][sampleName][
-                                                    titleCaseKey
-                                                ];
-                                            if (singleMetadataObj['current']) {
-                                                singleMetadataObj['current'] = deserialize(
-                                                    singleMetadataObj['current'],
-                                                    singleValidationType
-                                                );
-                                            }
-                                            if (singleMetadataObj['initial']) {
-                                                singleMetadataObj['initial'] = deserialize(
-                                                    singleMetadataObj['initial'],
-                                                    singleValidationType
-                                                );
-                                            }
-                                            if (
-                                                String(singleMetadataObj['initial']) ==
-                                                String(singleMetadataObj['current'])
-                                            ) {
-                                                delete stateMetadataChanges['sample'][sampleName][
-                                                    titleCaseKey
-                                                ];
-                                            }
-                                        }
-                                    }
-                                    if (
-                                        'Sample Name' in stateMetadataChanges['sample'][sampleName]
-                                    ) {
-                                        let newSampleName =
-                                            stateMetadataChanges['sample'][sampleName][
-                                                'Sample Name'
-                                            ]['current'];
-                                        if (newSampleName !== sampleName) {
-                                            stateMetadataChanges['sample'][newSampleName] =
-                                                stateMetadataChanges['sample'][sampleName];
-                                            delete stateMetadataChanges['sample'][sampleName];
-
-                                            newSampleList[stateSampleIndex][
-                                                'label'
-                                            ] = newSampleName;
-                                            const currentSelectedSample =
-                                                newSampleList[stateSampleIndex];
-                                            newSampleList.sort(function (
-                                                firstSample,
-                                                secondSample
-                                            ) {
-                                                return firstSample['label'].localeCompare(
-                                                    secondSample['label']
-                                                );
-                                            });
-                                            const newSampleIndex = newSampleList.findIndex(
-                                                (singleSample) => {
-                                                    return singleSample === currentSelectedSample;
-                                                }
-                                            );
-                                            updateSampleIndex(newSampleIndex);
-                                        }
-                                    }
+                                    const deserializedSampleChanges = deserializeSample(
+                                        currentSampleChanges
+                                    );
+                                    stateMetadataChanges['sample'][
+                                        sampleId
+                                    ] = deserializedSampleChanges;
                                     let newMetadata = [];
                                     for (const singleFile of stateMetadata) {
                                         let fileObj = { ...singleFile };
-                                        if (
-                                            singleFile['metadata']['sampleName'] === sampleName ||
-                                            isUnlabeledSample(
-                                                singleFile['metadata'],
-                                                sampleName,
-                                                stateUnlabeledSampleDict
-                                            )
-                                        ) {
+                                        const { id: fileId } = fileObj;
+                                        const fileChangeId = stateSampleFiles[fileId];
+                                        if (fileChangeId === sampleId) {
                                             fileObj['metadata'] = editObj(
                                                 newData,
                                                 singleFile['metadata'],
@@ -599,8 +580,25 @@ export default function MetadataPage(props) {
                                     }
                                     updateMetadata(newMetadata);
                                     updateMetadataChanges(stateMetadataChanges);
-                                    updateSampleList(newSampleList);
-                                    renderMetaDataChanges();
+                                    if (stateSampleIdMetadataKey in deserializedSampleChanges) {
+                                        const { newSampleList, newSampleFiles } = setUpSampleList(
+                                            sampleId,
+                                            stateMetadataChanges,
+                                            stateSampleIdMetadataKey
+                                        );
+                                        renderMetaDataChanges(
+                                            stateMetadataChanges,
+                                            newSampleList,
+                                            newSampleFiles
+                                        );
+                                    } else {
+                                        renderMetaDataChanges(
+                                            stateMetadataChanges,
+                                            stateSampleList,
+                                            stateSampleFiles
+                                        );
+                                    }
+
                                     resolve();
                                 }).catch(function (error) {
                                     console.log(error);
@@ -683,7 +681,30 @@ export default function MetadataPage(props) {
     };
 
     const getFormikEditRow = (validationObj) => {
-        const FormikEditRow = ({ onEditingApproved, ...props }) => {
+        const FormikEditRow = ({ onEditingApproved, columns, ...props }) => {
+            let newColumns = JSON.parse(JSON.stringify(columns));
+            for (let singleColumn of newColumns) {
+                const { field } = singleColumn;
+                let disableEdit = false;
+                if (field.includes('field') && !(field in props.data)) {
+                    disableEdit = true;
+                } else {
+                    const dataFieldKey = field.replace('value', 'field');
+                    if (!(dataFieldKey in props.data)) {
+                        disableEdit = true;
+                    }
+                }
+                if (disableEdit) {
+                    singleColumn['editable'] = 'never';
+                    let { cellStyle } = singleColumn;
+                    if (!cellStyle) {
+                        cellStyle = {};
+                    }
+                    cellStyle['transition'] = 'all 300ms ease 0s';
+                    cellStyle['opacity'] = '0.2';
+                    singleColumn['cellStyle'] = cellStyle;
+                }
+            }
             const formValidationObj = addTableValidation(props.data, validationObj);
             const yupFormValidation = Yup.object().shape(formValidationObj);
             return (
@@ -741,33 +762,26 @@ export default function MetadataPage(props) {
         let updatePayload = { patch_files: [] };
         for (const singleFile of metadata) {
             let metadataPatch = {};
-            const file_id = singleFile['id'];
-            let sampleName = singleFile['metadata']['sampleName'];
-            if (!sampleName) {
-                sampleName = findUnlabeledSample(singleFile['metadata'], unlabeledSampleDict);
-            }
+            const fileId = singleFile['id'];
+            const sampleId = sampleFiles[fileId];
+
             if (Object.keys(metadataChanges['request']).length !== 0) {
                 for (const singleRequestMetadataKey of Object.keys(metadataChanges['request'])) {
-                    const requestField =
-                        metadataChanges['request'][singleRequestMetadataKey]['field'];
-                    metadataPatch[requestField] =
+                    metadataPatch[singleRequestMetadataKey] =
                         metadataChanges['request'][singleRequestMetadataKey]['current'];
                 }
             }
-            if (sampleName in metadataChanges['sample']) {
-                for (const singleSampleMetadataKey of Object.keys(
-                    metadataChanges['sample'][sampleName]
-                )) {
-                    const sampleField =
-                        metadataChanges['sample'][sampleName][singleSampleMetadataKey]['field'];
-                    metadataPatch[sampleField] =
-                        metadataChanges['sample'][sampleName][singleSampleMetadataKey]['current'];
+            if (sampleId in metadataChanges['sample']) {
+                let sampleChanges = metadataChanges['sample'][sampleId];
+                for (const singleSampleMetadataKey of Object.keys(sampleChanges)) {
+                    metadataPatch[singleSampleMetadataKey] =
+                        sampleChanges[singleSampleMetadataKey]['current'];
                 }
             }
             if (Object.keys(metadataPatch).length !== 0) {
                 updatePayload['patch_files'].push({
                     patch: { metadata: metadataPatch },
-                    id: file_id,
+                    id: fileId,
                 });
             }
         }
@@ -895,7 +909,11 @@ export default function MetadataPage(props) {
                                             );
                                             updateRequestData(newRequestData);
                                             updateMetadataChanges(newMetadataChanges);
-                                            renderMetaDataChanges();
+                                            renderMetaDataChanges(
+                                                metadataChanges,
+                                                sampleList,
+                                                sampleFiles
+                                            );
                                             resolve();
                                         }).catch(function (error) {
                                             console.log(error);
