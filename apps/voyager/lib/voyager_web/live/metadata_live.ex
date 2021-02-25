@@ -61,26 +61,52 @@ defmodule VoyagerWeb.MetadataLive do
 		{:ok, socket
 			|> assign(user: user.email, user_token: user_token,
 					  metadataList: [], requestKeyList: @request_metadata_keys,
+					  selectedSample: nil, defaultSampleIdType: @sample_name_field,
 					  metadata_validation: @metadata_validation, noMetadataChangesMessage: UserMessages.const_no_metadata_changes_ready(),
 					  noQcReportDataMessage: UserMessages.const_no_qc_report_data(),
-					  qcReportField: @qc_report_field, sampleVerificationKeys: @sample_verification_keys,  params: params)
+					  qcReportField: @qc_report_field, sampleVerificationKeys: @sample_verification_keys,
+					  requestField: @request_id_field, sampleLabelKeys: @sample_label_keys,   params: params)
 		}
 
 	end
 
-	defp get_metadata_query(%{"requestId" => requestId, "sampleId" => _sampleId}) do
-		get_metadata_query(%{"requestId" => requestId})
+	defp get_metadata_query(%{"requestId" => requestId}, _user_token) do
+		{:ok, %FilesQuery{metadata: "requestId:" <> requestId, page_size: 100}, nil, @sample_name_field}
 	end
 
-	defp get_metadata_query(%{"requestId" => requestId}) do
-		{:ok, %FilesQuery{metadata: "requestId:" <> requestId, page_size: 100}}
+	defp get_metadata_query(%{"sampleId" => sampleId}, user_token) do
+		%FilesQuery{metadata: "sampleId:" <> sampleId, page_size: 100}
+			|> BeagleClient.list_all_query_files(user_token)
+			|> case do
+				{:ok, :ok, []} ->
+					message = UserMessages.resourceNotFound(%{sampleId: sampleId},"metadata")
+					{:error, message}
+				{:ok, :ok, response} ->
+					case Enum.at(response,0) do
+						%{"metadata" => %{"requestId" => requestId}, "id" => id} ->
+							{:ok, request_query, _,_} = get_metadata_query(%{"requestId" => requestId}, user_token)
+							{:ok,request_query,id, @sample_id_field}
+					end
+				end
 	end
 
-	defp get_metadata_query(%{"sampleId" => sampleId}) do
-		{:ok, %FilesQuery{metadata: "sampleId:" <> sampleId, page_size: 100}}
+	defp get_metadata_query(%{"sampleName" => sampleName}, user_token) do
+		%FilesQuery{metadata: "sampleName:" <> sampleName, page_size: 100}
+			|> BeagleClient.list_all_query_files(user_token)
+			|> case do
+				{:ok, :ok, []} ->
+					message = UserMessages.resourceNotFound(%{sampleName: sampleName},"metadata")
+					{:error, message}
+				{:ok, :ok, response} ->
+					case Enum.at(response,0) do
+						%{"metadata" => %{"requestId" => requestId}, "id" => id} ->
+							{:ok, request_query, _,_} = get_metadata_query(%{"requestId" => requestId}, user_token)
+							{:ok,request_query,id, @sample_name_field}
+					end
+				end
 	end
 
-	defp get_metadata_query(params) do
+	defp get_metadata_query(params, _user_token) do
 		error_message = params
 			|> Map.keys
 			|> UserMessages.queryNotRecognized
@@ -91,8 +117,8 @@ defmodule VoyagerWeb.MetadataLive do
 	def handle_event("fetch", params, socket) do
 		user_token = socket.assigns.user_token
 
-		case get_metadata_query(params) do
-			{:ok, query} ->
+		case get_metadata_query(params, user_token) do
+			{:ok, query, selectedSample, defaultSampleIdType} ->
     			{:noreply, query
       				|> BeagleClient.list_all_query_files(user_token)
       				|> case do
@@ -103,7 +129,7 @@ defmodule VoyagerWeb.MetadataLive do
       							|> put_flash(:error,message)
       					{:ok, :ok, response} ->
       						socket
-      							|> assign(metadataList: response, requestKeyList: @request_metadata_keys, emailKeyList: @email_keys)
+      							|> assign(metadataList: response, selectedSample: selectedSample, defaultSampleIdType: defaultSampleIdType)
 				      	{:error, :user_error, message} ->
 				        	socket
 				          		|> redirect(to: Routes.metadata_path(socket, :new))
