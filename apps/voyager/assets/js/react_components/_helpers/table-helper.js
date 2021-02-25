@@ -269,6 +269,7 @@ export function setupChangesTable(dict) {
 
     for (const singleKey of Object.keys(dict)) {
         const currentChangeObj = dict[singleKey];
+        const title = currentChangeObj['title'];
         let initial = currentChangeObj['initial'];
         let currentChange = currentChangeObj['current'];
         if (initial === null) {
@@ -297,7 +298,7 @@ export function setupChangesTable(dict) {
         }
 
         data.push({
-            field: singleKey,
+            field: title,
             updated: updated_html,
             current: initial_html,
         });
@@ -311,14 +312,15 @@ export function recordChanges(oldData, newData, currentChanges, titleToField) {
             if (singleKey !== 'tableData') {
                 if (oldData[singleKey] !== newData[singleKey]) {
                     let field_key = singleKey.replace('value', 'field');
-                    let field_value = newData[field_key];
+                    let title_value = newData[field_key];
+                    let field_value = titleToField[title_value];
                     if (field_value in currentChanges) {
                         currentChanges[field_value]['current'] = newData[singleKey];
                     } else {
                         currentChanges[field_value] = {
                             current: newData[singleKey],
                             initial: oldData[singleKey],
-                            field: titleToField[field_value],
+                            title: title_value,
                         };
                     }
                     if (
