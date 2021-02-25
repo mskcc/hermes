@@ -32,6 +32,13 @@ import axios from 'axios';
 import { Skeleton } from '@material-ui/lab';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+
+const FIELD_COLOR = '#FFF';
+const HEADER_COLOR = '#FFF';
+const FIELED_BACKGROUND_COLOR = 'darkslateblue';
+const HEADER_BACKGROUND_COLOR = 'slategrey';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -86,6 +93,18 @@ const useStyles = makeStyles((theme) => ({
     },
     loadingTableRow: {
         height: '50px',
+    },
+    changeRequestButton: {
+        textTransform: 'none',
+    },
+    sampleIdNotSelected: {
+        backgroundColor: 'white',
+    },
+    sampleIdSelected: {
+        backgroundColor: 'cornflowerblue',
+        '&:hover': {
+            backgroundColor: 'cornflowerblue',
+        },
     },
 }));
 
@@ -388,8 +407,8 @@ export default function MetadataPage(props) {
                 currentSampleMetadata,
                 sampleKeyList,
                 1,
-                'darkslateblue',
-                '#FFF',
+                FIELED_BACKGROUND_COLOR,
+                FIELD_COLOR,
                 true
             );
 
@@ -465,15 +484,15 @@ export default function MetadataPage(props) {
                         onSearchChange={(change) => handleSampleSearchChange(change)}
                         components={{
                             EditField: getFormikEditInput(),
-                            EditRow: getFormikEditRow(createYupValidation(metadata_validation)),
+                            EditRow: getFormikEditRow(createYupValidation(metadataValidation)),
                             Container: function createSampleContainer(props) {
                                 return <Paper {...props} elevation={0} />;
                             },
                         }}
                         options={{
                             headerStyle: {
-                                backgroundColor: 'slategrey',
-                                color: '#FFF',
+                                backgroundColor: HEADER_BACKGROUND_COLOR,
+                                color: HEADER_COLOR,
                             },
                             pageSize: 10,
                             searchText: sessionStorage.getItem('sampleSearch'),
@@ -602,8 +621,8 @@ export default function MetadataPage(props) {
                         }}
                         options={{
                             headerStyle: {
-                                backgroundColor: 'slategrey',
-                                color: '#FFF',
+                                backgroundColor: HEADER_BACKGROUND_COLOR,
+                                color: HEADER_COLOR,
                             },
                         }}
                     />
@@ -628,8 +647,8 @@ export default function MetadataPage(props) {
                         }}
                         options={{
                             headerStyle: {
-                                backgroundColor: 'slategrey',
-                                color: '#FFF',
+                                backgroundColor: HEADER_BACKGROUND_COLOR,
+                                color: HEADER_COLOR,
                             },
                         }}
                     />
@@ -644,8 +663,8 @@ export default function MetadataPage(props) {
                 metadata[0]['metadata'],
                 requestKeyList,
                 2,
-                'darkslateblue',
-                '#FFF',
+                FIELED_BACKGROUND_COLOR,
+                FIELD_COLOR,
                 true
             );
 
@@ -823,16 +842,16 @@ export default function MetadataPage(props) {
                                     },
                                     EditField: getFormikEditInput(),
                                     EditRow: getFormikEditRow(
-                                        createYupValidation(metadata_validation)
+                                        createYupValidation(metadataValidation)
                                     ),
                                 }}
                                 options={{
                                     headerStyle: {
-                                        backgroundColor: 'slategrey',
-                                        color: '#FFF',
+                                        backgroundColor: HEADER_BACKGROUND_COLOR,
+                                        color: HEADER_COLOR,
                                     },
-                                    pageSize: 6,
-                                    pageSizeOptions: [6, 12, 20],
+                                    pageSize: 8,
+                                    pageSizeOptions: [8, 16, 24],
                                 }}
                                 editable={{
                                     onRowUpdate: (newData, oldData) =>
@@ -951,8 +970,8 @@ export default function MetadataPage(props) {
                                 }}
                                 options={{
                                     headerStyle: {
-                                        backgroundColor: 'slategrey',
-                                        color: '#FFF',
+                                        backgroundColor: HEADER_BACKGROUND_COLOR,
+                                        color: HEADER_COLOR,
                                     },
                                     paging: false,
                                 }}
