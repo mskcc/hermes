@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { setupTable, getColors } from '@/_helpers';
 import MaterialTable from 'material-table';
 import axios from 'axios';
-import { Skeleton } from '@material-ui/lab';
+import { Skeleton } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import { Chart } from 'react-google-charts';
 import Chip from '@material-ui/core/Chip';

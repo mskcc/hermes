@@ -29,7 +29,7 @@ import VerticalTabs from '@/_components/VerticalTabs';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import axios from 'axios';
-import { Skeleton } from '@material-ui/lab';
+import { Skeleton } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
@@ -627,7 +627,11 @@ export default function MetadataPage(props) {
                 )}
                 {stateSampleInfoType === 2 && qcData.length === 0 && (
                     <Typography component="div">
-                        <Box textAlign="center" padding="100px">
+                        <Box
+                            sx={{
+                                textAlign: "center",
+                                padding: "100px"
+                            }}>
                             {noQcReportDataMessage}
                         </Box>
                     </Typography>
@@ -1071,7 +1075,10 @@ export default function MetadataPage(props) {
                         ))}
                         {!patchReady && (
                             <Typography component="div">
-                                <Box textAlign="center">{noMetadataChangesMessage}</Box>
+                                <Box
+                                    sx={{
+                                        textAlign: "center"
+                                    }}>{noMetadataChangesMessage}</Box>
                             </Typography>
                         )}
 
