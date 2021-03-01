@@ -120,7 +120,6 @@ export default function RegisterPage(props) {
                     {({ values, errors, touched, handleChange, handleSubmit, isSubmitting }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
-                                variant="outlined"
                                 margin="normal"
                                 fullWidth
                                 id="username"
@@ -133,10 +132,8 @@ export default function RegisterPage(props) {
                                 helperText={
                                     errors.username && touched.username ? errors.username : null
                                 }
-                                autoFocus
-                            />
+                                autoFocus />
                             <TextField
-                                variant="outlined"
                                 margin="normal"
                                 fullWidth
                                 id="first_name"
@@ -150,10 +147,8 @@ export default function RegisterPage(props) {
                                     errors.first_name && touched.first_name
                                         ? errors.first_name
                                         : null
-                                }
-                            />
+                                } />
                             <TextField
-                                variant="outlined"
                                 margin="normal"
                                 fullWidth
                                 id="last_name"
@@ -165,8 +160,7 @@ export default function RegisterPage(props) {
                                 error={errors.last_name && touched.last_name}
                                 helperText={
                                     errors.last_name && touched.last_name ? errors.last_name : null
-                                }
-                            />
+                                } />
                             <Button
                                 type="submit"
                                 fullWidth

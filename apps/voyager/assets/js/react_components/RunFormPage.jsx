@@ -176,7 +176,6 @@ export default function MetadataFormPage(props) {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
-                                        variant="outlined"
                                         margin="normal"
                                         fullWidth
                                         label="Request"
@@ -202,8 +201,7 @@ export default function MetadataFormPage(props) {
                                                     {params.InputProps.endAdornment}
                                                 </React.Fragment>
                                             ),
-                                        }}
-                                    />
+                                        }} />
                                 )}
                             />
 
@@ -222,7 +220,6 @@ export default function MetadataFormPage(props) {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
-                                        variant="outlined"
                                         margin="normal"
                                         fullWidth
                                         label="Pipeline"
@@ -248,8 +245,7 @@ export default function MetadataFormPage(props) {
                                                     {params.InputProps.endAdornment}
                                                 </React.Fragment>
                                             ),
-                                        }}
-                                    />
+                                        }} />
                                 )}
                             />
                             <Button

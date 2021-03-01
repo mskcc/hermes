@@ -206,7 +206,6 @@ export default function MetadataFormPage(props) {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
-                                        variant="outlined"
                                         margin="normal"
                                         fullWidth
                                         label="Id"
@@ -229,8 +228,7 @@ export default function MetadataFormPage(props) {
                                                     {params.InputProps.endAdornment}
                                                 </React.Fragment>
                                             ),
-                                        }}
-                                    />
+                                        }} />
                                 )}
                             />
                             <Button

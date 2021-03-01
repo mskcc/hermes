@@ -377,7 +377,7 @@ function editComponent(props) {
                         className={classes.editField}
                         onChange={(event) => setFieldValue(name, event.target.value)}
                         helperText={helperText}
-                    />
+                        variant="standard" />
                 );
             }}
         </Field>

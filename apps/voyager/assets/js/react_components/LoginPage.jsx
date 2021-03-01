@@ -106,7 +106,6 @@ export default function LoginPage(props) {
                     {({ values, errors, touched, handleChange, handleSubmit, isSubmitting }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
-                                variant="outlined"
                                 margin="normal"
                                 fullWidth
                                 id="username"
@@ -119,10 +118,8 @@ export default function LoginPage(props) {
                                 helperText={
                                     errors.username && touched.username ? errors.username : null
                                 }
-                                autoFocus
-                            />
+                                autoFocus />
                             <TextField
-                                variant="outlined"
                                 margin="normal"
                                 fullWidth
                                 name="password"
@@ -135,8 +132,7 @@ export default function LoginPage(props) {
                                 error={errors.password && touched.password}
                                 helperText={
                                     errors.password && touched.password ? errors.password : null
-                                }
-                            />
+                                } />
                             <Button
                                 type="submit"
                                 fullWidth
