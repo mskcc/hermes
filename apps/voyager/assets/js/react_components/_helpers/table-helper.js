@@ -2,11 +2,18 @@ import React from 'react';
 import { Field, getIn } from 'formik';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import * as diff from 'diff';
 import dompurify from 'dompurify';
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 import * as Yup from 'yup';
+import {
+    convertToTitleCase,
+    convertStrToNumList,
+    convertStrToStrList,
+    convertStrToBool,
+} from '@/_helpers';
+const { DateTime } = require('luxon');
+const diff = require('diff');
 
 const useStyles = makeStyles(() => ({
     editField: {
@@ -14,34 +21,124 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-export function convertToTitleCase(lowerCamelCase) {
-    let addSpaces = lowerCamelCase.replace(/([A-Z])/g, ' $1');
-    let titleCase = addSpaces.charAt(0).toUpperCase() + addSpaces.slice(1);
-    titleCase = titleCase.trim();
-    if (titleCase === 'Cf D N A2d Barcode') {
-        titleCase = 'Cf DNA 2d Barcode';
-    } else if (titleCase === 'Cmo Sample Name') {
-        titleCase = 'CMO Sample Name';
-    } else if (titleCase === 'Pi Email') {
-        titleCase = 'PI Email';
+const yupErrorMessage = (value, type, extra = '') => {
+    const errorMessage = `${value} is not a valid ${type}`;
+    if (extra) {
+        return `${errorMessage}, ${extra}`;
     }
-    return titleCase;
-}
+    return errorMessage;
+};
 
-export function createEmailYupValidation(keyList) {
+const validationTypes = {
+    email: Yup.string().email(({ value }) => yupErrorMessage(value, 'email')),
+    number: Yup.string().test('numberTest', '', function (value) {
+        const { path, createError } = this;
+        if (!value) {
+            return true;
+        }
+        if (isNaN(value)) {
+            return createError({
+                path,
+                message: yupErrorMessage(value, 'number'),
+            });
+        }
+        return true;
+    }),
+    bool: Yup.boolean().typeError(({ value }) =>
+        yupErrorMessage(value, 'boolean', 'please use either true or false')
+    ),
+    year: Yup.string().test('yearTest', '', function (value) {
+        const { path, createError } = this;
+        if (!value) {
+            return true;
+        }
+        if (!DateTime.fromFormat(value, 'yyyy').isValid) {
+            return createError({
+                path,
+                message: yupErrorMessage(value, 'year', 'Please use the yyyy format'),
+            });
+        }
+        return true;
+    }),
+    date: Yup.string().test('dateTest', '', function (value) {
+        const { path, createError } = this;
+        if (!value) {
+            return true;
+        }
+        if (!DateTime.fromFormat(value, 'yyyy-mm-dd').isValid) {
+            return createError({
+                path,
+                message: yupErrorMessage(value, 'date', 'please use the yyyy-mm-dd format'),
+            });
+        }
+        return true;
+    }),
+    numberList: Yup.array()
+        .transform(function (value, originalValue) {
+            if (this.isType(value) && value !== null) {
+                return value;
+            }
+            return originalValue ? originalValue.split(/[\s,]+/) : [];
+        })
+        .of(
+            Yup.string().test('numberTest', '', function (value) {
+                const { path, createError } = this;
+                if (!value) {
+                    return true;
+                }
+                if (isNaN(value)) {
+                    return createError({
+                        path,
+                        message: yupErrorMessage(value, 'number'),
+                    });
+                }
+                return true;
+            })
+        ),
+    emailList: Yup.array()
+        .transform(function (value, originalValue) {
+            if (this.isType(value) && value !== null) {
+                return value;
+            }
+            return originalValue ? originalValue.split(/[\s,]+/) : [];
+        })
+        .of(Yup.string().email(({ value }) => yupErrorMessage(value, 'email'))),
+};
+
+export function createYupValidation(keyValidationDict) {
     let yupValidationObj = {};
-    for (const singleKey of keyList) {
+    for (const [singleKey, singleValue] of Object.entries(keyValidationDict)) {
         const titleCaseKey = convertToTitleCase(singleKey);
-        yupValidationObj[titleCaseKey] = Yup.string().email();
+        if (singleValue in validationTypes) {
+            yupValidationObj[titleCaseKey] = validationTypes[singleValue];
+        }
     }
 
     return yupValidationObj;
 }
 
-export function setupTable(dictList, columnWidth, sortKey) {
+export function deserialize(value, validation_type) {
+    if (validation_type == 'number' || validation_type == 'year') {
+        return parseFloat(value);
+    }
+    if (validation_type == 'bool') {
+        return convertStrToBool(value);
+    }
+    if (validation_type == 'numberList') {
+        return convertStrToNumList(value);
+    }
+    if (validation_type == 'emailList') {
+        return convertStrToStrList(value);
+    }
+
+    return value;
+}
+
+export function setupTable(dictList, columnWidth, sortKey, ignoreList = [], columnSort = {}) {
     let column = [];
     let titleToField = {};
-    if (dictList) {
+
+    if (dictList && dictList.length > 0) {
         for (const singleKey of Object.keys(dictList[0])) {
             const titleCase = convertToTitleCase(singleKey);
             titleToField[titleCase] = singleKey;
@@ -49,16 +146,37 @@ export function setupTable(dictList, columnWidth, sortKey) {
                 title: titleCase,
                 field: singleKey,
             };
-            if (titleCase in columnWidth) {
-                columnObj['width'] = columnWidth[titleCase];
+            if (ignoreList.includes(singleKey)) {
+                columnObj['hidden'] = true;
+            }
+            if (singleKey in columnWidth) {
+                columnObj['width'] = columnWidth[singleKey];
             }
             column.push(columnObj);
         }
     }
 
+    const sortedColumn = column.sort((firstElem, secondElem) => {
+        const firstElemField = firstElem['field'];
+        const secondElemFiled = secondElem['field'];
+        if (firstElemField in columnSort && secondElemFiled in columnSort) {
+            return columnSort[firstElemField] - columnSort[secondElemFiled];
+        } else if (firstElemField in columnSort) {
+            return -1;
+        } else if (secondElemFiled in columnSort) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+
     const sortedTableData = dictList.sort((a, b) => a[sortKey].localeCompare(b[sortKey]));
 
-    return { tableData: sortedTableData, tableColumn: column, tableTitleToField: titleToField };
+    return {
+        tableData: sortedTableData,
+        tableColumn: sortedColumn,
+        tableTitleToField: titleToField,
+    };
 }
 
 export function setupDictTable(dict, keyList, numColumn, fieldBackgroundColor, fieldColor, sort) {
@@ -151,6 +269,7 @@ export function setupChangesTable(dict) {
 
     for (const singleKey of Object.keys(dict)) {
         const currentChangeObj = dict[singleKey];
+        const title = currentChangeObj['title'];
         let initial = currentChangeObj['initial'];
         let currentChange = currentChangeObj['current'];
         if (initial === null) {
@@ -159,7 +278,7 @@ export function setupChangesTable(dict) {
         if (currentChange === null) {
             currentChange = '';
         }
-        const diffChars = diff.diffChars(initial, currentChange);
+        const diffChars = diff.diffChars(String(initial), String(currentChange));
         let initial_html = '';
         let updated_html = '';
         for (let i = 0; i < Object.keys(diffChars).length; i++) {
@@ -179,7 +298,7 @@ export function setupChangesTable(dict) {
         }
 
         data.push({
-            field: singleKey,
+            field: title,
             updated: updated_html,
             current: initial_html,
         });
@@ -193,14 +312,15 @@ export function recordChanges(oldData, newData, currentChanges, titleToField) {
             if (singleKey !== 'tableData') {
                 if (oldData[singleKey] !== newData[singleKey]) {
                     let field_key = singleKey.replace('value', 'field');
-                    let field_value = newData[field_key];
+                    let title_value = newData[field_key];
+                    let field_value = titleToField[title_value];
                     if (field_value in currentChanges) {
                         currentChanges[field_value]['current'] = newData[singleKey];
                     } else {
                         currentChanges[field_value] = {
                             current: newData[singleKey],
                             initial: oldData[singleKey],
-                            field: titleToField[field_value],
+                            title: title_value,
                         };
                     }
                     if (
@@ -238,15 +358,17 @@ function editComponent(props) {
     return (
         <Field name={props.columnDef.field}>
             {({ field, form }) => {
-                const { name, value } = field;
+                const { name } = field;
                 const { errors, setFieldValue } = form;
                 const showError = !!getIn(errors, name);
                 let helperText = null;
                 if (errors[name]) {
-                    let field_key = name.replace('value', 'field');
-                    helperText = errors[name];
-                    let field_value = form.values[field_key];
-                    helperText = helperText.replace(name, field_value);
+                    if (Array.isArray(errors[name])) {
+                        const filteredErrors = errors[name].filter((x) => x);
+                        helperText = filteredErrors.join(', ');
+                    } else {
+                        helperText = String(errors[name]);
+                    }
                 }
                 return (
                     <TextField

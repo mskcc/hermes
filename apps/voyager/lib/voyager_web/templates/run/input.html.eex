@@ -1,0 +1,2 @@
+
+<%= ReactPhoenix.ClientSide.react_component("Components.RunFormPage", %{runSubmitRoute: Routes.run_path(@conn, :submit), runSuccessRoute: Routes.run_path(@conn, :success), runQueryRoute: Routes.run_path(@conn, :list), formKey: @form_key, type_key: @type_key }) %>

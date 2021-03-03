@@ -25,11 +25,11 @@ defmodule Seqosystem.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 1.0", only: [:dev]},
-      {:jason, ">= 1.0.0"},
-      {:git_hooks, "~> 0.5.1", only: [:test, :dev], runtime: false},
+      {:jason, "~> 1.2"},
+      {:git_hooks, "~> 0.5.2", only: [:test, :dev], runtime: false},
       {:ex_doc, "~> 0.23", only: [:test, :dev], runtime: false},
-      {:edeliver, ">= 1.6.0"},
-      {:distillery, "~> 2.0", warn_missing: false}
+      {:edeliver, "~> 1.8"},
+      {:distillery, "~> 2.1", warn_missing: false}
     ]
   end
 end

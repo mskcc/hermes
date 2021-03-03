@@ -6,7 +6,7 @@ defmodule VoyagerWeb.MetadataController do
 
   @metadata_key "metadata"
   @type_key "type"
-  @id_keys [["sampleId","Sample"],["requestId","Request"]]
+  @id_keys [["sampleId","Sample ID"],["sampleName","Sample Name"],["requestId","Request"]]
   @initial_id_type "requestId"
 
   def new(conn, _params) do

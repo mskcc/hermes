@@ -1,2 +1,3 @@
 
-<%= ReactPhoenix.ClientSide.react_component("Components.MetadataPage", %{metadataList: @metadataList, requestKeyList: @requestKeyList, emailKeyList: @emailKeyList, params: @params}) %>
+<%= ReactPhoenix.ClientSide.react_component("Components.MetadataPage", %{metadataList: @metadataList, requestKeyList: @requestKeyList, metadataValidation: @metadata_validation, noMetadataChangesMessage: @noMetadataChangesMessage, noQcReportDataMessage: @noQcReportDataMessage, qcReportField: @qcReportField, sampleVerificationKeys: @sampleVerificationKeys, requestField: @requestField, sampleLabelKeys: @sampleLabelKeys,
+	selectedSample: @selectedSample, defaultSampleIdType: @defaultSampleIdType, params: @params, metadataInputRoute: Routes.metadata_path(@socket, :new)}) %>
