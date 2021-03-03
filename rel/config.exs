@@ -52,6 +52,5 @@ release :voyager do
   set applications: [
     :runtime_tools,
     voyager: :permanent,
-    dashboard: :permanent,
   ]
 end
