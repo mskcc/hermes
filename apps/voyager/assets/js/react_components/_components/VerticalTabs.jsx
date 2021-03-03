@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function VerticalTabs(props) {
     const classes = useStyles();
-    const { handleChange, tabs, stateInfo } = props;
+    const { handleChange, tabs, stateInfo, currentTab } = props;
     const [value, setValue] = useState(0);
 
     const internalHandleChange = (event, newValue) => {
@@ -67,7 +67,7 @@ export default function VerticalTabs(props) {
             <Tabs
                 orientation="vertical"
                 variant="scrollable"
-                value={stateInfo['stateSampleIndex']}
+                value={currentTab}
                 onChange={internalHandleChange}
                 className={classes.verticalTabs}
             >

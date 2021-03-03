@@ -9,12 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import axios from 'axios';
 import { findMatchParts } from '@/_helpers';
 const useStyles = makeStyles((theme) => ({
@@ -39,33 +34,13 @@ const useStyles = makeStyles((theme) => ({
         width: '1.5rem !important',
         height: '1.5rem !important',
     },
+    loadingSpinner: {
+        position: 'absolute',
+        right: '40px',
+    },
 }));
 
-const filterOptions = createFilterOptions({
-    limit: 10,
-});
-
-function changeRecommendations(
-    id_type,
-    metadataQueryRoute,
-    type_key,
-    updateRecommendation,
-    updateLoading
-) {
-    updateLoading(true);
-    axios
-        .get(metadataQueryRoute, {
-            params: {
-                [type_key]: id_type,
-            },
-        })
-        .then((response) => {
-            updateRecommendation(response.data);
-        })
-        .finally(() => {
-            updateLoading(false);
-        });
-}
+const FILTER_GROUP_LIMIT = 3;
 
 export default function MetadataFormPage(props) {
     const classes = useStyles();
@@ -78,21 +53,62 @@ export default function MetadataFormPage(props) {
         type_key,
     } = props;
     const [recommendation, updateRecommendation] = useState([]);
-    const [current_id_type, updateIdType] = useState(initial_id_type);
+    const [idType, updateIdType] = useState(initial_id_type);
     const [loading, updateLoading] = useState(false);
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
 
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
 
+    const addRecommendations = (id_types, metadataQueryRoute, type_key) => {
+        let id_field_params = [];
+        let id_title_params = [];
+        id_keys.sort((a, b) => a[0].localeCompare(b[0]));
+        for (const singleType of id_keys) {
+            id_field_params.push(singleType[0]);
+            id_title_params.push(singleType[1]);
+        }
+
+        axios
+            .get(metadataQueryRoute, {
+                params: {
+                    [type_key]: id_field_params,
+                },
+            })
+            .then((response) => {
+                let ids_added_dict = {};
+                let recommendationList = [];
+                for (const singleResponseObj of response.data) {
+                    for (const [index, singleRecommendation] of singleResponseObj.entries()) {
+                        if (singleRecommendation) {
+                            const recommendationName = id_field_params[index];
+                            if (!(recommendationName in ids_added_dict)) {
+                                ids_added_dict[recommendationName] = {};
+                            }
+                            if (!(singleRecommendation in ids_added_dict[recommendationName])) {
+                                let recommendationObj = {
+                                    title: singleRecommendation,
+                                    type: id_title_params[index],
+                                    field: id_field_params[index],
+                                };
+                                ids_added_dict[recommendationName][singleRecommendation] = null;
+                                recommendationList.push(recommendationObj);
+                            }
+                        }
+                    }
+                }
+                recommendationList.sort((a, b) => a['type'].localeCompare(b['type']));
+                updateRecommendation(recommendationList);
+            })
+            .finally(() => {
+                updateLoading(false);
+            });
+    };
+
     useEffect(() => {
-        changeRecommendations(
-            current_id_type,
-            metadataQueryRoute,
-            type_key,
-            updateRecommendation,
-            updateLoading
-        );
-    }, [current_id_type]);
+        updateLoading(true);
+        addRecommendations(id_keys, metadataQueryRoute, type_key);
+    }, []);
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -106,19 +122,17 @@ export default function MetadataFormPage(props) {
                 <Formik
                     initialValues={{
                         id: '',
-                        type: initial_id_type,
                     }}
                     enableReinitialize={false}
                     validationSchema={Yup.object().shape({
                         id: Yup.string().required('ID is required'),
-                        type: Yup.string().required('ID type is required'),
                     })}
-                    onSubmit={({ id, type }, { setErrors, setSubmitting }) => {
+                    onSubmit={({ id }, { setErrors, setSubmitting }) => {
                         axios
                             .post(metadataFormRoute, {
                                 [formKey]: {
                                     id: id,
-                                    type: type,
+                                    type: idType,
                                 },
                             })
                             .then((response) => {
@@ -154,14 +168,40 @@ export default function MetadataFormPage(props) {
                             <Autocomplete
                                 disableListWrap
                                 options={recommendation}
-                                filterOptions={filterOptions}
+                                filterOptions={(options, { inputValue }) => {
+                                    let foundOptions = {};
+                                    let optionList = [];
+                                    for (const singleOption of options) {
+                                        const { field, title } = singleOption;
+                                        if (
+                                            title
+                                                .toLowerCase()
+                                                .includes(inputValue.toLowerCase()) ||
+                                            inputValue === ''
+                                        ) {
+                                            if (!(field in foundOptions)) {
+                                                foundOptions[field] = 0;
+                                            }
+                                            if (foundOptions[field] < FILTER_GROUP_LIMIT) {
+                                                optionList.push(singleOption);
+                                                foundOptions[field] += 1;
+                                            }
+                                        }
+                                    }
+                                    return optionList;
+                                    //console.log(options);
+                                    //return options;
+                                }}
+                                groupBy={(option) => option['type']}
+                                getOptionLabel={(option) => option['title']}
                                 loading={loading}
-                                onInputChange={(event, newValue) => {
-                                    values.id = newValue;
-                                    handleChange(newValue);
+                                onChange={(event, newValue) => {
+                                    values.id = newValue['title'];
+                                    handleChange(newValue['title']);
+                                    updateIdType(newValue['field']);
                                 }}
                                 renderOption={(option, { inputValue }) => {
-                                    return findMatchParts(option, inputValue);
+                                    return findMatchParts(option['title'], inputValue);
                                 }}
                                 renderInput={(params) => (
                                     <TextField
@@ -183,6 +223,7 @@ export default function MetadataFormPage(props) {
                                                         <CircularProgress
                                                             color="inherit"
                                                             size={20}
+                                                            className={classes.loadingSpinner}
                                                         />
                                                     ) : null}
                                                     {params.InputProps.endAdornment}
@@ -192,34 +233,6 @@ export default function MetadataFormPage(props) {
                                     />
                                 )}
                             />
-
-                            <FormControl variant="outlined" className={classes.form}>
-                                <InputLabel>ID Type</InputLabel>
-                                <Select
-                                    value={values.type}
-                                    id="type"
-                                    name="type"
-                                    onChange={function updateRecommendation(event) {
-                                        const new_id_type = event.target.value;
-                                        updateIdType(new_id_type);
-                                        handleChange(event);
-                                    }}
-                                    error={errors.type && touched.type}
-                                    label="ID Type"
-                                >
-                                    {id_keys.map((value, index) => {
-                                        const [item_value, item_label] = value;
-                                        return (
-                                            <MenuItem key={index} value={item_value}>
-                                                {item_label}
-                                            </MenuItem>
-                                        );
-                                    })}
-                                </Select>
-                                <FormHelperText error={errors.type && touched.type}>
-                                    {errors.type && touched.type ? errors.type : null}
-                                </FormHelperText>
-                            </FormControl>
                             <Button
                                 type="submit"
                                 fullWidth

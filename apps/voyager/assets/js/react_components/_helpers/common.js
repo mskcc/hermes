@@ -82,6 +82,16 @@ export function convertStrToBool(sampleStr) {
     return sampleStr;
 }
 
+export function handlePlural(currentNum, noneResponse, singularResponse, pluralResponse) {
+    if (currentNum == 0) {
+        return noneResponse;
+    } else if (currentNum == 1) {
+        return singularResponse;
+    } else {
+        return pluralResponse;
+    }
+}
+
 export function findMatchParts(option, inputValue) {
     let parts = [];
     if (inputValue && inputValue.length !== 0 && inputValue.trim().length !== 0) {
