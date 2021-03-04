@@ -230,7 +230,7 @@ const RunJobs = function (props) {
 
 export default function RunPage(props) {
     const classes = useStyles();
-    const runListDaysAgo = 15;
+    const runListDaysAgo = 7;
     const { runList, runJobsRoute, handleEvent, pushEvent } = props;
     const [runs, updateRuns] = useState(runList);
 
