@@ -3,7 +3,12 @@ import * as palette from 'google-palette';
 export function getColors(dataSize) {
     if (dataSize) {
         let chartJsColors = [];
-        const colorList = palette('mpn65', dataSize);
+        let colorList = [];
+        if (dataSize < 65) {
+            colorList = palette('mpn65', dataSize);
+        } else {
+            colorList = palette('tol-rainbow', dataSize);
+        }
         for (const singleColor of colorList) {
             chartJsColors.push('#' + singleColor);
         }
