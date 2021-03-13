@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Autocomplete from '@material-ui/core/Autocomplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import axios from 'axios';
 import { findMatchParts } from '@/_helpers';
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +62,7 @@ export default function MetadataFormPage(props) {
     const addRecommendations = (id_types, metadataQueryRoute, type_key) => {
         let id_field_params = [];
         let id_title_params = [];
-        id_keys.sort((a, b) => a[0].localeCompare(b[0]));
+        id_keys.sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()));
         for (const singleType of id_keys) {
             id_field_params.push(singleType[0]);
             id_title_params.push(singleType[1]);
@@ -189,8 +189,6 @@ export default function MetadataFormPage(props) {
                                         }
                                     }
                                     return optionList;
-                                    //console.log(options);
-                                    //return options;
                                 }}
                                 groupBy={(option) => option['type']}
                                 getOptionLabel={(option) => option['title']}
@@ -206,6 +204,7 @@ export default function MetadataFormPage(props) {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
+                                        variant="outlined"
                                         margin="normal"
                                         fullWidth
                                         label="Id"
@@ -228,7 +227,8 @@ export default function MetadataFormPage(props) {
                                                     {params.InputProps.endAdornment}
                                                 </React.Fragment>
                                             ),
-                                        }} />
+                                        }}
+                                    />
                                 )}
                             />
                             <Button
