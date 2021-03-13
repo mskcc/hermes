@@ -108,6 +108,7 @@ export default function LoginPage(props) {
                             <TextField
                                 margin="normal"
                                 fullWidth
+                                variant="outlined"
                                 id="username"
                                 label="Username"
                                 name="username"
@@ -118,10 +119,12 @@ export default function LoginPage(props) {
                                 helperText={
                                     errors.username && touched.username ? errors.username : null
                                 }
-                                autoFocus />
+                                autoFocus
+                            />
                             <TextField
                                 margin="normal"
                                 fullWidth
+                                variant="outlined"
                                 name="password"
                                 label="Password"
                                 type="password"
@@ -132,7 +135,8 @@ export default function LoginPage(props) {
                                 error={errors.password && touched.password}
                                 helperText={
                                     errors.password && touched.password ? errors.password : null
-                                } />
+                                }
+                            />
                             <Button
                                 type="submit"
                                 fullWidth
