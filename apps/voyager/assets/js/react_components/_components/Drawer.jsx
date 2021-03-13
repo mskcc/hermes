@@ -136,11 +136,7 @@ export default function PermanentDrawerLeft(props) {
                         Voyager
                     </Typography>
                 </div>
-                <Box
-                    className={classes.userPanel}
-                    sx={{
-                        boxShadow: 4
-                    }}>
+                <Box className={classes.userPanel} boxShadow={4}>
                     <Avatar user={user}></Avatar>
                 </Box>
                 <div className={classes.linkPanel}>
