@@ -132,7 +132,7 @@ export function handlePlural(currentNum, noneResponse, singularResponse, pluralR
 export function findMatchParts(option, inputValue) {
     let parts = [];
     if (inputValue && inputValue.length !== 0 && inputValue.trim().length !== 0) {
-        const match = option.search(inputValue);
+        const match = option.toLowerCase().indexOf(inputValue.toLowerCase());
         if (match !== -1) {
             const start = 0;
             const end = option.length;
