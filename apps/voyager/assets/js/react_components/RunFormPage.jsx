@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Autocomplete, { createFilterOptions } from "@material-ui/core/Autocomplete";
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import axios from 'axios';
 import { findMatchParts } from '@/_helpers';
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +62,7 @@ function addRecommendations(
         });
 }
 
-export default function MetadataFormPage(props) {
+export default function RunFormPage(props) {
     const classes = useStyles();
     const { runSubmitRoute, runSuccessRoute, formKey, runQueryRoute, type_key } = props;
     const [requestRecommendation, updateRequestRecommendation] = useState([]);
@@ -177,6 +177,7 @@ export default function MetadataFormPage(props) {
                                     <TextField
                                         {...params}
                                         margin="normal"
+                                        variant="outlined"
                                         fullWidth
                                         label="Request"
                                         name="request"
@@ -201,7 +202,8 @@ export default function MetadataFormPage(props) {
                                                     {params.InputProps.endAdornment}
                                                 </React.Fragment>
                                             ),
-                                        }} />
+                                        }}
+                                    />
                                 )}
                             />
 
@@ -221,6 +223,7 @@ export default function MetadataFormPage(props) {
                                     <TextField
                                         {...params}
                                         margin="normal"
+                                        variant="outlined"
                                         fullWidth
                                         label="Pipeline"
                                         name="pipeline"
@@ -245,7 +248,8 @@ export default function MetadataFormPage(props) {
                                                     {params.InputProps.endAdornment}
                                                 </React.Fragment>
                                             ),
-                                        }} />
+                                        }}
+                                    />
                                 )}
                             />
                             <Button
