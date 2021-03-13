@@ -1,4 +1,6 @@
 import React from 'react';
+const { DateTime } = require('luxon');
+
 let conversionFixes = {
     'Cf D N A2d Barcode': 'Cf DNA 2d Barcode',
     'Cmo Sample Name': 'CMO Sample Name',
@@ -24,6 +26,10 @@ export function convertToTitleCase(sampleStr) {
         titleCase = conversionFixes[titleCase];
     }
     return titleCase;
+}
+
+export function paginateList(samplelist, pageSize, pageNumber) {
+    return samplelist.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
 }
 
 export function convertStrToList(sampleStr, delimiter, conversionFunction) {
@@ -80,6 +86,37 @@ export function convertStrToBool(sampleStr) {
         return false;
     }
     return sampleStr;
+}
+
+export function randomNumber(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+export function sortDateList(dateKey, dateList) {
+    const sortDateObjs = (firstObj, secondObj) => {
+        const { sortDate: firstObjDate } = firstObj;
+        const { sortDate: secondObjDate } = secondObj;
+        if (firstObjDate < secondObjDate) {
+            return -1;
+        } else if (secondObjDate < firstObjDate) {
+            return 1;
+        } else {
+            return 0;
+        }
+    };
+
+    const validDates = [];
+    for (let singleObj of dateList) {
+        const { [dateKey]: singleObjDate } = singleObj;
+        const dateTimeObj = DateTime.fromISO(singleObjDate);
+        if (dateTimeObj.isValid) {
+            singleObj['sortDate'] = dateTimeObj;
+            validDates.push(singleObj);
+        }
+    }
+
+    validDates.sort(sortDateObjs);
+    return validDates;
 }
 
 export function handlePlural(currentNum, noneResponse, singularResponse, pluralResponse) {
