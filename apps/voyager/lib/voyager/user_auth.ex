@@ -35,6 +35,7 @@ defmodule Voyager.UserAuth do
     |> redirect(to: user_return_to || signed_in_path(conn))
   end
 
+
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
     put_resp_cookie(conn, @remember_me_cookie, token, @remember_me_options)
   end
@@ -87,7 +88,7 @@ defmodule Voyager.UserAuth do
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: "/")
+    |> redirect(to: sign_in_page(conn))
   end
 
   @doc """
@@ -161,7 +162,7 @@ defmodule Voyager.UserAuth do
       conn
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
-      |> redirect(to: Routes.session_path(conn, :new))
+      |> redirect(to: sign_in_page(conn))
       |> halt()
     end
   end
@@ -169,10 +170,14 @@ defmodule Voyager.UserAuth do
   defp maybe_store_return_to(%{method: "GET"} = conn) do
     %{request_path: request_path, query_string: query_string} = conn
     return_to = if query_string == "", do: request_path, else: request_path <> "?" <> query_string
-    put_session(conn, :user_return_to, return_to)
+    user_return_to = if return_to ==  Routes.session_path(conn, :delete), do: signed_in_path(conn), else: return_to
+
+    put_session(conn, :user_return_to, user_return_to)
   end
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: "/"
+  defp sign_in_page(conn), do: Routes.session_path(conn, :new)
+
+  defp signed_in_path(conn), do: Routes.metadata_path(conn, :new)
 end
