@@ -3,8 +3,7 @@ defmodule VoyagerWeb.Endpoint do
    plug(:canonical_host)
 
    defp canonical_host(conn, _opts) do
-    :voyager
-    |> Application.get_env(:canonical_host)
+    "voyager.mskcc.org"
     |> case do
       host when is_binary(host) ->
         opts = PlugCanonicalHost.init(canonical_host: host)
