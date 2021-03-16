@@ -36,7 +36,12 @@ config :voyager, VoyagerWeb.Endpoint,
   live_view: [signing_salt: "vb5uxCyB"],
   url: [host: "localhost"],
   secret_key_base: "/HiFGvgJ4lR86prPoc0NzTSAmEP1lA8QJWc8E8tp0ZDsbzlYBpSMF1zAz0dzwUS5",
-  http: [port: 4000],
+  https: [
+    port: 4000,
+    cipher_suite: :strong,
+    certfile: "priv/cert/selfsigned.pem",
+    keyfile: "priv/cert/selfsigned_key.pem"  ],
+
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
