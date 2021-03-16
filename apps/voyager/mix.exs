@@ -63,6 +63,7 @@ defmodule Voyager.MixProject do
       {:gettext, "~> 0.18.2"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.4"},
+      {:plug_canonical_host, "~> 2.0"},
       {:domain, in_umbrella: true},
       {:beagle_client, in_umbrella: true}
 
