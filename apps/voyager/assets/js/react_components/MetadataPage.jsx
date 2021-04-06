@@ -29,11 +29,12 @@ import VerticalTabs from '@/_components/VerticalTabs';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import axios from 'axios';
-import { Skeleton } from '@material-ui/lab';
+import Skeleton from '@material-ui/lab/Skeleton';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 const FIELD_COLOR = '#FFF';
 const HEADER_COLOR = '#FFF';
@@ -96,13 +97,12 @@ const useStyles = makeStyles((theme) => ({
     changeRequestButton: {
         textTransform: 'none',
     },
-    sampleIdNotSelected: {
-        backgroundColor: 'white',
-    },
     sampleIdSelected: {
-        backgroundColor: 'cornflowerblue',
-        '&:hover': {
+        '&.Mui-selected': {
             backgroundColor: 'cornflowerblue',
+            '&:hover': {
+                backgroundColor: 'cornflowerblue',
+            },
         },
     },
 }));
@@ -934,39 +934,42 @@ export default function MetadataPage(props) {
                             <Typography> {sampleHeaderLabel} </Typography>
                             <Breadcrumbs separator=" " className={classes.heading}>
                                 <Typography color="textPrimary"> {sampleHeader} </Typography>
-                                <ButtonGroup>
+                                <ToggleButtonGroup
+                                    exclusive
+                                    value={sampleIdMetadataKey}
+                                    onChange={(event, newValue) => {
+                                        if (newValue) {
+                                            updateSampleIdMetadataKey(newValue);
+                                            const {
+                                                newSampleList,
+                                                newSampleFiles,
+                                            } = setUpSampleList(
+                                                sampleList[sampleIndex]['id'],
+                                                metadataChanges,
+                                                newValue
+                                            );
+                                            renderMetaDataChanges(
+                                                metadataChanges,
+                                                newSampleList,
+                                                newSampleFiles
+                                            );
+                                        }
+
+                                        event.stopPropagation();
+                                    }}
+                                >
                                     {sampleLabelKeys.map((sampleKey, index) => (
-                                        <Button
+                                        <ToggleButton
                                             key={index}
                                             variant="outlined"
+                                            value={sampleKey[0]}
                                             size="small"
-                                            className={
-                                                sampleKey[0] === sampleIdMetadataKey
-                                                    ? classes.sampleIdSelected
-                                                    : classes.sampleIdNotSelected
-                                            }
-                                            onClick={(event) => {
-                                                updateSampleIdMetadataKey(sampleKey[0]);
-                                                const {
-                                                    newSampleList,
-                                                    newSampleFiles,
-                                                } = setUpSampleList(
-                                                    sampleList[sampleIndex]['id'],
-                                                    metadataChanges,
-                                                    sampleKey[0]
-                                                );
-                                                renderMetaDataChanges(
-                                                    metadataChanges,
-                                                    newSampleList,
-                                                    newSampleFiles
-                                                );
-                                                event.stopPropagation();
-                                            }}
+                                            className={classes.sampleIdSelected}
                                         >
                                             {sampleKey[1]}
-                                        </Button>
+                                        </ToggleButton>
                                     ))}
-                                </ButtonGroup>
+                                </ToggleButtonGroup>
                             </Breadcrumbs>
                         </Breadcrumbs>
                     </AccordionSummary>

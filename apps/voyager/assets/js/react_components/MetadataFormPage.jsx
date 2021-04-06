@@ -62,7 +62,7 @@ export default function MetadataFormPage(props) {
     const addRecommendations = (id_types, metadataQueryRoute, type_key) => {
         let id_field_params = [];
         let id_title_params = [];
-        id_keys.sort((a, b) => a[0].localeCompare(b[0]));
+        id_keys.sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()));
         for (const singleType of id_keys) {
             id_field_params.push(singleType[0]);
             id_title_params.push(singleType[1]);
@@ -189,8 +189,6 @@ export default function MetadataFormPage(props) {
                                         }
                                     }
                                     return optionList;
-                                    //console.log(options);
-                                    //return options;
                                 }}
                                 groupBy={(option) => option['type']}
                                 getOptionLabel={(option) => option['title']}

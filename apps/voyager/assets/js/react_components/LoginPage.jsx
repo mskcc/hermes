@@ -106,9 +106,9 @@ export default function LoginPage(props) {
                     {({ values, errors, touched, handleChange, handleSubmit, isSubmitting }) => (
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <TextField
-                                variant="outlined"
                                 margin="normal"
                                 fullWidth
+                                variant="outlined"
                                 id="username"
                                 label="Username"
                                 name="username"
@@ -122,9 +122,9 @@ export default function LoginPage(props) {
                                 autoFocus
                             />
                             <TextField
-                                variant="outlined"
                                 margin="normal"
                                 fullWidth
+                                variant="outlined"
                                 name="password"
                                 label="Password"
                                 type="password"
