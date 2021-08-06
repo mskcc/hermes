@@ -5,12 +5,7 @@ defmodule SubmitRun do
   use TypedStruct
 
   typedstruct do
-
-  	field :pipeline, String.t()
-  	field :request_ids, String.t()
-
+    field(:pipeline, String.t())
+    field(:request_ids, String.t())
   end
-
-
-
 end

@@ -8,7 +8,6 @@ defmodule BeagleClient do
   import BatchPatchFiles
   import RunsQuery
 
-
   @moduledoc """
   Module to interact with Beagle
   ### API response
@@ -43,7 +42,7 @@ defmodule BeagleClient do
 
   """
   def list_all_file_groups(token) do
-    list_all(BeagleEndpoint.const_file_groups, [], token)
+    list_all(BeagleEndpoint.const_file_groups(), [], token)
   end
 
   @doc """
@@ -62,7 +61,7 @@ defmodule BeagleClient do
   """
   def list_all_query_files(%FilesQuery{} = file_query_struct, token) do
     query_key_list = process_query_struct(file_query_struct)
-    list_all(BeagleEndpoint.const_file_query, query_key_list, token)
+    list_all(BeagleEndpoint.const_file_query(), query_key_list, token)
   end
 
   @doc """
@@ -80,9 +79,8 @@ defmodule BeagleClient do
   """
   def list_all_query_runs(%RunsQuery{} = runs_query_struct, token) do
     query_key_list = process_query_struct(runs_query_struct)
-    list_all(BeagleEndpoint.const_run_query, query_key_list, token)
+    list_all(BeagleEndpoint.const_run_query(), query_key_list, token)
   end
-
 
   @doc """
   List all beagle pipelines from a pipeline query
@@ -99,7 +97,7 @@ defmodule BeagleClient do
   """
   def list_all_pipelines(%Pipelines{} = pipeline_query_struct, token) do
     query_key_list = process_query_struct(pipeline_query_struct)
-    list_all(BeagleEndpoint.const_pipeline, query_key_list, token)
+    list_all(BeagleEndpoint.const_pipeline(), query_key_list, token)
   end
 
   @doc """
@@ -117,10 +115,10 @@ defmodule BeagleClient do
   """
   def batch_patch_files(%BatchPatchFiles{} = batch_patch_struct, token) do
     batch_patch_payload = Map.from_struct(batch_patch_struct)
-    client(token)
-      |> Tesla.post(BeagleEndpoint.const_batch_patch_files, batch_patch_payload)
-      |> handle_response
 
+    client(token)
+    |> Tesla.post(BeagleEndpoint.const_batch_patch_files(), batch_patch_payload)
+    |> handle_response
   end
 
   @doc """
@@ -138,9 +136,10 @@ defmodule BeagleClient do
   """
   def file_groups(%FileGroupsList{} = file_group_list, token) do
     query_key_list = process_query_struct(file_group_list)
+
     client(token)
-      |> Tesla.get(BeagleEndpoint.const_file_groups, query: query_key_list)
-      |> handle_response
+    |> Tesla.get(BeagleEndpoint.const_file_groups(), query: query_key_list)
+    |> handle_response
   end
 
   @doc """
@@ -158,9 +157,10 @@ defmodule BeagleClient do
   """
   def pipelines(%Pipelines{} = pipeline_query_struct, token) do
     query_key_list = process_query_struct(pipeline_query_struct)
+
     client(token)
-      |> Tesla.get(BeagleEndpoint.const_file_query, query: query_key_list)
-      |> handle_response
+    |> Tesla.get(BeagleEndpoint.const_file_query(), query: query_key_list)
+    |> handle_response
   end
 
   @doc """
@@ -178,9 +178,10 @@ defmodule BeagleClient do
   """
   def submit_run(%SubmitRun{} = run_struct, token) do
     run_payload = Map.from_struct(run_struct)
+
     client(token)
-      |> Tesla.post(BeagleEndpoint.const_submit_run, run_payload)
-      |> handle_response
+    |> Tesla.post(BeagleEndpoint.const_submit_run(), run_payload)
+    |> handle_response
   end
 
   @doc """
@@ -198,9 +199,10 @@ defmodule BeagleClient do
   """
   def query_files(%FilesQuery{} = file_query_struct, token) do
     query_key_list = process_query_struct(file_query_struct)
+
     client(token)
-      |> Tesla.get(BeagleEndpoint.const_file_query, query: query_key_list)
-      |> handle_response
+    |> Tesla.get(BeagleEndpoint.const_file_query(), query: query_key_list)
+    |> handle_response
   end
 
   @doc """
@@ -217,12 +219,13 @@ defmodule BeagleClient do
   """
   def register_user(%Register{} = register_struct) do
     register_payload = Map.from_struct(register_struct)
+
     client()
-      |> Tesla.post(BeagleEndpoint.const_register, register_payload)
-      |> handle_response
+    |> Tesla.post(BeagleEndpoint.const_register(), register_payload)
+    |> handle_response
   end
 
- @doc """
+  @doc """
   Query Runs
 
   ## Parameters
@@ -233,53 +236,62 @@ defmodule BeagleClient do
   """
   def query_runs(%RunsQuery{} = run_query_struct, token) do
     query_key_list = process_query_struct(run_query_struct)
+
     client(token)
-      |> Tesla.get(BeagleEndpoint.const_run_query, query: query_key_list)
-      |> handle_response
+    |> Tesla.get(BeagleEndpoint.const_run_query(), query: query_key_list)
+    |> handle_response
   end
 
   defp list_all(endpoint, query, token) do
-    response_obj = client(token)
-      |> Tesla.get(endpoint, query: query )
+    response_obj =
+      client(token)
+      |> Tesla.get(endpoint, query: query)
       |> handle_response
+
     case response_obj do
       {:ok, :ok, %{"results" => results, "next" => next}} when not is_nil(next) ->
-          {_, next_query} = Keyword.get_and_update(query, :page, &({&1, &1 +1}))
-          case list_all(endpoint, next_query, token) do
-            {:ok, :ok, next_results} ->
-              results =
-                results
-                |> Enum.reject(&is_nil/1)
-              combined_results = results ++ next_results
-              {:ok, :ok, combined_results}
-            {:error, error_type, error_message} ->
-              {:error, error_type, error_message}
-          end
-      {:ok, :ok, %{"results" => results, "next" => next}} when is_nil(next) ->
-          results =
-            results
-            |> Enum.reject(&is_nil/1)
-          {:ok, :ok, results}
-      {:error, error_type, error_message} -> {:error, error_type, error_message}
-    end
+        {_, next_query} = Keyword.get_and_update(query, :page, &{&1, &1 + 1})
 
+        case list_all(endpoint, next_query, token) do
+          {:ok, :ok, next_results} ->
+            results =
+              results
+              |> Enum.reject(&is_nil/1)
+
+            combined_results = results ++ next_results
+            {:ok, :ok, combined_results}
+
+          {:error, error_type, error_message} ->
+            {:error, error_type, error_message}
+        end
+
+      {:ok, :ok, %{"results" => results, "next" => next}} when is_nil(next) ->
+        results =
+          results
+          |> Enum.reject(&is_nil/1)
+
+        {:ok, :ok, results}
+
+      {:error, error_type, error_message} ->
+        {:error, error_type, error_message}
+    end
   end
 
   defp process_query_struct(query_struct) do
     query_struct
-        |> remove_nil_values
-        |> convert_to_klist
+    |> remove_nil_values
+    |> convert_to_klist
   end
 
   defp remove_nil_values(query_struct) do
     query_struct
-      |> Map.from_struct
-      |> Enum.reject(fn {_, v} -> is_nil(v) end)
-      |> Map.new
+    |> Map.from_struct()
+    |> Enum.reject(fn {_, v} -> is_nil(v) end)
+    |> Map.new()
   end
 
   defp convert_to_klist(map) do
-    Enum.map(map, fn({key, value}) -> {key, value} end)
+    Enum.map(map, fn {key, value} -> {key, value} end)
   end
 
   @doc """
@@ -297,9 +309,10 @@ defmodule BeagleClient do
   """
   def fetch_pipelines(%PipelinesList{} = pipelines_query_struct, token) do
     query_key_list = process_query_struct(pipelines_query_struct)
+
     client(token)
-      |> Tesla.get(BeagleEndpoint.const_fetch_pipelines, query: query_key_list)
-      |> handle_response
+    |> Tesla.get(BeagleEndpoint.const_fetch_pipelines(), query: query_key_list)
+    |> handle_response
   end
 
   @doc """
@@ -317,11 +330,13 @@ defmodule BeagleClient do
   """
   def fetch_auth_token(username, password), do: fetch_auth_token(client(), username, password)
 
-
   defp fetch_auth_token(client, username, password) do
-      client
-      |> Tesla.post(BeagleEndpoint.const_fetch_auth_token, Jason.encode!(%{username: username, password: password}))
-      |> handle_response
+    client
+    |> Tesla.post(
+      BeagleEndpoint.const_fetch_auth_token(),
+      Jason.encode!(%{username: username, password: password})
+    )
+    |> handle_response
   end
 
   @doc """
@@ -338,11 +353,10 @@ defmodule BeagleClient do
   """
   def validate_auth_token(token), do: validate_auth_token(client(), token)
 
-
   defp validate_auth_token(client, token) do
-      client
-      |> Tesla.post(BeagleEndpoint.const_validate_auth_token, Jason.encode!(%{token: token}))
-      |> handle_response
+    client
+    |> Tesla.post(BeagleEndpoint.const_validate_auth_token(), Jason.encode!(%{token: token}))
+    |> handle_response
   end
 
   @doc """
@@ -360,18 +374,16 @@ defmodule BeagleClient do
   def refresh_auth_token(token), do: refresh_auth_token(client(), token)
 
   defp refresh_auth_token(client, token) do
-      client
-      |> Tesla.post(BeagleEndpoint.const_refresh_auth_token, Jason.encode!(%{refresh: token}))
-      |> handle_response
+    client
+    |> Tesla.post(BeagleEndpoint.const_refresh_auth_token(), Jason.encode!(%{refresh: token}))
+    |> handle_response
   end
-
 
   defp client(token) when is_binary(token) do
     middleware = [
       {Tesla.Middleware.BaseUrl, Application.fetch_env!(:beagle_client, :url)},
       Tesla.Middleware.JSON,
-      {Tesla.Middleware.Headers,
-       [{"Authorization", "Bearer " <> token}]}
+      {Tesla.Middleware.Headers, [{"Authorization", "Bearer " <> token}]}
     ]
 
     Tesla.client(middleware)
@@ -399,40 +411,41 @@ defmodule BeagleClient do
         {:ok, :ok, response.body}
 
       %{status: n} when n in [404] ->
-        if String.contains?(response.body,"Phoenix.Router.NoRouteError") do
-          {:error, :server_error, UserMessages.const_server_down }
+        if String.contains?(response.body, "Phoenix.Router.NoRouteError") do
+          {:error, :server_error, UserMessages.const_server_down()}
         else
           {:error, :user_error, "Resource not found"}
         end
 
       %{status: n, body: body} when is_map_key(body, "detail") ->
         message = Map.get(body, "detail")
+
         case n do
           status_code when status_code in 400..499 ->
-            {:error, :user_error, message }
-          status_code when status_code in 500..599 ->
-            {:error, :server_error, message }
-          _ ->
-            {:error, :unexpected_error, message }
-        end
+            {:error, :user_error, message}
 
+          status_code when status_code in 500..599 ->
+            {:error, :server_error, message}
+
+          _ ->
+            {:error, :unexpected_error, message}
+        end
 
       %{status: n} when n in 400..499 ->
         {:error, :user_error, response.body}
 
-
-
       {:error, error} ->
         case error do
-          :econnrefused -> {:error, :server_error, UserMessages.const_server_down }
+          :econnrefused ->
+            {:error, :server_error, UserMessages.const_server_down()}
+
           _ ->
-            IO.inspect error
+            IO.inspect(error)
             {:error, :unexpected_error, error}
         end
 
-
       _ ->
-        IO.inspect {:error, :unexpected_error, {response.status, response.body}}
+        IO.inspect({:error, :unexpected_error, {response.status, response.body}})
         {:error, :unexpected_error, {response.status, response.body}}
     end
   end
