@@ -15,9 +15,14 @@ defmodule JiraClient do
   )
 
   @doc false
-  def search_tickets(project_id, startAt \\ 0, maxResult \\ 50) do
+  def search_tickets(board, project_id \\ nil, startAt \\ 0, maxResult \\ 50) do
+    jql_query = if project_id == nil do
+      "project=#{board}"
+    else
+      "project=#{board} AND summary~\"#{project_id}\""
+    end
     params = [
-      jql: "project=VADEV AND summary~\"#{project_id}\"",
+      jql: jql_query,
       maxResult: maxResult,
       startAt: startAt
     ]
@@ -38,7 +43,8 @@ defmodule JiraClient do
                 "key" => &1["key"],
                 "status" => &1["fields"]["status"]["name"],
                 "pipeline" => &1["fields"]["customfield_10901"],
-                "updated" => &1["fields"]["updated"]
+                "updated" => &1["fields"]["updated"],
+                "summary" => &1["fields"]["summary"]
               }
             )
           }
