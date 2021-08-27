@@ -52,8 +52,4 @@ defmodule JiraClient do
       end
   end
 
-  @spec process_response({:error, Tesla.Env.t()}) :: {:error, String.t()}
-  defp process_response({:error, message}) do
-    {:error, message}
-  end
 end
