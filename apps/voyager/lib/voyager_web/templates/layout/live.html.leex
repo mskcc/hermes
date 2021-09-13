@@ -7,7 +7,9 @@
 		%{ link: Routes.metadata_path(@socket, :new), icon: "local_offer", key: "metadata", text: "Metadata" },
 		%{ link: Routes.run_path(@socket, :index), icon: "clear_all", key: "runs", text: "Runs" },
 		%{ link: Routes.run_path(@socket, :new), icon: "work", key: "submit_run", text: "Submit Run" },
-				%{ link: Routes.dashboard_path(@socket, :index), icon: "work", key: "dashboard", text: "Dashboard" },
+		%{ link: Routes.dashboard_path(@socket, :index), icon: "work", key: "dashboard", text: "Dashboard" },
+		%{ link: Routes.project_status_path(@socket, :index), icon: "work", key: "project_status", text: "Project Status" },
+		%{ link: Routes.dashboard_path(@socket, :index), icon: "work", key: "dashboard", text: "Dashboard" },
         %{ link: Routes.session_path(@socket, :delete), icon: "logout", key: "logout", text: "Logout" }
 		],
 		user: @user
