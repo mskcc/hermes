@@ -444,8 +444,6 @@ defmodule BeagleClient do
   end
 
   defp handle_response(request) do
-    IO.inspect(request)
-
     response =
       case request do
         {:ok, response} -> response
