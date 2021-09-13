@@ -104,7 +104,7 @@ export default function DashboardPage(props) {
                                     </Avatar>
                                 }
                                 title="Samples Delivered"
-                                subheader="Breakdown of the samples CMO Informatics has delivered"
+                                subheader="Samples CMO Informatics has delivered"
                                 titleTypographyProps={{ variant: 'h5', align: 'left' }}
                             ></CardHeader>
                             <CardContent>
@@ -119,7 +119,7 @@ export default function DashboardPage(props) {
                                     samples delivered
                                 </Typography>
                                 <Typography variant="h5" className={classes.cardText}>
-                                    Breakdown by Assay
+                                    Assay
                                 </Typography>
                                 {samplesCompletedAssayChartData && (
                                     <Doughnut
@@ -135,7 +135,7 @@ export default function DashboardPage(props) {
                                     ></Doughnut>
                                 )}
                                 <Typography variant="h5" className={classes.cardText}>
-                                    Breakdown by Tumor or Normal
+                                    Tumor or Normal
                                 </Typography>
                                 {samplesCompletedTorNChartData && (
                                     <Doughnut
@@ -169,7 +169,7 @@ export default function DashboardPage(props) {
                                             </Avatar>
                                         }
                                         title="Samples in Progress"
-                                        subheader="Breakdown of the samples in process at CMO Informatics"
+                                        subheader="Samples in process at CMO Informatics"
                                         titleTypographyProps={{ variant: 'h5', align: 'left' }}
                                     ></CardHeader>
                                     <CardContent>
@@ -188,7 +188,7 @@ export default function DashboardPage(props) {
                                             samples in process
                                         </Typography>
                                         <Typography variant="h5" className={classes.cardText}>
-                                            Breakdown by Assay
+                                            Assay
                                         </Typography>
                                         {samplesInProcessChartData && (
                                             <Doughnut
