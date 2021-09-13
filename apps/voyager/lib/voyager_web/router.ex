@@ -48,7 +48,7 @@ defmodule VoyagerWeb.Router do
     post "/runs/submit", RunController, :submit
     get "/runs/runJobList", RunController, :checkRunJobs
     get "/logout", SessionController, :delete
-
+    live "/dashboard", DashboardLive, :index
   end
 
   # Other scopes may use custom stacks.
