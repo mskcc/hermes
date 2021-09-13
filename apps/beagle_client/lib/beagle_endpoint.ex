@@ -71,4 +71,9 @@ defmodule BeagleEndpoint do
   Route to search for requests
   """
   def const_request_search, do: "/v0/fs/request/"
+
+  @doc """
+  Route to search for project status
+  """
+  def const_project_status_search, do: "/v0/notifier/status-page/"
 end

@@ -28,6 +28,7 @@ import RunFormPage from '@/RunFormPage';
 
 import ProjectStatusPage from '@/ProjectStatusPage';
 import DashboardPage from '@/DashboardPage';
+import FAQPage from '@/FaqPage';
 
 // Define a `hooks` variable to keep all our defined LiveView hooks:
 let hooks = { ReactPhoenix };
@@ -56,9 +57,7 @@ window.Components = {
     RegisterPage,
     RunPage,
     RunFormPage,
-<<<<<<< Updated upstream
-=======
     ProjectStatusPage,
->>>>>>> Stashed changes
     DashboardPage,
+    FAQPage,
 };

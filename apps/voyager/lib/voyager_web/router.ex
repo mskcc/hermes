@@ -25,6 +25,7 @@ defmodule VoyagerWeb.Router do
 
     get "/register", VoyagerWeb.RegisterController, :new
     post "/register", VoyagerWeb.RegisterController, :register
+    get "/faq", VoyagerWeb.FaqController, :new
     get "/register-success", VoyagerWeb.RegisterController, :success
   end
 
@@ -37,11 +38,11 @@ defmodule VoyagerWeb.Router do
 
   scope "/", VoyagerWeb do
     pipe_through [:browser, :require_authenticated_user]
-    get "/", MetadataController, :new
+    get "/metadata", MetadataController, :new
     get "/metadata/values", MetadataController, :list
     get "/metadata/search", MetadataController, :search
     post "/metadataSubmit", MetadataController, :patch
-    live "/metadata", MetadataLive, :index
+    live "/metadataView", MetadataLive, :index
     live "/runs", RunLive, :index
     get "/runs/submit", RunController, :new
     get "/runs/success", RunController, :success
@@ -50,7 +51,7 @@ defmodule VoyagerWeb.Router do
     get "/runs/runJobList", RunController, :checkRunJobs
     get "/logout", SessionController, :delete
     live "/projectStatus", ProjectStatusLive, :index
-    live "/dashboard", DashboardLive, :index
+    live "/", DashboardLive, :index
   end
 
   # Other scopes may use custom stacks.
