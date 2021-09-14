@@ -25,7 +25,7 @@ export function convertDictToPieData({ dataDict = null, colorDict = null } = {})
         let combinedList = [];
 
         for (const [key, value] of Object.entries(dataDict)) {
-            if (colorDict) {
+            if (colorDict && key in colorDict) {
                 combinedList.push({ data: value, label: key, color: colorDict[key] });
             } else {
                 combinedList.push({ data: value, label: key, color: null });

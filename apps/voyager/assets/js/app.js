@@ -25,6 +25,7 @@ import Drawer from '@/_components/Drawer';
 import RegisterPage from '@/RegisterPage';
 import RunPage from '@/RunPage';
 import RunFormPage from '@/RunFormPage';
+import DashboardPage from '@/DashboardPage';
 
 // Define a `hooks` variable to keep all our defined LiveView hooks:
 let hooks = { ReactPhoenix };
@@ -53,4 +54,5 @@ window.Components = {
     RegisterPage,
     RunPage,
     RunFormPage,
+    DashboardPage,
 };
