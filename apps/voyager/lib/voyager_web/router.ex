@@ -39,6 +39,7 @@ defmodule VoyagerWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
     get "/", MetadataController, :new
     get "/metadata/values", MetadataController, :list
+    get "/metadata/search", MetadataController, :search
     post "/metadataSubmit", MetadataController, :patch
     live "/metadata", MetadataLive, :index
     live "/runs", RunLive, :index
@@ -48,6 +49,7 @@ defmodule VoyagerWeb.Router do
     post "/runs/submit", RunController, :submit
     get "/runs/runJobList", RunController, :checkRunJobs
     get "/logout", SessionController, :delete
+    live "/projectStatus", ProjectStatusLive, :index
     live "/dashboard", DashboardLive, :index
   end
 

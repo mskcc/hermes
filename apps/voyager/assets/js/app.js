@@ -25,6 +25,8 @@ import Drawer from '@/_components/Drawer';
 import RegisterPage from '@/RegisterPage';
 import RunPage from '@/RunPage';
 import RunFormPage from '@/RunFormPage';
+
+import ProjectStatusPage from '@/ProjectStatusPage';
 import DashboardPage from '@/DashboardPage';
 
 // Define a `hooks` variable to keep all our defined LiveView hooks:
@@ -54,5 +56,9 @@ window.Components = {
     RegisterPage,
     RunPage,
     RunFormPage,
+<<<<<<< Updated upstream
+=======
+    ProjectStatusPage,
+>>>>>>> Stashed changes
     DashboardPage,
 };

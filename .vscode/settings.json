@@ -1,0 +1,6 @@
+{
+  "cSpell.words": ["exome", "noreply", "onco"],
+  "[elixir]": {
+    "editor.defaultFormatter": "JakeBecker.elixir-ls"
+  }
+}
