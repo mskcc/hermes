@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 import MaterialTable from 'material-table';
 import Paper from '@material-ui/core/Paper';
@@ -53,32 +47,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function useDebounce(value, delay) {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-
-    useEffect(() => {
-        const debouncedHandler = setTimeout(() => {
-            setDebouncedValue(value);
-        }, delay);
-
-        return () => {
-            clearTimeout(debouncedHandler);
-        };
-    }, [value, delay]);
-    return debouncedValue;
-}
-
 export default function ProjectStatusPage(props) {
     const classes = useStyles();
-    const { projectDataList, handleEvent, pushEvent } = props;
+    const { projectDataList, projectSearch, handleEvent, pushEvent } = props;
     console.log(projectDataList);
     const [projectData, updateProjectData] = useState(projectDataList);
     const [projectTableData, updateProjectTableData] = useState([]);
     const [projectTableColumn, updateProjectTableColumn] = useState([]);
     const [isLoading, updateIsLoading] = useState(false);
-    const [searchQuery, updateSearchQuery] = useState('');
-    const debouncedSearchQuery = useDebounce(searchQuery, 500);
-    console.log(debouncedSearchQuery);
+    const [searchQuery, updateSearchQuery] = useState();
+
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
     const setUp = () => {
@@ -86,7 +64,7 @@ export default function ProjectStatusPage(props) {
             projectData,
             {},
             'status',
-            [],
+            ['id', 'jira_id'],
             {}
         );
         updateProjectTableData(tableData);
@@ -103,13 +81,16 @@ export default function ProjectStatusPage(props) {
 
     useEffect(() => {
         if (handleEvent && pushEvent) {
+            console.log(projectSearch);
             if (projectData && projectData.length !== 0) {
                 setUp();
             } else if (projectData.length == 0 && projectDataList.length != 0) {
                 updateProjectData(projectDataList);
-            } else {
-                //pushEvent('fetch', params);
+            } else if (projectSearch == null && sessionStorage.getItem('projectSearch') == null) {
+                pushEvent('fetch', { search: '' });
             }
+        } else {
+            sessionStorage.removeItem('projectSearch');
         }
     }, [projectData]);
 
@@ -124,12 +105,14 @@ export default function ProjectStatusPage(props) {
                                 margin="normal"
                                 variant="standard"
                                 fullWidth
+                                defaultValue={sessionStorage.getItem('projectSearch')}
                                 label="Search"
                                 name="search"
                                 id="search"
                                 autoFocus
                                 onChange={(event) => {
-                                    updateSearchQuery(event.target.value);
+                                    sessionStorage.setItem('projectSearch', event.target.value);
+                                    pushEvent('fetch', { search: event.target.value });
                                 }}
                             />
                         </Paper>

@@ -3,7 +3,7 @@ defmodule Voyager.UserAuth do
   import Phoenix.Controller
 
   alias Domain.Accounts
-  alias VoyagerWeb.Router.Helpers , as: Routes
+  alias VoyagerWeb.Router.Helpers, as: Routes
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -34,7 +34,6 @@ defmodule Voyager.UserAuth do
     |> maybe_write_remember_me_cookie(token, params)
     |> redirect(to: user_return_to || signed_in_path(conn))
   end
-
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
     put_resp_cookie(conn, @remember_me_cookie, token, @remember_me_options)
@@ -75,10 +74,10 @@ defmodule Voyager.UserAuth do
 
     if user_token do
       {_, user} = Accounts.get_user_by_access_token(user_token)
+
       if user do
         Accounts.delete_user_tokens(user)
       end
-
     end
 
     if live_socket_id = get_session(conn, :live_socket_id) do
@@ -98,10 +97,11 @@ defmodule Voyager.UserAuth do
   """
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
+
     if user_token do
       {access_token_status, user} = Accounts.get_user_by_access_token(user_token)
-      cond do
 
+      cond do
         is_nil(user) || !user || access_token_status == :error ->
           assign(conn, :current_user, nil)
 
@@ -112,7 +112,10 @@ defmodule Voyager.UserAuth do
           conn
           |> renew_session()
           |> put_session(:user_token, user.access_token)
-          |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(user.access_token)}")
+          |> put_session(
+            :live_socket_id,
+            "users_sessions:#{Base.url_encode64(user.access_token)}"
+          )
 
         true ->
           assign(conn, :current_user, user)
@@ -170,7 +173,11 @@ defmodule Voyager.UserAuth do
   defp maybe_store_return_to(%{method: "GET"} = conn) do
     %{request_path: request_path, query_string: query_string} = conn
     return_to = if query_string == "", do: request_path, else: request_path <> "?" <> query_string
-    user_return_to = if return_to ==  Routes.session_path(conn, :delete), do: signed_in_path(conn), else: return_to
+
+    user_return_to =
+      if return_to == Routes.session_path(conn, :delete),
+        do: signed_in_path(conn),
+        else: return_to
 
     put_session(conn, :user_return_to, user_return_to)
   end
@@ -179,5 +186,5 @@ defmodule Voyager.UserAuth do
 
   defp sign_in_page(conn), do: Routes.session_path(conn, :new)
 
-  defp signed_in_path(conn), do: Routes.metadata_path(conn, :new)
+  defp signed_in_path(conn), do: Routes.dashboard_path(conn, :index)
 end

@@ -1,6 +1,7 @@
 defmodule VoyagerWeb.ProjectStatusLive do
   use VoyagerWeb, :live_view
   alias Domain.Accounts
+  import ProjectStatusSearch
 
   @doc """
   @mockup_samples [
@@ -116,6 +117,31 @@ defmodule VoyagerWeb.ProjectStatusLive do
 
     {:ok,
      socket
-     |> assign(user: user.email, user_token: user_token, project_data: @mockup_projects)}
+     |> assign(
+       user: user.email,
+       user_token: user_token,
+       project_data: [],
+       project_search: ""
+     )}
+  end
+
+  @impl true
+  def handle_event("fetch", %{"search" => searchQuery}, socket) do
+    user_token = socket.assigns.user_token
+
+    {:noreply,
+     %ProjectStatusSearch{search: searchQuery, page_size: 1000}
+     |> BeagleClient.list_all_project_statuses(user_token)
+     |> case do
+       {:ok, :ok, result_list} ->
+         IO.inspect(result_list)
+
+         socket
+         |> assign(project_data: result_list, project_search: searchQuery)
+
+       {_, _, _} ->
+         socket
+         |> put_flash(:error, UserMessages.const_server_down())
+     end}
   end
 end
