@@ -5,8 +5,8 @@ defmodule VoyagerWeb.DashboardLive do
   @samples_completed 40
   @samples_completed_assay_breakdown %{
     impact: 20,
-    exome: 10,
-    access: 10
+    hemepact: 10,
+    customcapture: 10
   }
   @samples_completed_t_or_n_breakdown %{
     normal: 25,
@@ -16,8 +16,8 @@ defmodule VoyagerWeb.DashboardLive do
   @samples_in_process 20
   @samples_process_assay_breakdown %{
     impact: 20,
-    exome: 10,
-    access: 10
+    hemepact: 10,
+    customcapture: 10
   }
 
   @impl true
