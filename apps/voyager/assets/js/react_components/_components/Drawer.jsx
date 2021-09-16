@@ -133,7 +133,7 @@ export default function PermanentDrawerLeft(props) {
                         gutterBottom
                         className={classes.titleText}
                     >
-                        Voyager
+                        Hermes
                     </Typography>
                 </div>
                 <Box className={classes.userPanel} boxShadow={4}>

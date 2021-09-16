@@ -14,6 +14,13 @@ defmodule UserMessages do
       )
 
   @doc """
+  Error message when a resource unexpectedly does not load
+  """
+  def const_resource_not_loaded(type) do
+    gettext("Sorry! We were unable to load ") <> type <> gettext(" data.")
+  end
+
+  @doc """
   Error message when a resource query returns no results
   """
   def resourceNotFound(params, type) do

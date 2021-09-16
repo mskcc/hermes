@@ -7,6 +7,9 @@ defmodule BeagleClient do
   import Pipelines
   import BatchPatchFiles
   import RunsQuery
+  import SampleSearch
+  import RequestSearch
+  import ProjectStatusSearch
 
   @moduledoc """
   Module to interact with Beagle
@@ -98,6 +101,24 @@ defmodule BeagleClient do
   def list_all_pipelines(%Pipelines{} = pipeline_query_struct, token) do
     query_key_list = process_query_struct(pipeline_query_struct)
     list_all(BeagleEndpoint.const_pipeline(), query_key_list, token)
+  end
+
+  @doc """
+  List all beagle project statuses from a project status query
+
+  ## Parameters
+
+    - project_status_search_struct(ProjectStatusSearch): ProjectStatusSearch object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def list_all_project_statuses(%ProjectStatusSearch{} = project_status_search_struct, token) do
+    query_key_list = process_query_struct(project_status_search_struct)
+    list_all(BeagleEndpoint.const_project_status_search(), query_key_list, token)
   end
 
   @doc """
@@ -202,6 +223,69 @@ defmodule BeagleClient do
 
     client(token)
     |> Tesla.get(BeagleEndpoint.const_file_query(), query: query_key_list)
+    |> handle_response
+  end
+
+  @doc """
+  Search Samples
+
+  ## Parameters
+
+    - sample_search_struct(SampleSearch): SampleSearch object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def search_samples(%SampleSearch{} = sample_search_struct, token) do
+    query_key_list = process_query_struct(sample_search_struct)
+
+    client(token)
+    |> Tesla.get(BeagleEndpoint.const_sample_search(), query: query_key_list)
+    |> handle_response
+  end
+
+  @doc """
+  Search Requests
+
+  ## Parameters
+
+    - request_search_struct(RequestSearch): RequestSearch object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def search_requests(%RequestSearch{} = request_search_struct, token) do
+    query_key_list = process_query_struct(request_search_struct)
+
+    client(token)
+    |> Tesla.get(BeagleEndpoint.const_request_search(), query: query_key_list)
+    |> handle_response
+  end
+
+  @doc """
+  Project Status Search
+
+  ## Parameters
+
+    - project_status_search_struct(ProjectStatusSearch): ProjectStatusSearch object
+    - token(string): Beagle authentication token
+
+  ## Returns
+
+    - BeagleResponse
+
+  """
+  def search_project_status(%ProjectStatusSearch{} = project_status_search_struct, token) do
+    query_key_list = process_query_struct(project_status_search_struct)
+
+    client(token)
+    |> Tesla.get(BeagleEndpoint.const_project_status_search(), query: query_key_list)
     |> handle_response
   end
 
@@ -400,6 +484,8 @@ defmodule BeagleClient do
   end
 
   defp handle_response(request) do
+    IO.inspect(request)
+
     response =
       case request do
         {:ok, response} -> response

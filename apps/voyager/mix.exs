@@ -4,7 +4,7 @@ defmodule Voyager.MixProject do
   def project do
     [
       app: :voyager,
-      version: append_revision("0.2.1"),
+      version: append_revision("1.0.0"),
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -63,6 +63,7 @@ defmodule Voyager.MixProject do
       {:gettext, "~> 0.18.2"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.4"},
+      {:plug_canonical_host, "~> 2.0"},
       {:domain, in_umbrella: true},
       {:beagle_client, in_umbrella: true}
 

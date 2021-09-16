@@ -20,6 +20,7 @@ apps/
 1. Install [Docker](https://docs.docker.com/compose/install/).
 2. `docker-compose up`
 3. (Optional) If you plan to do releases, be sure to copy your pub key to `.ssh/authorized_keys` on deploy@<access01|access02>
+4. run `mix phx.gen.cert` to generate the self-signed ssl certificates
 
 ## Deployment (VM)
 ### Release (causes downtime)

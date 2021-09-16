@@ -62,7 +62,7 @@ function addRecommendations(
         });
 }
 
-export default function MetadataFormPage(props) {
+export default function RunFormPage(props) {
     const classes = useStyles();
     const { runSubmitRoute, runSuccessRoute, formKey, runQueryRoute, type_key } = props;
     const [requestRecommendation, updateRequestRecommendation] = useState([]);
@@ -176,8 +176,8 @@ export default function MetadataFormPage(props) {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
-                                        variant="outlined"
                                         margin="normal"
+                                        variant="outlined"
                                         fullWidth
                                         label="Request"
                                         name="request"
@@ -222,8 +222,8 @@ export default function MetadataFormPage(props) {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
-                                        variant="outlined"
                                         margin="normal"
+                                        variant="outlined"
                                         fullWidth
                                         label="Pipeline"
                                         name="pipeline"

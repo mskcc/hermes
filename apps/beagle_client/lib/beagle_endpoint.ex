@@ -61,4 +61,19 @@ defmodule BeagleEndpoint do
   Route to fetch runs
   """
   def const_run_query, do: "/v0/run/api/"
+
+  @doc """
+  Route to search for samples
+  """
+  def const_sample_search, do: "/v0/fs/sample/"
+
+  @doc """
+  Route to search for requests
+  """
+  def const_request_search, do: "/v0/fs/request/"
+
+  @doc """
+  Route to search for project status
+  """
+  def const_project_status_search, do: "/v0/notifier/status-page/"
 end
