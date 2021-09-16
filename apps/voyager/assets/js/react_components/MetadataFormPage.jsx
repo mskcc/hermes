@@ -44,60 +44,29 @@ const FILTER_GROUP_LIMIT = 3;
 
 export default function MetadataFormPage(props) {
     const classes = useStyles();
-    const {
-        metadataFormRoute,
-        formKey,
-        id_keys,
-        initial_id_type,
-        metadataQueryRoute,
-        type_key,
-    } = props;
+    const { metadataFormRoute, formKey, metadataQueryRoute, search_key } = props;
     const [recommendation, updateRecommendation] = useState([]);
-    const [idType, updateIdType] = useState(initial_id_type);
+    const [idType, updateIdType] = useState('');
     const [loading, updateLoading] = useState(false);
+    const [errorMessage, updateErrorMessage] = useState('');
+    const [searchQuery, updateSearchQuery] = useState('');
     const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute('content');
 
     axios.defaults.headers.post['X-CSRF-Token'] = csrfToken;
 
-    const addRecommendations = (id_types, metadataQueryRoute, type_key) => {
-        let id_field_params = [];
-        let id_title_params = [];
-        id_keys.sort((a, b) => a[0].localeCompare(b[0]));
-        for (const singleType of id_keys) {
-            id_field_params.push(singleType[0]);
-            id_title_params.push(singleType[1]);
-        }
-
+    const addRecommendations = (metadataQueryRoute, search_key, search_key_value) => {
         axios
             .get(metadataQueryRoute, {
                 params: {
-                    [type_key]: id_field_params,
+                    [search_key]: search_key_value,
                 },
             })
             .then((response) => {
-                let ids_added_dict = {};
-                let recommendationList = [];
-                for (const singleResponseObj of response.data) {
-                    for (const [index, singleRecommendation] of singleResponseObj.entries()) {
-                        if (singleRecommendation) {
-                            const recommendationName = id_field_params[index];
-                            if (!(recommendationName in ids_added_dict)) {
-                                ids_added_dict[recommendationName] = {};
-                            }
-                            if (!(singleRecommendation in ids_added_dict[recommendationName])) {
-                                let recommendationObj = {
-                                    title: singleRecommendation,
-                                    type: id_title_params[index],
-                                    field: id_field_params[index],
-                                };
-                                ids_added_dict[recommendationName][singleRecommendation] = null;
-                                recommendationList.push(recommendationObj);
-                            }
-                        }
-                    }
+                const message = response.data.message;
+                if (message) {
+                    updateErrorMessage(message);
                 }
-                recommendationList.sort((a, b) => a['type'].localeCompare(b['type']));
-                updateRecommendation(recommendationList);
+                updateRecommendation(response.data.search);
             })
             .finally(() => {
                 updateLoading(false);
@@ -105,9 +74,17 @@ export default function MetadataFormPage(props) {
     };
 
     useEffect(() => {
-        updateLoading(true);
-        addRecommendations(id_keys, metadataQueryRoute, type_key);
-    }, []);
+        updateRecommendation([]);
+        const debouncedSearchHandler = setTimeout(() => {
+            updateLoading(true);
+            addRecommendations(metadataQueryRoute, search_key, searchQuery);
+        }, 500);
+
+        return () => {
+            updateLoading(false);
+            clearTimeout(debouncedSearchHandler);
+        };
+    }, [searchQuery]);
 
     return (
         <Container component="main" maxWidth="xs">
@@ -151,8 +128,7 @@ export default function MetadataFormPage(props) {
                                     }
                                 } else {
                                     setErrors({
-                                        id:
-                                            'Unfortunately, it looks like our webserver is down. We should have it back up shortly.',
+                                        id: 'Unfortunately, it looks like our webserver is down. We should have it back up shortly.',
                                     });
                                     console.log('Unexpected error in metadata selection: ');
                                     console.error(err);
@@ -167,6 +143,7 @@ export default function MetadataFormPage(props) {
                         <form className={classes.form} onSubmit={handleSubmit}>
                             <Autocomplete
                                 disableListWrap
+                                freeSolo={true}
                                 options={recommendation}
                                 filterOptions={(options, { inputValue }) => {
                                     let foundOptions = {};
@@ -189,12 +166,13 @@ export default function MetadataFormPage(props) {
                                         }
                                     }
                                     return optionList;
-                                    //console.log(options);
-                                    //return options;
                                 }}
                                 groupBy={(option) => option['type']}
                                 getOptionLabel={(option) => option['title']}
                                 loading={loading}
+                                onInputChange={(event, newValue) => {
+                                    updateSearchQuery(newValue);
+                                }}
                                 onChange={(event, newValue) => {
                                     values.id = newValue['title'];
                                     handleChange(newValue['title']);
@@ -212,8 +190,10 @@ export default function MetadataFormPage(props) {
                                         label="Id"
                                         name="id"
                                         id="id"
-                                        error={errors.id && touched.id}
-                                        helperText={errors.id && touched.id ? errors.id : null}
+                                        error={(errors.id && touched.id) || errorMessage}
+                                        helperText={
+                                            errors.id && touched.id ? errors.id : errorMessage
+                                        }
                                         autoFocus
                                         InputProps={{
                                             ...params.InputProps,

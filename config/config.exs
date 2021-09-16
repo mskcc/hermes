@@ -47,6 +47,11 @@ config :beagle_client,
   username: "",
   password: ""
 
+config :jira_client,
+  url: "",
+  username: "",
+  password: ""
+
 if Mix.env() != :prod do
   case Code.ensure_compiled(:git_hooks) do
     {:module, :git_hooks} ->
