@@ -28,7 +28,7 @@ import RunFormPage from '@/RunFormPage';
 
 import ProjectStatusPage from '@/ProjectStatusPage';
 import DashboardPage from '@/DashboardPage';
-import FaqPage from '@/FAQPage';
+import FaqPage from '@/FaqPage';
 
 // Define a `hooks` variable to keep all our defined LiveView hooks:
 let hooks = { ReactPhoenix };
