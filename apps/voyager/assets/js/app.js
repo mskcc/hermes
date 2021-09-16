@@ -59,5 +59,5 @@ window.Components = {
     RunFormPage,
     ProjectStatusPage,
     DashboardPage,
-    FAQPage,
+    FaqPage,
 };
