@@ -8,8 +8,12 @@ defmodule VoyagerWeb.MetadataController do
   @metadata_key "metadata"
   @type_key "type"
   @search_key "search"
-  @id_keys [["sampleId", "Sample ID"], ["sampleName", "Sample Name"], ["requestId", "Request"]]
-  @initial_id_type "requestId"
+  @id_keys [
+    ["primaryId", "Primary ID"],
+    ["cmoSampleName", "CMO Sample Name"],
+    ["igoRequestId", "Igo Request"]
+  ]
+  @initial_id_type "igoRequestId"
 
   def new(conn, _params) do
     render(conn, "input.html",
@@ -83,13 +87,13 @@ defmodule VoyagerWeb.MetadataController do
         Enum.map(single_search_obj, fn {key, value} ->
           case key do
             "request_id" when value != nil ->
-              %{:title => value, :type => "Request", :field => "requestId"}
+              %{:title => value, :type => "Request", :field => "igoRequestId"}
 
             "sample_id" when value != nil ->
-              %{:title => value, :type => "Sample Id", :field => "sampleId"}
+              %{:title => value, :type => "Sample Id", :field => "primaryId"}
 
             "sample_name" when value != nil ->
-              %{:title => value, :type => "Sample Name", :field => "sampleName"}
+              %{:title => value, :type => "Sample Name", :field => "cmoSampleName"}
 
             _ ->
               nil
